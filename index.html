@@ -29,7 +29,7 @@
 <div class="side-menu" id="menu">
     <!-- Menu will be dynamically loaded here -->
 </div>
-<div class="welcome-message">
+<div class="welcome-message" id="welcome">
     <h2>Bienvenue</h2>
     <p>Découvrez les œuvres de Marie Sallantin <br>en naviguant dans les séries  <br>via le menu de gauche.</p>
     <div class="cv-photo">
@@ -110,6 +110,7 @@
 
                 // Function to display images of a specific series
                 function displaySeries(folder, seriesName) {
+                    document.getElementById('welcome').style.display = 'none'; // Masquer la section d'accueil
                     gallery.innerHTML = '';
                     currentSeries = series[folder] || [];
                     currentSeriesName = seriesName;
