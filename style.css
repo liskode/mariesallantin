@@ -158,27 +158,36 @@ lightbox p {
     margin-top: 10px;
 }
 
-.lightbox .close, .lightbox .prev, .lightbox .next {
+.lightbox .prev,
+.lightbox .next {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    background: #fff;
+    background: rgba(255, 255, 255, 0.8);
     padding: 10px;
     cursor: pointer;
     border-radius: 50%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-}
-
-.lightbox .close {
-    right: 20px;
+    z-index: 1000; /* Assure que les flèches restent au-dessus */
 }
 
 .lightbox .prev {
     left: 20px;
 }
 
-lightbox .next {
-    right: 60px;
+.lightbox .next {
+    right: 20px;
+}
+.lightbox .close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
 }
 
 footer {
