@@ -50,10 +50,20 @@
     <span class="next" id="next">&#10095;</span>
 </div>
 <footer>
-    &copy; 2025 Marie Sallantin. Tous droits réservés. Version 2.1
+    &copy; 2025 Marie Sallantin. Tous droits réservés. Version 2.2
 </footer>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        const menuLinks = document.querySelectorAll('.side-menu a');
+        menuLinks.forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault(); // Empêche le comportement par défaut du lien
+                const folder = this.getAttribute('data-folder'); // Récupère le dossier associé au lien
+                if (folder) {
+                    displaySeries(folder, this.textContent); // Appelle la fonction pour afficher la série
+                }
+            });    
+        });
         const gallery = document.getElementById('gallery');
         const menu = document.getElementById('menu');
         const lightbox = document.getElementById('lightbox');
@@ -110,29 +120,45 @@
 
                 // Function to display images of a specific series
                 function displaySeries(folder, seriesName) {
-                    gallery.innerHTML = '';
-                    currentSeries = series[folder] || [];
-                    currentSeriesName = seriesName;
-                    currentIndex = 0;
-                    if (currentSeries.length > 0) {
-                        currentSeries.forEach(({ filePath, title }, index) => {
-                            const item = document.createElement('div');
-                            item.className = 'gallery-item';
-                            item.innerHTML = `
-                                <img src="${mediaPath}/${filePath}" alt="${title}">
-                                <p>${title}</p>
-                            `;
-                            item.addEventListener('click', () => openLightbox(index));
-                            gallery.appendChild(item);
-                        });
-                    } else {
-                        const emptyMessage = document.createElement('div');
-                        emptyMessage.className = 'empty-message';
-                        emptyMessage.textContent = 'Aucune image';
-                        gallery.appendChild(emptyMessage);
-                    }
-                }
+                    console.log('Affichage de la série : ', folder);
+                    const gallery = document.getElementById('gallery');
+                    gallery.innerHTML = ''; // Vide la galerie précédente
 
+                    // Charge les images correspondant au dossier
+                    fetch('titles.txt')
+                        .then(response => response.text())
+                        .then(text => {
+                            const lines = text.split('\n').filter(line => line.trim());
+                            const images = [];
+
+                            // Parcours le fichier titles.txt pour trouver les images de la série
+                            lines.forEach(line => {
+                                if (line.startsWith(`${folder}/`)) {
+                                const [filePath, title] = line.split(';').map(part => part.trim());
+                                images.push({ filePath, title });
+                            }
+                        });
+
+                        // Affiche les images dans la galerie
+                        if (images.length > 0) {
+                            images.forEach(({ filePath, title }) => {
+                                const item = document.createElement('div');
+                                item.className = 'gallery-item';
+                                item.innerHTML = `
+                                    <img src="media/${filePath}" alt="${title}">
+                                    <p>${title}</p>
+                    `            ;
+                                gallery.appendChild(item);
+                            });
+                        } else {
+                            gallery.innerHTML = '<p>Aucune image trouvée pour cette série.</p>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors du chargement des images :', error);
+                        gallery.innerHTML = '<p>Erreur lors du chargement des images.</p>';
+                    });
+                }
                 // Lightbox functions
                 function openLightbox(index) {
                     currentIndex = index;
