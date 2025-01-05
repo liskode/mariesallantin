@@ -1,0 +1,149 @@
+# ANG;Anges musiciens
+# BAI;Grandes baigneuses
+# DAM;Dame et licorne
+# ETA;Étangs et Reflets
+# FOR;Forêt, Saisons
+# MIN;Mini formats
+# MMS;Masque Miroir et Statuette
+# TOI;La toilette, d'après Corot
+ANG/anges-musiciens00001.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00002.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00003.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00004.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00005.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00006.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00007.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00008.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00009.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00010.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00011.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00013.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00014.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00015.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00016.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00017.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00018.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00019.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00020.jpg;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00021.JPG;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00022.JPG;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00023.JPG;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00024.JPG;ange musicien 2014 acrylique/toile 61x50cm
+ANG/anges-musiciens00026.jpeg;ange musicien 2014 acrylique/toile 61x50cm
+BAI/gb00.jpeg;
+BAI/gb01.jpg;
+BAI/gb02.jpg;
+BAI/gb03.jpg;
+BAI/gb04.jpg;
+BAI/gb05.jpg;
+BAI/gb06.jpg;
+BAI/gb07.jpg;
+BAI/gb08.jpg;
+BAI/gb09.jpg;
+BAI/gb10.jpg;
+BAI/gb11.jpg;
+BAI/gb12.jpg;
+/DameEtLicorne00001.JPG;
+DAM/DameEtLicorne00002.JPG;Dame et licorne, la vue 2015 tempera/toile 24X16cm
+DAM/DameEtLicorne00003.JPG;Dame et licorne, à mon seul désir, 2015 tmpera /toile 22x35cm
+DAM/DameEtLicorne00004.JPG;dame et licorne, le goût, 2015, tempera/toile 22x14cm
+DAM/DameEtLicorne00005.JPG;dame et licorne, l'odorat, 2015 tempera/toile 22x14cm
+DAM/DameEtLicorne00006.JPG;Dame et licorne,l'ouïe, 2015 tempera/toile 22x14cm 
+DAM/DameEtLicorne00007.jpeg;Dame et licorne, (Matisse), 2022 tempera/toile 97x130cm
+DAM/DameEtLicorne00008.jpeg;Dame et licorne, 2022 tempera/toile 40x40cm
+DAM/DameEtLicorne00009.jpeg;Dame et licorne, 2022 tempera/toile 40x40cm
+DAM/DameEtLicorne00010.jpeg;Dame et licorne 2022 tempera/toile 97x146cm
+DAM/DameEtLicorne00011.jpeg;Dame et licorne 2022 tempera/toile 97x130cm
+DAM/DameEtLicorne00012.jpeg;le jardin de la licorne 2022 tempera/toile 20x20cm
+DAM/DameEtLicorne00013.jpeg;le jardin de la licorne 2022 tempera/toile 20x20cm
+DAM/DameEtLicorne00014.jpeg;le jardin de la licorne 2022 tempera/toile 20x20cm
+DAM/DameEtLicorne00015.jpeg;le jardin de la licorne 2022 tempera/toile 20x20cm
+DAM/DameEtLicorne00016.jpeg;le jardin de la licorne 2022 tempera/toile 20x20cm
+DAM/DameEtLicorne00017.jpeg;le jardin de la licorne 2022 tempera/toile 20x20cm
+DAM/DameEtLicorne00018.jpeg;le jardin de la licorne 2022 tempera/toile 20x20cm
+DAM/DameEtLicorne00019.jpeg;le jardin de la licorne 2022 tempera/toile 22x35cm
+DAM/DameEtLicorne00020.jpeg;le jardin de la licorne 2022 tempera/toile 22x35cm
+DAM/DameEtLicorne00021.jpeg;le jardin de la licorne 2022 tempera/toile 22x35cm
+DAM/DameEtLicorne00022.jpeg;le jardin de la licorne 2022 tempera/toile 22x35cm
+DAM/DameEtLicorne00023.jpeg;le jardin de la licorne 2022 tempera/toile 97x130cm
+ETA/Etang01.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang02.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang03.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang04.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang05.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang06.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang07.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang08.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang09.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang10.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang11.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang12.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+ETA/Etang13.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
+FOR/Foret01.jpg;
+FOR/Foret02.jpg;
+FOR/Foret03.jpg;
+FOR/Foret04.jpg;
+FOR/Foret05.jpg;
+FOR/Foret06.jpg;
+FOR/Foret07.jpg;
+FOR/Foret08.jpg;
+FOR/Foret09.jpg;
+FOR/Foret10.jpg;
+FOR/Foret11.jpg;
+FOR/Foret12.jpg;
+FOR/Foret14.jpg;
+MIN/mini01.jpg;
+MIN/mini02.jpg;
+MIN/mini03.jpg;
+MIN/mini04.jpg;
+MIN/mini05.jpg;
+MIN/mini06.jpg;
+MIN/mini07.jpg;
+MIN/mini08.jpg;
+MIN/mini09.jpg;
+MIN/mini10.jpg;
+MIN/mini11.jpg;
+MIN/mini12.jpg;
+MIN/mini13.jpg;
+MIN/mini14.jpg;
+MIN/mini15.jpg;
+MIN/mini16.jpg;
+MIN/mini17.jpg;
+MIN/mini18.jpg;
+MIN/mini19.jpg;
+MIN/mini20.jpg;
+MIN/mini21.jpg;
+MMS/MasqueMiroirStatuette00001.JPG;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00002.JPG;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00003.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00004.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00005.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00006.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00007.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00008.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00009.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00010.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00011.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00012.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00013.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00014.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00015.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00016.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00017.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00018.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00019.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00020.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00021.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+MMS/MasqueMiroirStatuette00022.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
+TOI/Toilette00001.jpg;Corot, la toilette
+TOI/Toilette00002.jpeg;la toilette 2014 acrylique sur toile N°1 120x120cm
+TOI/Toilette00003.jpeg;la toilette 2014 acrylique sur toile N°2 120x120cm
+TOI/Toilette00004.jpeg;la toilette 2014 acrylique sur toile N°3 120x120cm
+TOI/Toilette00005.jpeg;la toilette  2014 acrylique /toile n°4 120x120cm
+TOI/Toilette00006.jpeg;la toilette 2014 acrylique/toile n°5 120x120cm
+TOI/Toilette00007.jpeg; la toilette 2014 acrylique /toile n°6 120x120cm
+TOI/Toilette00008.jpeg;la toilette 2014 acrylique/toile n°7 120x120cm
+TOI/Toilette00009.jpeg;la toilette 2014 acrylique/toile n°8 120x120cm
+TOI/Toilette00010.jpeg;la toilette 2014 acrylique/toile n°9 120x120cm
+TOI/Toilette00011.jpeg;la toilette 2014acrylique/toile  n°10 120x120cm
+TOI/Toilette00012.jpg;la toilette 2014 acrylique/toile  n°11 120x120cm

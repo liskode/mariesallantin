@@ -1,0 +1,193 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Marie Sallantin, artiste peintre française spécialisée dans les séries thématiques : Étangs, Forêts, Baigneuses et Grandes œuvres.">
+    <meta name="keywords" content="Marie Sallantin, Artiste Peintre, La Compagnie de Venus, Peinture, Art Contemporain, Séries Thématiques">
+    <meta name="author" content="Marie Sallantin">
+    <title>Marie Sallantin - Artiste Peintre</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+    <div class="header-right">
+        <h1>MARIE SALLANTIN</h1>
+    </div>
+    <div class="header-left">
+        <h2>LA COMPAGNIE DE VÉNUS</h2>
+        <p>PEINTURES 2015-2018</p>
+    </div>
+</header>
+<nav>
+    <a href="https://www.yourart.art/fr/profile/647c7aa16fb27d7bead78b17" target="_blank">YOURART</a>
+    <a href="cv.html">CV</a>
+    <a href="liens.html">LIENS</a>
+</nav>
+<div class="spacer"></div>
+<div class="side-menu" id="menu">
+    <!-- Menu will be dynamically loaded here -->
+</div>
+<div class="welcome-message">
+    <h2>Bienvenue</h2>
+    <p>Découvrez les œuvres de Marie Sallantin <br>en naviguant dans les séries  <br>via le menu de gauche.</p>
+    <div class="cv-photo">
+        <img src="media/cv.jpg" alt="Photo de Marie Sallantin" />
+    </div>
+</div>
+<div class="main-content">
+    <section class="gallery" id="gallery">
+        <!-- Images will be dynamically loaded here -->
+    </section>
+</div>
+<div class="lightbox" id="lightbox">
+    <span class="close" id="close">&times;</span>
+    <span class="prev" id="prev">&#10094;</span>
+    <h3 id="lightbox-title"></h3>
+    <img id="lightbox-img" src="" alt="">
+    <p id="lightbox-desc"></p>
+    <span class="next" id="next">&#10095;</span>
+</div>
+<footer>
+    &copy; 2025 Marie Sallantin. Tous droits réservés. Version 2.1
+</footer>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const gallery = document.getElementById('gallery');
+        const menu = document.getElementById('menu');
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = document.getElementById('lightbox-img');
+        const lightboxTitle = document.getElementById('lightbox-title');
+        const lightboxDesc = document.getElementById('lightbox-desc');
+        const closeBtn = document.getElementById('close');
+        const prevBtn = document.getElementById('prev');
+        const nextBtn = document.getElementById('next');
+        const mediaPath = './media';
+        let currentSeries = [];
+        let currentIndex = 0;
+        let currentSeriesName = '';
+        let seriesOrder = [];
+        let series = {};
+        let seriesNames = {};
+
+        fetch(`${mediaPath}/titles.txt`)
+            .then(response => response.text())
+            .then(text => {
+                const lines = text.split('\n').filter(line => line.trim());
+
+                // Parse titles.txt and organize by series
+                lines.forEach(line => {
+                    if (line.startsWith('#')) {
+                        const [folder, seriesName] = line.substring(1).split(';').map(part => part.trim());
+                        seriesNames[folder] = seriesName;
+                        series[folder] = [];
+                        seriesOrder.push(folder);
+                    } else {
+                        const [filePath, title] = line.split(';').map(part => part.trim());
+                        const folder = filePath.split('/')[0];
+                        if (seriesNames[folder]) {
+                            series[folder].push({ filePath, title });
+                        }
+                    }
+                });
+
+                // Generate menu links
+                if (seriesOrder.length > 0) {
+                    seriesOrder.forEach(folder => {
+                        const link = document.createElement('a');
+                        link.href = '#';
+                        link.textContent = seriesNames[folder];
+                        link.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            displaySeries(folder, seriesNames[folder]);
+                        });
+                        menu.appendChild(link);
+                    });
+                } else {
+                    menu.innerHTML = '<p style="color:red; padding: 20px;">Erreur : Aucun menu disponible. Vérifiez le contenu de titles.txt.</p>';
+                }
+
+                // Function to display images of a specific series
+                function displaySeries(folder, seriesName) {
+                    gallery.innerHTML = '';
+                    currentSeries = series[folder] || [];
+                    currentSeriesName = seriesName;
+                    currentIndex = 0;
+                    if (currentSeries.length > 0) {
+                        currentSeries.forEach(({ filePath, title }, index) => {
+                            const item = document.createElement('div');
+                            item.className = 'gallery-item';
+                            item.innerHTML = `
+                                <img src="${mediaPath}/${filePath}" alt="${title}">
+                                <p>${title}</p>
+                            `;
+                            item.addEventListener('click', () => openLightbox(index));
+                            gallery.appendChild(item);
+                        });
+                    } else {
+                        const emptyMessage = document.createElement('div');
+                        emptyMessage.className = 'empty-message';
+                        emptyMessage.textContent = 'Aucune image';
+                        gallery.appendChild(emptyMessage);
+                    }
+                }
+
+                // Lightbox functions
+                function openLightbox(index) {
+                    currentIndex = index;
+                    const { filePath, title } = currentSeries[index];
+                    lightboxImg.src = `${mediaPath}/${filePath}`;
+                    lightboxTitle.textContent = currentSeriesName;
+                    lightboxDesc.textContent = title;
+                    lightbox.style.display = 'flex';
+                }
+
+                closeBtn.addEventListener('click', () => {
+                    lightbox.style.display = 'none';
+                });
+
+                prevBtn.addEventListener('click', showPrevImage);
+                nextBtn.addEventListener('click', showNextImage);
+
+                document.addEventListener('keydown', (e) => {
+                    if (lightbox.style.display === 'flex') {
+                        if (e.key === 'ArrowLeft') showPrevImage();
+                        if (e.key === 'ArrowRight') showNextImage();
+                        if (e.key === 'ArrowUp') showPrevSeries();
+                        if (e.key === 'ArrowDown') showNextSeries();
+                        if (e.key === 'Escape') lightbox.style.display = 'none';
+                    }
+                });
+
+                function showPrevImage() {
+                    currentIndex = (currentIndex > 0) ? currentIndex - 1 : currentSeries.length - 1;
+                    const { filePath, title } = currentSeries[currentIndex];
+                    lightboxImg.src = `${mediaPath}/${filePath}`;
+                    lightboxDesc.textContent = title;
+                }
+
+                function showNextImage() {
+                    currentIndex = (currentIndex < currentSeries.length - 1) ? currentIndex + 1 : 0;
+                    const { filePath, title } = currentSeries[currentIndex];
+                    lightboxImg.src = `${mediaPath}/${filePath}`;
+                    lightboxDesc.textContent = title;
+                }
+
+                function showPrevSeries() {
+                    let currentFolderIndex = seriesOrder.indexOf(currentSeriesName);
+                    currentFolderIndex = (currentFolderIndex > 0) ? currentFolderIndex - 1 : seriesOrder.length - 1;
+                    displaySeries(seriesOrder[currentFolderIndex], seriesNames[seriesOrder[currentFolderIndex]]);
+                }
+
+                function showNextSeries() {
+                    let currentFolderIndex = seriesOrder.indexOf(currentSeriesName);
+                    currentFolderIndex = (currentFolderIndex < seriesOrder.length - 1) ? currentFolderIndex + 1 : 0;
+                    displaySeries(seriesOrder[currentFolderIndex], seriesNames[seriesOrder[currentFolderIndex]]);
+                }
+            })
+            .catch(err => console.error('Failed to load titles file:', err));
+    });
+</script>
+</body>
+</html>
