@@ -17,24 +17,27 @@
     </div>
     <div class="header-left">
         <h2>LA COMPAGNIE DE VÉNUS</h2>
-        <p>PEINTURES 2015-2018</p>
+        <p>PEINTURES ET DESSINS</p>
     </div>
 </header>
 <nav>
-    <a href="https://www.yourart.art/fr/profile/647c7aa16fb27d7bead78b17" target="_blank">YOURART</a>
+    <a href="index.html">&larr; Peintures</a>
     <a href="cv.html">CV</a>
     <a href="liens.html">LIENS</a>
+    <a href="https://www.yourart.art/fr/profile/647c7aa16fb27d7bead78b17" target="_blank"  ><img src="images/logo-yourart.png"></a>
 </nav>
+
 <div class="spacer"></div>
 <div class="side-menu" id="menu">
     <!-- Menu will be dynamically loaded here -->
 </div>
 <div class="welcome-message" id="welcome">
-    <h2>Bienvenue</h2>
-    <p>Découvrez les œuvres de Marie Sallantin <br>en naviguant dans les séries  <br>via le menu de gauche.</p>
-    <div class="cv-photo">
-        <img src="media/cv.jpg" alt="Photo de Marie Sallantin" />
-    </div>
+<img src="media/cv.jpg" alt="Photo de Marie Sallantin" />
+<p>Bienvenue sur le site de Marie Sallantin, artiste peintre française née en 1946 à Paris. ￼
+<br>Formée à l’École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle a développé une œuvre riche et variée, explorant des thèmes classiques tels que la naissance d’Aphrodite, les Trois Grâces, Danaé, La Divine Comédie, les anges musiciens, les baigneuses, la nature et les saisons. ￼
+<br>Son engagement pour la peinture se manifeste également à travers ses écrits, notamment « L’Art en questions, 30 réponses » (1999), « Les années noires de la peinture » (2013) et « Vénus, carnets d’atelier 1993-2002 » (2017), où elle défend avec passion cet art. ￼
+<br>Nous vous invitons à explorer les différentes périodes de son œuvre en parcourant les séries présentées dans le menu de gauche. Bonne visite !
+    </p>
 </div>
 <div class="main-content">
     <section class="gallery" id="gallery">
@@ -50,7 +53,7 @@
 //    <span class="next" id="next">&#10095;</span>
 //</div>
 <footer>
-    &copy; 2025 Marie Sallantin. Tous droits réservés. Version 2.2
+    &copy; 2025 Marie Sallantin. Tous droits réservés. Version 3.0
 </footer>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -129,7 +132,7 @@
                     } else {
                         const emptyMessage = document.createElement('div');
                         emptyMessage.className = 'empty-message';
-                        emptyMessage.textContent = 'Aucune image';
+                        emptyMessage.textContent = 'En construction, repassez prochainement !';
                         gallery.appendChild(emptyMessage);
                     }
                 }

@@ -1,77 +1,92 @@
-<!-- liens.html -->
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Liens externes relatifs aux oeuvres de Marie Sallantin, artiste peintre.">
-    <meta name="keywords" content="Marie Sallantin, Liens, Peinture, Art, Critiques">
-    <meta name="author" content="Marie Sallantin">
     <title>Liens - Marie Sallantin</title>
+    <link rel="stylesheet" href="style.css">
     <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-            color: #333;
-            line-height: 1.6;
+.main-content ul {
+    list-style-type: none;
+    padding-left: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centre les éléments horizontalement */
+    gap: 20px; /* Ajoute un espacement entre les items */
+}
+.main-content li {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    max-width: 600px; /* Limite la largeur pour un bon rendu */
+}        .main-content li img {
+            width: 80px;
+            height: 80px;
+            border-radius: 10px;
+            margin-right: 15px;
+            object-fit: cover;
         }
-        header, footer {
-            background-color: #555;
-            color: #fff;
-            text-align: center;
-            padding: 10px 0;
-        }
-        .container {
-            width: 80%;
-            margin: auto;
-            overflow: hidden;
-            padding: 20px;
-        }
-  .header-left h1 {
-    margin: 0;
-    font-size: 2.8em;
-    font-family: 'Monolith', serif;
-    font-weight: 700;
-    color: #555; /* Gris utilisé pour le header */
-    letter-spacing: 2px;
-}        a {
-            color: #0066cc;
+        .main-content li a {
+            font-family: 'Monolith', sans-serif;
             text-decoration: none;
+            color: var(--primary-color);
+            font-size: 1em;
         }
-        a:hover {
+        .main-content li a:hover {
             text-decoration: underline;
-        }
-        .back-button {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 10px 15px;
-            background-color: #555;
-            color: #fff;
-            text-decoration: none;
-            border-radius: 5px;
-        }
-        .back-button:hover {
-            background-color: #333;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Liens</h1>
-    </header>
-    <div class="container">
-        <p>Voici quelques articles et références externes sur les oeuvres de Marie Sallantin :</p>
-        <ul>
-            <li><a href="http://sur-la-peinture.com/marie-sallantin-met-la-pression/#more-6342" target="_blank">Article : "Marie Sallantin met la pression"</a></li>
-        </ul>
-        <div style="text-align: center;">
-            <a href="index.html" class="back-button">Retour</a>
-        </div>
+<header>
+    <div class="header-right">
+        <h1>MARIE SALLANTIN</h1>
     </div>
-    <footer>
-        &copy; 2025 Marie Sallantin. Tous droits réservés.
-    </footer>
+    <div class="header-left">
+        <h2>LA COMPAGNIE DE VÉNUS</h2>
+        <p>PEINTURES ET DESSINS</p>
+    </div>
+</header>
+<nav>
+    <a href="index.html">PEINTURES</a>
+    <a href="https://www.yourart.art/fr/profile/647c7aa16fb27d7bead78b17" target="_blank">YOURART</a>
+    <a href="cv.html">CV</a>
+    <a href="liens.html" class="active">LIENS</a>
+</nav>
+
+<div class="main-content">
+    <div class="welcome-message">
+        <ul>
+            <li>
+                <img alt="Thumbnail" src="https://tse4.mm.bing.net/th?id=OIP.e4uDVb7V5EA0OdX167N-XQHaHY&amp;pid=Api">
+                <a href="http://sur-la-peinture.com/marie-sallantin-met-la-pression/#more-6342" target="_blank">
+                    Article : "Marie Sallantin met la pression"
+                </a>
+            </li>
+            <li>
+                <img alt="Thumbnail" src="https://tse2.mm.bing.net/th?id=OIP.HFSCnbQ0Yso-ZrvJ4j8nAQAAAA&pid=Api">
+                <a href="https://lacapitalegalerie.fr/marie-sallantin-2" target="_blank">Exposition à La Capitale Galerie</a>
+            </li>
+            <li>
+                <img alt="Thumbnail" src="https://tse1.mm.bing.net/th?id=OIP.pzlRyCNhPqqMGW82vHTdggHaFj&pid=Api">
+                <a href="https://galeriepeinturefraiche.art/sallantin-marie" target="_blank">Galerie Peinture Fraîche</a>
+            </li>
+            <li>
+                <img alt="Thumbnail" src="https://tse2.mm.bing.net/th?id=OIP.VGyiLEd1AbQBej9QTsjVzgHaFd&pid=Api">
+                <a href="https://www.ktotv.com/video/00071872/david-foenkinos-et-marie-sallantin" target="_blank">Interview sur KTOTV</a>
+            </li>
+            <li>
+                <img alt="Thumbnail" src="images/logo-fap.jpg">
+                <a href="fap.html" target="_blank">Face à l'Art - Salon virtuel de peintres</a>
+            </li>
+        </ul>
+     </div>
+</div>
+
+<footer>
+    &copy; 2025 Marie Sallantin. Tous droits réservés. Version 3.0 
+</footer>
+
 </body>
 </html>

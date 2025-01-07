@@ -1,106 +1,110 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Monolith&display=swap');
+:root {
+    --primary-color: #333;
+    --secondary-color: #555;
+    --light-color: #777;
+    --border-color: #ccc;
+    --background-color: #f0f0f0;
+}
 
-body {
+/* Global Styles */
+body, header, nav, .side-menu, footer, .welcome-message {
     font-family: 'Monolith', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0; /* Gris clair pour le fond de la page */
-    color: #333; /* Gris sombre pour le texte */
+    background-color: var(--background-color);
+    color: var(--primary-color);
 }
 
+/* Header */
 header {
-    text-align: center; /* Centre le contenu du header */
+    text-align: center;
     padding: 20px 40px;
-    background-color: #f0f0f0; /* Fond gris clair */
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--border-color);
+}
+
+header h1, header h2, header p {
+    margin: 0;
+    font-weight: 400;
 }
 
 header h1 {
-    margin: 0;
     font-size: 2.8em;
     letter-spacing: 3px;
-    font-weight: 400;
-    color: #333; /* Texte en gris sombre */
 }
 
 header h2 {
-    margin: 10px 0 0;
+    margin-top: 10px;
     font-size: 1.5em;
     letter-spacing: 2px;
-    font-weight: 400;
-    color: #555; /* Texte légèrement plus clair */
+    color: var(--secondary-color);
 }
 
 header p {
-    margin: 5px 0 0;
+    margin-top: 5px;
     font-size: 1em;
     letter-spacing: 4px;
-    font-weight: 400;
-    color: #777;
+    color: var(--light-color);
 }
 
+/* Navigation */
 nav {
-    background-color: #f0f0f0; /* Fond gris clair */
     overflow: hidden;
     display: flex;
     justify-content: center;
     padding: 10px 0;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid var(--border-color);
 }
 
-nav a {
-    color: #333; /* Texte en gris sombre */
+nav a, .side-menu a {
+    display: block;
+    color: var(--primary-color);
     padding: 14px 20px;
     text-decoration: none;
     font-size: 1em;
     text-transform: uppercase;
 }
 
-nav a:hover {
+nav a:hover, .side-menu a:hover,
+nav a:focus, .side-menu a:focus {
     background-color: #ddd;
+    outline: 2px dashed var(--primary-color);
 }
 
+/* Side Menu */
 .side-menu {
     width: 250px;
-    position: absolute; /* Utilisation de absolute pour placer le menu sous le nav */
-    top: 60px; /* Décalage pour commencer sous le menu horizontal */
+    position: absolute;
+    top: 60px;
     left: 0;
-    height: calc(100% - 60px); /* Ajustement de la hauteur pour prendre en compte le menu horizontal */
-    background-color: #f0f0f0; /* Fond gris clair */
+    height: calc(100% - 60px);
     overflow-y: auto;
     padding: 0;
-    border-right: 1px solid #ccc;
+    border-right: 1px solid var(--border-color);
+}
+.side-menu a img {
+    width: 20px;  /* Ajuste la largeur de l'image */
+    height: auto; /* Maintient le ratio de l'image */
+    margin-right: 10px; /* Espace entre l'image et le texte */
+    vertical-align: middle; /* Aligne l'image avec le texte */
 }
 
-.side-menu a {
-    display: block;
-    padding: 14px 20px;
-    text-decoration: none;
-    color: #333; /* Texte en gris sombre */
-    font-size: 1em;
-    text-transform: uppercase;
-}
-
-.side-menu a:hover {
-    background-color: #ddd;
-}
-
+/* Main Content */
 .main-content {
-    margin-left: 270px; /* Ajusté en fonction de la largeur du menu */
+    margin-left: 270px;
     padding: 20px;
 }
 
+/* Gallery */
 .gallery {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px; /* Espacement entre les images */
+    gap: 20px;
 }
 
 .gallery-item {
-    margin: 0;
-    border: 1px solid #ccc;
+    border: 1px solid var(--border-color);
     overflow: hidden;
     width: 220px;
     height: 220px;
@@ -115,20 +119,22 @@ nav a:hover {
 }
 
 .gallery-item p {
+    font-family: 'Monolith', sans-serif;
     margin: 5px 0 0;
     font-size: 0.9em;
-    text-align: center;
-    color: #333; /* Texte en gris sombre */
+    text-align: left;
 }
 
+/* Empty Message */
 .empty-message {
     width: 100%;
     text-align: center;
     font-size: 1em;
     margin: 20px 0;
-    color: #999;
+    color: var(--light-color);
 }
 
+/* Lightbox */
 .lightbox {
     position: fixed;
     top: 0;
@@ -143,7 +149,9 @@ nav a:hover {
     z-index: 1000;
 }
 
-.lightbox h3 {
+.lightbox h3, .lightbox-title {
+    font-family: 'Monolith', sans-serif;
+    font-size: 1.2em;
     color: #fff;
     margin-bottom: 10px;
 }
@@ -153,22 +161,24 @@ nav a:hover {
     max-height: 70%;
 }
 
-lightbox p {
+.lightbox p {
     color: #ccc;
     margin-top: 10px;
 }
 
-.lightbox .prev,
-.lightbox .next {
+.lightbox .prev, .lightbox .next, .lightbox .close {
     position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
     background: rgba(255, 255, 255, 0.8);
     padding: 10px;
     cursor: pointer;
     border-radius: 50%;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    z-index: 1000; /* Assure que les flèches restent au-dessus */
+    z-index: 1000;
+}
+
+.lightbox .prev, .lightbox .next {
+    top: 50%;
+    transform: translateY(-50%);
 }
 
 .lightbox .prev {
@@ -178,45 +188,55 @@ lightbox p {
 .lightbox .next {
     right: 20px;
 }
+
 .lightbox .close {
-    position: absolute;
     top: 20px;
     right: 20px;
-    background: rgba(255, 255, 255, 0.8);
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    z-index: 1000;
 }
 
+/* Footer */
 footer {
     margin: 20px 0;
     font-size: 0.9em;
     text-align: center;
-    color: #333; /* Texte en gris sombre */
 }
 
-.welcome-message {
-    width: 60%;
-    margin: 20px auto 0 270px; /* Ajoute une marge à gauche égale à la largeur du menu de gauche */
-    text-align: center;
-    color: #333;
-}
-
-.welcome-message h2 {
-    font-size: 1.8em;
-    margin-bottom: 10px;
-}
-
+/* Welcome Message */
+        .welcome-message {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 400px;
+            margin: 40px auto;
+            font-family: 'Monolith', sans-serif;
+            color: var(--primary-color);
+            line-height: 1.1;
+            text-align: justify;
+        }
+        .welcome-message img {
+            width: 300px;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
 .welcome-message p {
-    font-size: 1.1em;
+    font-size: 1em;
     line-height: 1.5;
 }
 
+/* Responsive Design */
 @media (max-width: 800px) {
     .welcome-message {
         width: 90%;
-        margin: 20px auto; /* Réduit la marge gauche sur petits écrans */
+        margin: 20px auto;
+    }
+
+    .side-menu {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
     }
 }
