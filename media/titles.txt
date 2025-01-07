@@ -6,11 +6,11 @@
 # MIN;Mini formats
 # MMS;Masque Miroir et Statuette
 # TOI;La toilette, d'après Corot
-# DAN;Dante
+# DANTE;Dante
 # ENF;Enfer
 # PUR;Le Purgatoire
 # PAR;Le Paradis
-# DAN;Danaé
+# DANA;Danaé
 # MAV;Mauvais temps pour les anges
 # JUG;Le jugement dernier
 ANG/anges-musiciens00001.jpg;ange musicien 2014 acrylique/toile 61x50cm
