@@ -123,7 +123,7 @@
                             const item = document.createElement('div');
                             item.className = 'gallery-item';
                             item.innerHTML = `
-                                <img src="${mediaPath}/${filePath}" alt="${title}">
+                                <img src="${mediaPath}/${filePath}" alt="Peinture contemporaine de Marie Sallantin issue de la série ${seriesName} : ${title}">
                                 <p>${title}</p>
                             `;
                             item.addEventListener('click', () => openLightbox(index));
@@ -142,6 +142,8 @@
                     currentIndex = index;
                     const { filePath, title } = currentSeries[index];
                     lightboxImg.src = `${mediaPath}/${filePath}`;
+                    //Ajout de l'attribut alt pour l'image
+                    lightboxImg.alt = `Peinture contemporaine de Marie Sallantin issue de la série ${currentSeriesName} : ${currentSeries[currentIndex].title}`;
                     lightboxTitle.textContent = currentSeriesName;
                     lightboxDesc.textContent = title;
                     lightbox.style.display = 'flex';
