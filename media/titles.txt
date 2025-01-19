@@ -154,3 +154,31 @@ TOI/Toilette00009.jpeg;la toilette 2014 acrylique/toile n°8 120x120cm
 TOI/Toilette00010.jpeg;la toilette 2014 acrylique/toile n°9 120x120cm
 TOI/Toilette00011.jpeg;la toilette 2014acrylique/toile  n°10 120x120cm
 TOI/Toilette00012.jpg;la toilette 2014 acrylique/toile  n°11 120x120cm
+PAR/Paradis00001.jpg;CIEUX blancs 3005 40x40cm tempera
+PAR/Paradis00002.jpg;cieux blancs (1) 2005 38X46cm
+PAR/Paradis00003.jpg;CIEUX BLANCS 2005
+PAR/Paradis00004.jpg;"La Charité" 2006 100X500cm acrylique /toile
+PAR/Paradis00005.jpg;CIEUX blancs 2005 40x40cm tempera sur toile
+PAR/Paradis00006.jpg;CIEUX blanc 2005  tempera/toile
+PAR/Paradis00007.jpg;9
+PAR/Paradis00008.jpg;CIEUX OR
+PAR/Paradis00009.jpg;CIEUX OR CHÉRUBIN
+PAR/Paradis00010.jpg;CIEUX  OR CHÉRUBIN 2
+PAR/Paradis00011.jpg;CIEUX blancs 2005  38x46cm (2) tempera/toile
+PAR/Paradis00012.jpg;LE PARADIS 2004
+PAR/Paradis00013.jpg;MILLE CIEUX 2004
+PAR/Paradis00014.jpg;MILLE CIEUX 2004
+PAR/Paradis00015.jpg;MILLE CIEUX. ANGE ROUGE 2005
+PAR/Paradis00016.jpg;MILLE CIEUX OR 2006 100X100CM
+PAR/Paradis00017.jpg;MILLE CIEUX OR 2004 100X100CM
+PAR/Paradis00018.jpg;MILLE CIEUX le char de Phaeton 2006 100cmX100cm
+PAR/Paradis00019.jpg;MILLE CIEUX 2005
+PAR/Paradis00020.jpg; MILLE CIEUX 2007
+PAR/Paradis00021.jpg;MILLE CIEUX 2007
+PAR/Paradis00022.jpg;MILLE CIEUX 2007
+PAR/Paradis00023.jpg;MILLE CIEUX 2007
+PAR/Paradis00024.jpg;MILLE CIEUX 2007
+PAR/Paradis00025.jpg;MILLE CIEUX 2007
+PAR /Paradis00026.jpg;MILLE CIEUX BLANCS 2004 40X40 CM
+PAR /Paradis00027.jpg;
+PAR /Paradis00028.jpg;LE PARADIS anges musicien 2008 39,5x30cm
