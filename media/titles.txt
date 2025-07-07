@@ -37,20 +37,20 @@ ANG/anges-musiciens00022.JPG;ange musicien 2014 acrylique/toile 61x50cm
 ANG/anges-musiciens00023.JPG;ange musicien 2014 acrylique/toile 61x50cm
 ANG/anges-musiciens00024.JPG;ange musicien 2014 acrylique/toile 61x50cm
 ANG/anges-musiciens00026.jpeg;ange musicien 2014 acrylique/toile 61x50cm
-BAI/gb00.jpeg;
-BAI/gb01.jpg;
-BAI/gb02.jpg;
-BAI/gb03.jpg;
-BAI/gb04.jpg;
-BAI/gb05.jpg;
-BAI/gb06.jpg;
-BAI/gb07.jpg;
-BAI/gb08.jpg;
-BAI/gb09.jpg;
-BAI/gb10.jpg;
-BAI/gb11.jpg;
-BAI/gb12.jpg;
-/DameEtLicorne00001.JPG;
+BAI/gb00.jpeg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb01.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb02.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb03.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb04.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb05.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb06.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb07.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb08.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb09.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb10.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb11.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+BAI/gb12.jpg;Grandes baigneuses 2014 acrylique/toile 120x120cm
+DAM/DameEtLicorne00001.JPG;Dame et licorne 2015 tempera/toile 22x14cm
 DAM/DameEtLicorne00002.JPG;Dame et licorne, la vue 2015 tempera/toile 24X16cm
 DAM/DameEtLicorne00003.JPG;Dame et licorne, à mon seul désir, 2015 tmpera /toile 22x35cm
 DAM/DameEtLicorne00004.JPG;dame et licorne, le goût, 2015, tempera/toile 22x14cm
@@ -86,40 +86,40 @@ ETA/Etang10.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61
 ETA/Etang11.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
 ETA/Etang12.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
 ETA/Etang13.jpg;Compagnie de Vénus. Suite Etangs 2018 Acrylique sur toile 50x61cm
-FOR/Foret01.jpg;
-FOR/Foret02.jpg;
-FOR/Foret03.jpg;
-FOR/Foret04.jpg;
-FOR/Foret05.jpg;
-FOR/Foret06.jpg;
-FOR/Foret07.jpg;
-FOR/Foret08.jpg;
-FOR/Foret09.jpg;
-FOR/Foret10.jpg;
-FOR/Foret11.jpg;
-FOR/Foret12.jpg;
-FOR/Foret14.jpg;
-MIN/mini01.jpg;
-MIN/mini02.jpg;
-MIN/mini03.jpg;
-MIN/mini04.jpg;
-MIN/mini05.jpg;
-MIN/mini06.jpg;
-MIN/mini07.jpg;
-MIN/mini08.jpg;
-MIN/mini09.jpg;
-MIN/mini10.jpg;
-MIN/mini11.jpg;
-MIN/mini12.jpg;
-MIN/mini13.jpg;
-MIN/mini14.jpg;
-MIN/mini15.jpg;
-MIN/mini16.jpg;
-MIN/mini17.jpg;
-MIN/mini18.jpg;
-MIN/mini19.jpg;
-MIN/mini20.jpg;
-MIN/mini21.jpg;
+FOR/Foret01.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret02.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret03.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret04.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret05.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret06.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret07.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret08.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret09.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret10.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret11.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret12.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+FOR/Foret14.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
+MIN/mini01.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini02.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini03.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini04.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini05.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini06.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini07.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini08.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini09.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini10.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini11.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini12.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini13.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini14.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini15.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini16.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini17.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini18.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini19.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini20.jpg;Mini format 2014 acrylique/toile 20x20cm
+MIN/mini21.jpg;Mini format 2014 acrylique/toile 20x20cm
 MMS/MasqueMiroirStatuette00001.JPG;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00002.JPG;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00003.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm

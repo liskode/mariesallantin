@@ -24,7 +24,7 @@
     <a href="index.html">&larr; Peintures</a>
     <a href="cv.html">CV</a>
     <a href="liens.html">LIENS</a>
-    <a href="https://www.yourart.art/fr/profile/647c7aa16fb27d7bead78b17" target="_blank"  ><img src="images/logo-yourart.png"></a>
+    <a href="https://www.artmajeur.com/marie-sallantin" target="_blank"><img src="images/logo-artmajeur.png" alt="ArtMajeur"></a>
 </nav>
 
 <div class="spacer"></div>
@@ -44,14 +44,14 @@
         <!-- Images will be dynamically loaded here -->
     </section>
 </div>
-//<div class="lightbox" id="lightbox">
-//    <span class="close" id="close">&times;</span>
-//    <span class="prev" id="prev">&#10094;</span>
-//    <h3 id="lightbox-title"></h3>
-//    <img id="lightbox-img" src="" alt="">
-//    <p id="lightbox-desc"></p>
-//    <span class="next" id="next">&#10095;</span>
-//</div>
+<div class="lightbox" id="lightbox">
+    <span class="close" id="close">&times;</span>
+    <span class="prev" id="prev">&#10094;</span>
+    <h3 id="lightbox-title"></h3>
+    <img id="lightbox-img" src="" alt="">
+    <p id="lightbox-desc"></p>
+    <span class="next" id="next">&#10095;</span>
+</div>
 <footer>
     &copy; 2025 Marie Sallantin. Tous droits réservés. Version 3.21
 </footer>
@@ -74,8 +74,16 @@
         let series = {};
         let seriesNames = {};
 
+        // Show loading state
+        menu.innerHTML = '<p style="text-align: center; padding: 20px; color: var(--light-color);">Chargement...</p>';
+        
         fetch(`${mediaPath}/titles.txt`)
-            .then(response => response.text())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
             .then(text => {
                 const lines = text.split('\n').filter(line => line.trim());
 
@@ -118,13 +126,15 @@
                     currentSeries = series[folder] || [];
                     currentSeriesName = seriesName;
                     currentIndex = 0;
+                    
                     if (currentSeries.length > 0) {
                         currentSeries.forEach(({ filePath, title }, index) => {
                             const item = document.createElement('div');
                             item.className = 'gallery-item';
                             item.innerHTML = `
-                                <img src="${mediaPath}/${filePath}" alt="Peinture contemporaine de Marie Sallantin issue de la série ${seriesName} : ${title}">
+                                <img src="${mediaPath}/${filePath}" alt="Peinture contemporaine de Marie Sallantin issue de la série ${seriesName} : ${title}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
                                 <p>${title}</p>
+                                <p style="display:none; color: var(--light-color); font-style: italic;">Image non disponible</p>
                             `;
                             item.addEventListener('click', () => openLightbox(index));
                             gallery.appendChild(item);
@@ -166,6 +176,13 @@
                     }
                 });
 
+                // Close lightbox when clicking outside the image
+                lightbox.addEventListener('click', (e) => {
+                    if (e.target === lightbox) {
+                        lightbox.style.display = 'none';
+                    }
+                });
+
                 function showPrevImage() {
                     currentIndex = (currentIndex > 0) ? currentIndex - 1 : currentSeries.length - 1;
                     const { filePath, title } = currentSeries[currentIndex];
@@ -192,7 +209,10 @@
                     displaySeries(seriesOrder[currentFolderIndex], seriesNames[seriesOrder[currentFolderIndex]]);
                 }
             })
-            .catch(err => console.error('Failed to load titles file:', err));
+            .catch(err => {
+                console.error('Failed to load titles file:', err);
+                menu.innerHTML = '<p style="color:red; padding: 20px; text-align: center;">Erreur lors du chargement. Veuillez rafraîchir la page.</p>';
+            });
     });
 </script>
 </body>
