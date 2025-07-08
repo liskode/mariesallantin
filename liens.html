@@ -1,92 +1,64 @@
 
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Liens - Marie Sallantin</title>
     <link rel="stylesheet" href="style.css">
-    <style>
-.main-content ul {
-    list-style-type: none;
-    padding-left: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centre les éléments horizontalement */
-    gap: 20px; /* Ajoute un espacement entre les items */
-}
-.main-content li {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    max-width: 600px; /* Limite la largeur pour un bon rendu */
-}        .main-content li img {
-            width: 80px;
-            height: 80px;
-            border-radius: 10px;
-            margin-right: 15px;
-            object-fit: cover;
-        }
-        .main-content li a {
-            font-family: 'Monolith', sans-serif;
-            text-decoration: none;
-            color: var(--primary-color);
-            font-size: 1em;
-        }
-        .main-content li a:hover {
-            text-decoration: underline;
-        }
-    </style>
 </head>
 <body>
-<header>
-    <div class="header-right">
-        <h1>MARIE SALLANTIN</h1>
+  <header class="main-header">
+    <div class="header-content">
+      <div>
+        <h1>Marie Sallantin</h1>
+        <p class="subtitle">La Compagnie de Vénus</p>
+      </div>
+      <nav class="main-nav">
+        <a href="index.html">Peintures</a>
+        <a href="cv.html">CV</a>
+        <a href="liens.html" class="active">Liens</a>
+        <a href="https://www.artmajeur.com/marie-sallantin" target="_blank" rel="noopener">
+          <img src="images/logo-artmajeur.png" alt="ArtMajeur" class="nav-logo"/>
+        </a>
+      </nav>
     </div>
-    <div class="header-left">
-        <h2>LA COMPAGNIE DE VÉNUS</h2>
-        <p>PEINTURES ET DESSINS</p>
-    </div>
-</header>
-<nav>
-    <a href="index.html">PEINTURES</a>
-    <a href="https://www.yourart.art/fr/profile/647c7aa16fb27d7bead78b17" target="_blank">YOURART</a>
-    <a href="cv.html">CV</a>
-    <a href="liens.html" class="active">LIENS</a>
-</nav>
-
-<div class="main-content">
-    <div class="welcome-message">
-        <ul>
+  </header>
+  <div class="layout">
+    <main>
+      <section class="welcome">
+        <div class="welcome-text">
+          <h2>Liens et ressources</h2>
+          <ul class="links-list">
             <li>
-                <img alt="Thumbnail" src="https://tse4.mm.bing.net/th?id=OIP.e4uDVb7V5EA0OdX167N-XQHaHY&amp;pid=Api">
-                <a href="http://sur-la-peinture.com/marie-sallantin-met-la-pression/#more-6342" target="_blank">
-                    Article : "Marie Sallantin met la pression"
-                </a>
+              <img class="link-thumb" alt="Thumbnail" src="https://tse4.mm.bing.net/th?id=OIP.e4uDVb7V5EA0OdX167N-XQHaHY&amp;pid=Api">
+              <a href="http://sur-la-peinture.com/marie-sallantin-met-la-pression/#more-6342" target="_blank">
+                Article : "Marie Sallantin met la pression"
+              </a>
             </li>
             <li>
-                <img alt="Thumbnail" src="https://tse2.mm.bing.net/th?id=OIP.HFSCnbQ0Yso-ZrvJ4j8nAQAAAA&pid=Api">
-                <a href="https://lacapitalegalerie.fr/marie-sallantin-2" target="_blank">Exposition à La Capitale Galerie</a>
+              <img class="link-thumb" alt="Thumbnail" src="https://tse2.mm.bing.net/th?id=OIP.HFSCnbQ0Yso-ZrvJ4j8nAQAAAA&pid=Api">
+              <a href="https://lacapitalegalerie.fr/marie-sallantin-2" target="_blank">Exposition à La Capitale Galerie</a>
             </li>
             <li>
-                <img alt="Thumbnail" src="https://tse1.mm.bing.net/th?id=OIP.pzlRyCNhPqqMGW82vHTdggHaFj&pid=Api">
-                <a href="https://galeriepeinturefraiche.art/sallantin-marie" target="_blank">Galerie Peinture Fraîche</a>
+              <img class="link-thumb" alt="Thumbnail" src="https://tse1.mm.bing.net/th?id=OIP.pzlRyCNhPqqMGW82vHTdggHaFj&pid=Api">
+              <a href="https://galeriepeinturefraiche.art/sallantin-marie" target="_blank">Galerie Peinture Fraîche</a>
             </li>
             <li>
-                <img alt="Thumbnail" src="https://tse2.mm.bing.net/th?id=OIP.VGyiLEd1AbQBej9QTsjVzgHaFd&pid=Api">
-                <a href="https://www.ktotv.com/video/00071872/david-foenkinos-et-marie-sallantin" target="_blank">Interview sur KTOTV</a>
+              <img class="link-thumb" alt="Thumbnail" src="https://tse2.mm.bing.net/th?id=OIP.VGyiLEd1AbQBej9QTsjVzgHaFd&pid=Api">
+              <a href="https://www.ktotv.com/video/00071872/david-foenkinos-et-marie-sallantin" target="_blank">Interview sur KTOTV</a>
             </li>
             <li>
-                <img alt="Thumbnail" src="images/logo-fap.jpg">
-                <a href="fap.html" target="_blank">Face à l'Art - Salon virtuel de peintres</a>
+              <img class="link-thumb" alt="Thumbnail" src="images/logo-fap.jpg">
+              <a href="fap.html" target="_blank">Face à l'Art - Salon virtuel de peintres</a>
             </li>
-        </ul>
-     </div>
-</div>
-
-<footer>
-    &copy; 2025 Marie Sallantin. Tous droits réservés. Version 3.0 
-</footer>
-
+          </ul>
+        </div>
+      </section>
+    </main>
+  </div>
+  <footer>
+    &copy; 2025 Marie Sallantin. Tous droits réservés.
+  </footer>
 </body>
 </html>

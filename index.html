@@ -1,219 +1,92 @@
-
+<!-- BACKUP: The original index.html is saved as index.backup.html -->
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Marie Sallantin, artiste peintre française spécialisée dans les séries thématiques : Étangs, Forêts, Baigneuses et Grandes œuvres.">
-    <meta name="keywords" content="Marie Sallantin, Artiste Peintre, La Compagnie de Venus, Peinture, Art Contemporain, Séries Thématiques">
-    <meta name="author" content="Marie Sallantin">
-    <title>Marie Sallantin - Artiste Peintre</title>
-    <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Marie Sallantin – Artiste Peintre</title>
+  <meta name="description" content="Portfolio de Marie Sallantin, artiste peintre française. Découvrez ses séries thématiques et œuvres originales."/>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-<header>
-    <div class="header-right">
-        <h1>MARIE SALLANTIN</h1>
+  <header class="main-header">
+    <div class="header-content">
+      <div>
+        <h1>Marie Sallantin</h1>
+        <p class="subtitle">La Compagnie de Vénus</p>
+      </div>
+      <nav class="main-nav">
+        <a href="index.html" class="active">Peintures</a>
+        <a href="cv.html">CV</a>
+        <a href="liens.html">Liens</a>
+        <a href="https://www.artmajeur.com/marie-sallantin" target="_blank" rel="noopener">
+          <img src="images/logo-artmajeur.png" alt="ArtMajeur" class="nav-logo"/>
+        </a>
+      </nav>
     </div>
-    <div class="header-left">
-        <h2>LA COMPAGNIE DE VÉNUS</h2>
-        <p>PEINTURES ET DESSINS</p>
-    </div>
-</header>
-<nav>
-    <a href="index.html">&larr; Peintures</a>
-    <a href="cv.html">CV</a>
-    <a href="liens.html">LIENS</a>
-    <a href="https://www.artmajeur.com/marie-sallantin" target="_blank"><img src="images/logo-artmajeur.png" alt="ArtMajeur"></a>
-</nav>
+  </header>
 
-<div class="spacer"></div>
-<div class="side-menu" id="menu">
-    <!-- Menu will be dynamically loaded here -->
-</div>
-<div class="welcome-message" id="welcome">
-<img src="media/cv.jpg" alt="Photo de Marie Sallantin" />
-<p>Bienvenue sur le site de Marie Sallantin, artiste peintre française née en 1946 à Paris. ￼
-<br>Formée à l’École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle a développé une œuvre riche et variée, explorant des thèmes classiques tels que la naissance d’Aphrodite, les Trois Grâces, Danaé, La Divine Comédie, les anges musiciens, les baigneuses, la nature et les saisons. ￼
-<br>Son engagement pour la peinture se manifeste également à travers ses écrits, notamment « L’Art en questions, 30 réponses » (1999), « Les années noires de la peinture » (2013) et « Vénus, carnets d’atelier 1993-2002 » (2017), où elle défend avec passion cet art. ￼
-<br>Nous vous invitons à explorer les différentes périodes de son œuvre en parcourant les séries présentées dans le menu de gauche. Bonne visite !
-    </p>
-</div>
-<div class="main-content">
-    <section class="gallery" id="gallery">
-        <!-- Images will be dynamically loaded here -->
-    </section>
-</div>
-<div class="lightbox" id="lightbox">
-    <span class="close" id="close">&times;</span>
-    <span class="prev" id="prev">&#10094;</span>
-    <h3 id="lightbox-title"></h3>
-    <img id="lightbox-img" src="" alt="">
-    <p id="lightbox-desc"></p>
-    <span class="next" id="next">&#10095;</span>
-</div>
-<footer>
-    &copy; 2025 Marie Sallantin. Tous droits réservés. Version 3.21
-</footer>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const gallery = document.getElementById('gallery');
-        const menu = document.getElementById('menu');
-        const lightbox = document.getElementById('lightbox');
-        const lightboxImg = document.getElementById('lightbox-img');
-        const lightboxTitle = document.getElementById('lightbox-title');
-        const lightboxDesc = document.getElementById('lightbox-desc');
-        const closeBtn = document.getElementById('close');
-        const prevBtn = document.getElementById('prev');
-        const nextBtn = document.getElementById('next');
-        const mediaPath = './media';
-        let currentSeries = [];
-        let currentIndex = 0;
-        let currentSeriesName = '';
-        let seriesOrder = [];
-        let series = {};
-        let seriesNames = {};
+  <div class="layout">
+    <aside class="side-menu" id="side-menu">
+      <h2 class="side-menu-title">Séries</h2>
+      <ul id="series-list">
+        <!-- Dynamically filled by JS -->
+      </ul>
+    </aside>
+    <main>
+      <section class="welcome">
+        <div class="welcome-vertical">
+          <img src="media/cv.jpg" alt="Marie Sallantin" class="welcome-img"/>
+          <div class="welcome-text">
+            <p>
+              Bienvenue sur le site de Marie Sallantin, artiste peintre française née en 1946 à Paris.<br>
+              Formée à l’École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle vit et travaille à Paris.<br>
+              Son œuvre explore des thèmes classiques et contemporains à travers des séries thématiques : Anges musiciens, Grandes baigneuses, Dame et licorne, Étangs et Reflets, Forêt, Mini formats, Masque Miroir et Statuette, La toilette d'après Corot, et d'autres.<br>
+              Chaque série propose une vision singulière, entre figuration et abstraction, où la couleur et la lumière occupent une place centrale.<br>
+              Parcourez les œuvres en sélectionnant une série dans le menu à gauche ou en bas sur mobile.
+            </p>
+          </div>
+        </div>
+      </section>
 
-        // Show loading state
-        menu.innerHTML = '<p style="text-align: center; padding: 20px; color: var(--light-color);">Chargement...</p>';
-        
-        fetch(`${mediaPath}/titles.txt`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.text();
-            })
-            .then(text => {
-                const lines = text.split('\n').filter(line => line.trim());
+      <section class="series-gallery" id="gallery">
+        <!-- Dynamically generated gallery goes here -->
+      </section>
+    </main>
+  </div>
 
-                // Parse titles.txt and organize by series
-                lines.forEach(line => {
-                    if (line.startsWith('#')) {
-                        const [folder, seriesName] = line.substring(1).split(';').map(part => part.trim());
-                        seriesNames[folder] = seriesName;
-                        series[folder] = [];
-                        seriesOrder.push(folder);
-                    } else {
-                        const [filePath, title] = line.split(';').map(part => part.trim());
-                        const folder = filePath.split('/')[0];
-                        if (seriesNames[folder]) {
-                            series[folder].push({ filePath, title });
-                        }
-                    }
-                });
+  <footer>
+    &copy; 2025 Marie Sallantin. Tous droits réservés.
+  </footer>
 
-                // Generate menu links
-                if (seriesOrder.length > 0) {
-                    seriesOrder.forEach(folder => {
-                        const link = document.createElement('a');
-                        link.href = '#';
-                        link.textContent = seriesNames[folder];
-                        link.addEventListener('click', (e) => {
-                            e.preventDefault();
-                            displaySeries(folder, seriesNames[folder]);
-                        });
-                        menu.appendChild(link);
-                    });
-                } else {
-                    menu.innerHTML = '<p style="color:red; padding: 20px;">Erreur : Aucun menu disponible. Vérifiez le contenu de titles.txt.</p>';
-                }
-
-                // Function to display images of a specific series
-                function displaySeries(folder, seriesName) {
-                    document.getElementById('welcome').style.display = 'none'; // Masquer la section d'accueil
-                    gallery.innerHTML = '';
-                    currentSeries = series[folder] || [];
-                    currentSeriesName = seriesName;
-                    currentIndex = 0;
-                    
-                    if (currentSeries.length > 0) {
-                        currentSeries.forEach(({ filePath, title }, index) => {
-                            const item = document.createElement('div');
-                            item.className = 'gallery-item';
-                            item.innerHTML = `
-                                <img src="${mediaPath}/${filePath}" alt="Peinture contemporaine de Marie Sallantin issue de la série ${seriesName} : ${title}" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                                <p>${title}</p>
-                                <p style="display:none; color: var(--light-color); font-style: italic;">Image non disponible</p>
-                            `;
-                            item.addEventListener('click', () => openLightbox(index));
-                            gallery.appendChild(item);
-                        });
-                    } else {
-                        const emptyMessage = document.createElement('div');
-                        emptyMessage.className = 'empty-message';
-                        emptyMessage.textContent = 'En construction, repassez prochainement !';
-                        gallery.appendChild(emptyMessage);
-                    }
-                }
-
-                // Lightbox functions
-                function openLightbox(index) {
-                    currentIndex = index;
-                    const { filePath, title } = currentSeries[index];
-                    lightboxImg.src = `${mediaPath}/${filePath}`;
-                    //Ajout de l'attribut alt pour l'image
-                    lightboxImg.alt = `Peinture contemporaine de Marie Sallantin issue de la série ${currentSeriesName} : ${currentSeries[currentIndex].title}`;
-                    lightboxTitle.textContent = currentSeriesName;
-                    lightboxDesc.textContent = title;
-                    lightbox.style.display = 'flex';
-                }
-
-                closeBtn.addEventListener('click', () => {
-                    lightbox.style.display = 'none';
-                });
-
-                prevBtn.addEventListener('click', showPrevImage);
-                nextBtn.addEventListener('click', showNextImage);
-
-                document.addEventListener('keydown', (e) => {
-                    if (lightbox.style.display === 'flex') {
-                        if (e.key === 'ArrowLeft') showPrevImage();
-                        if (e.key === 'ArrowRight') showNextImage();
-                        if (e.key === 'ArrowUp') showPrevSeries();
-                        if (e.key === 'ArrowDown') showNextSeries();
-                        if (e.key === 'Escape') lightbox.style.display = 'none';
-                    }
-                });
-
-                // Close lightbox when clicking outside the image
-                lightbox.addEventListener('click', (e) => {
-                    if (e.target === lightbox) {
-                        lightbox.style.display = 'none';
-                    }
-                });
-
-                function showPrevImage() {
-                    currentIndex = (currentIndex > 0) ? currentIndex - 1 : currentSeries.length - 1;
-                    const { filePath, title } = currentSeries[currentIndex];
-                    lightboxImg.src = `${mediaPath}/${filePath}`;
-                    lightboxDesc.textContent = title;
-                }
-
-                function showNextImage() {
-                    currentIndex = (currentIndex < currentSeries.length - 1) ? currentIndex + 1 : 0;
-                    const { filePath, title } = currentSeries[currentIndex];
-                    lightboxImg.src = `${mediaPath}/${filePath}`;
-                    lightboxDesc.textContent = title;
-                }
-
-                function showPrevSeries() {
-                    let currentFolderIndex = seriesOrder.indexOf(currentSeriesName);
-                    currentFolderIndex = (currentFolderIndex > 0) ? currentFolderIndex - 1 : seriesOrder.length - 1;
-                    displaySeries(seriesOrder[currentFolderIndex], seriesNames[seriesOrder[currentFolderIndex]]);
-                }
-
-                function showNextSeries() {
-                    let currentFolderIndex = seriesOrder.indexOf(currentSeriesName);
-                    currentFolderIndex = (currentFolderIndex < seriesOrder.length - 1) ? currentFolderIndex + 1 : 0;
-                    displaySeries(seriesOrder[currentFolderIndex], seriesNames[seriesOrder[currentFolderIndex]]);
-                }
-            })
-            .catch(err => {
-                console.error('Failed to load titles file:', err);
-                menu.innerHTML = '<p style="color:red; padding: 20px; text-align: center;">Erreur lors du chargement. Veuillez rafraîchir la page.</p>';
-            });
-    });
-</script>
+  <script src="gallery.js"></script>
+  <script>
+    // Dynamically populate the series menu from titles.txt
+    fetch('media/titles.txt')
+      .then(r => r.text())
+      .then(text => {
+        const lines = text.split('\n');
+        const series = lines.filter(l => l.startsWith('#')).map(l => {
+          const [code, name] = l.replace('#','').split(';');
+          return { code: code.trim(), name: name.trim() };
+        });
+        const ul = document.getElementById('series-list');
+        series.forEach(s => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `#${s.code}`;
+          a.textContent = s.name;
+          a.onclick = (e) => {
+            e.preventDefault();
+            // You can trigger gallery filtering here
+            window.scrollTo({ top: document.getElementById('gallery').offsetTop - 40, behavior: 'smooth' });
+            // Optionally: filterGalleryBySeries(s.code);
+          };
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+      });
+  </script>
 </body>
 </html>
