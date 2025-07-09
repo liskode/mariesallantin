@@ -25,6 +25,12 @@
     </div>
   </header>
   <div class="layout">
+    <aside class="side-menu" id="side-menu">
+      <h2 class="side-menu-title">Séries</h2>
+      <ul id="series-list">
+        <!-- Dynamically filled by JS -->
+      </ul>
+    </aside>
     <main class="cv-main">
       <section class="welcome">
         <img src="media/cv.jpg" alt="Marie Sallantin" class="welcome-img"/>
@@ -120,6 +126,26 @@
         });
       }
     });
+
+    // Génération dynamique du menu des séries
+    fetch('media/titles.txt')
+      .then(r => r.text())
+      .then(text => {
+        const lines = text.split('\n');
+        const series = lines.filter(l => l.startsWith('#')).map(l => {
+          const [code, name] = l.replace('#','').split(';');
+          return { code: code.trim(), name: name.trim() };
+        });
+        const ul = document.getElementById('series-list');
+        series.forEach(s => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `index.html?gallery#${s.code}`;
+          a.textContent = s.name;
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+      });
   </script>
 </body>
 </html>
