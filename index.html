@@ -10,47 +10,48 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
-  <header class="main-header">
-    <div class="header-content">
-      <div>
-        <h1>Marie Sallantin</h1>
-        <p class="subtitle">La Compagnie de Vénus</p>
-      </div>
-      <nav class="main-nav">
-        <a href="index.html?gallery" class="active">Peintures</a>
-        <a href="cv.html">CV</a>
-        <a href="liens.html">Liens</a>
-        <a href="https://www.artmajeur.com/marie-sallantin" target="_blank" rel="noopener">
-          <img src="images/logo-artmajeur.png" alt="ArtMajeur" class="nav-logo"/>
-        </a>
-      </nav>
-    </div>
-  </header>
-
-  <div class="layout">
-    <aside class="side-menu" id="side-menu">
-      <h2 class="side-menu-title">Séries</h2>
-      <ul id="series-list">
-        <!-- Dynamically filled by JS -->
-      </ul>
-    </aside>
-    <main>
-      <section class="welcome" id="welcome-section">
-        <div class="welcome-vertical">
-          <img src="media/cv.jpg" alt="Marie Sallantin" class="welcome-img"/>
-          <div class="welcome-text">
-            <p>
-              Bienvenue sur le site de Marie Sallantin, artiste peintre française née en 1946 à Paris.<br>
-              Formée à l’École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle vit et travaille à Paris.<br>
-              Son œuvre explore des thèmes classiques et contemporains à travers des séries thématiques : Anges musiciens, Grandes baigneuses, Dame et licorne, Étangs et Reflets, Forêt, Mini formats, Masque Miroir et Statuette, La toilette d'après Corot, et d'autres.<br>
-              Chaque série propose une vision singulière, entre figuration et abstraction, où la couleur et la lumière occupent une place centrale.<br>
-            </p>
-          </div>
+  <div class="site-grid">
+    <header class="main-header">
+      <div class="header-content">
+        <div>
+          <h1>Marie Sallantin</h1>
+          <p class="subtitle">La Compagnie de Vénus</p>
         </div>
-      </section>
-      <section class="series-gallery" id="gallery" style="display:none;"></section>
-      <section class="series-overview" id="series-overview" style="display:none;"></section>
-    </main>
+        <nav class="main-nav">
+          <a href="index.html?gallery" class="active">Peintures</a>
+          <a href="cv.html">CV</a>
+          <a href="liens.html">Liens</a>
+          <a href="https://www.artmajeur.com/marie-sallantin" target="_blank" rel="noopener">
+            <img src="images/logo-artmajeur.png" alt="ArtMajeur" class="nav-logo"/>
+          </a>
+        </nav>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="side-menu" id="side-menu">
+        <h2 class="side-menu-title">Séries</h2>
+        <ul id="series-list">
+          <!-- Dynamically filled by JS -->
+        </ul>
+      </aside>
+      <main>
+        <section class="welcome" id="welcome-section">
+          <div class="welcome-vertical">
+            <img src="media/cv.jpg" alt="Marie Sallantin" class="welcome-img"/>
+            <div class="welcome-text">
+              <p>
+                Bienvenue sur le site de Marie Sallantin, artiste peintre française née en 1946 à Paris.<br>
+                Formée à l’École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle vit et travaille à Paris.<br>
+                Son œuvre explore des thèmes classiques et contemporains à travers des séries thématiques : Anges musiciens, Grandes baigneuses, Dame et licorne, Étangs et Reflets, Forêt, Mini formats, Masque Miroir et Statuette, La toilette d'après Corot, et d'autres.<br>
+                Chaque série propose une vision singulière, entre figuration et abstraction, où la couleur et la lumière occupent une place centrale.<br>
+              </p>
+            </div>
+          </div>
+        </section>
+        <section class="series-gallery" id="gallery" style="display:none;"></section>
+        <section class="series-overview" id="series-overview" style="display:none;"></section>
+      </main>
+    </div>
   </div>
 
   <footer>
