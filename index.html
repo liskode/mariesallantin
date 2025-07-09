@@ -17,7 +17,7 @@
         <p class="subtitle">La Compagnie de Vénus</p>
       </div>
       <nav class="main-nav">
-        <a href="index.html" class="active">Peintures</a>
+        <a href="index.html?gallery" class="active">Peintures</a>
         <a href="cv.html">CV</a>
         <a href="liens.html">Liens</a>
         <a href="https://www.artmajeur.com/marie-sallantin" target="_blank" rel="noopener">
@@ -35,7 +35,7 @@
       </ul>
     </aside>
     <main>
-      <section class="welcome">
+      <section class="welcome" id="welcome-section">
         <div class="welcome-vertical">
           <img src="media/cv.jpg" alt="Marie Sallantin" class="welcome-img"/>
           <div class="welcome-text">
@@ -44,15 +44,12 @@
               Formée à l’École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle vit et travaille à Paris.<br>
               Son œuvre explore des thèmes classiques et contemporains à travers des séries thématiques : Anges musiciens, Grandes baigneuses, Dame et licorne, Étangs et Reflets, Forêt, Mini formats, Masque Miroir et Statuette, La toilette d'après Corot, et d'autres.<br>
               Chaque série propose une vision singulière, entre figuration et abstraction, où la couleur et la lumière occupent une place centrale.<br>
-              Parcourez les œuvres en sélectionnant une série dans le menu à gauche ou en bas sur mobile.
             </p>
           </div>
         </div>
       </section>
-
-      <section class="series-gallery" id="gallery">
-        <!-- Dynamically generated gallery goes here -->
-      </section>
+      <section class="series-gallery" id="gallery" style="display:none;"></section>
+      <section class="series-overview" id="series-overview" style="display:none;"></section>
     </main>
   </div>
 
@@ -62,6 +59,35 @@
 
   <script src="gallery.js"></script>
   <script>
+    // Masquer immédiatement l'accueil si on arrive sur ?gallery ou #gallery, même si le DOM n'est pas prêt
+    if (window.location.search.includes('gallery') || window.location.hash === '#gallery') {
+      var tries = 0;
+      var interval = setInterval(function() {
+        var welcome = document.getElementById('welcome-section');
+        if (welcome) {
+          welcome.style.display = 'none';
+          clearInterval(interval);
+        }
+        tries++;
+        if (tries > 30) clearInterval(interval); // Arrêter après 3 secondes
+      }, 100);
+    }
+    // Affichage direct de la galerie si ?gallery ou #gallery dans l'URL
+    document.addEventListener('DOMContentLoaded', function() {
+      if (window.location.search.includes('gallery') || window.location.hash === '#gallery') {
+        if (typeof showSection === 'function') showSection('series-overview');
+        // Attendre que window.showSeriesOverview soit défini
+        var tries = 0;
+        var interval = setInterval(function() {
+          if (window.showSeriesOverview) {
+            window.showSeriesOverview();
+            clearInterval(interval);
+          }
+          tries++;
+          if (tries > 30) clearInterval(interval); // Arrêter après 3 secondes
+        }, 100);
+      }
+    });
     // Dynamically populate the series menu from titles.txt
     fetch('media/titles.txt')
       .then(r => r.text())
@@ -87,6 +113,33 @@
           ul.appendChild(li);
         });
       });
+
+    // Menu Peintures : affiche la galerie des séries
+    document.querySelectorAll('.main-nav a').forEach(a => {
+      if (a.textContent.trim().toLowerCase() === 'peintures') {
+        a.addEventListener('click', function(e) {
+          // Toujours recharger la page avec ?gallery si on n'est pas déjà sur la galerie
+          if (!window.location.search.includes('gallery')) {
+            return; // laisser le lien fonctionner normalement
+          }
+          // Sinon, basculer dynamiquement
+          e.preventDefault();
+          if (!window.location.search.includes('gallery')) {
+            const url = window.location.pathname + '?gallery';
+            window.history.replaceState({}, '', url);
+          }
+          showSection('series-overview');
+          if (window.showSeriesOverview) window.showSeriesOverview();
+        });
+      }
+    });
+
+    // Fonction utilitaire pour afficher une seule section
+    function showSection(section) {
+      document.getElementById('welcome-section').style.display = (section === 'welcome-section') ? '' : 'none';
+      document.getElementById('series-overview').style.display = (section === 'series-overview') ? '' : 'none';
+      document.getElementById('gallery').style.display = (section === 'gallery') ? '' : 'none';
+    }
   </script>
 </body>
 </html>

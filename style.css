@@ -357,6 +357,51 @@ footer {
   text-align: left;
 }
 
+.series-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
+  max-width: 1200px;
+  margin: 48px auto 48px auto;
+  padding: 0 24px;
+}
+.series-overview-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px 12px 18px 12px;
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+.series-overview-item:hover {
+  box-shadow: 0 8px 32px rgba(0,0,0,0.10);
+  transform: translateY(-4px) scale(1.03);
+}
+.series-overview-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin-bottom: 18px;
+  text-align: center;
+}
+.series-overview-img {
+  width: 100%;
+  max-width: 220px;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  background: #eee;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.series-overview-img:hover {
+  transform: scale(1.04);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.13);
+}
+
 /* Responsive sidebar */
 @media (max-width: 900px) {
   .layout {

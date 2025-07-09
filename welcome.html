@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Marie Sallantin – Accueil</title>
+  <meta name="description" content="Accueil du portfolio de Marie Sallantin, artiste peintre française."/>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    .welcome-home {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 80vh;
+      text-align: center;
+      gap: 32px;
+    }
+    .welcome-home .welcome-img {
+      width: 180px;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 50%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+      margin-bottom: 18px;
+    }
+    .welcome-home .welcome-text {
+      max-width: 630px;
+      color: var(--secondary);
+      font-size: 1.15rem;
+      line-height: 1.7;
+    }
+    .enter-btn {
+      background: var(--accent);
+      color: #fff;
+      font-size: 1.2rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 24px;
+      padding: 16px 48px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: background 0.2s, color 0.2s, transform 0.2s;
+      margin-top: 24px;
+    }
+    .enter-btn:hover {
+      background: #222;
+      color: var(--accent);
+      transform: translateY(-2px) scale(1.04);
+    }
+  </style>
+</head>
+<body>
+  <header class="main-header">
+    <div class="header-content">
+      <div>
+        <h1>Marie Sallantin</h1>
+        <p class="subtitle">La Compagnie de Vénus</p>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="welcome-home">
+      <img src="media/cv.jpg" alt="Marie Sallantin" class="welcome-img"/>
+      <div class="welcome-text">
+        <p>
+          Bienvenue sur le site de Marie Sallantin, artiste peintre française née en 1946 à Paris.<br>
+          Formée à l’École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle vit et travaille à Paris.<br>
+          Son œuvre explore des thèmes classiques et contemporains à travers des séries thématiques : Anges musiciens, Grandes baigneuses, Dame et licorne, Étangs et Reflets, Forêt, Mini formats, Masque Miroir et Statuette, La toilette d'après Corot, et d'autres.<br>
+          Chaque série propose une vision singulière, entre figuration et abstraction, où la couleur et la lumière occupent une place centrale.<br>
+          Parcourez les œuvres en sélectionnant une série dans le menu à gauche ou en bas sur mobile.
+        </p>
+      </div>
+      <a href="index.html" class="enter-btn">Entrer</a>
+    </div>
+  </main>
+  <footer>
+    &copy; 2025 Marie Sallantin. Tous droits réservés.
+  </footer>
+</body>
+</html> 

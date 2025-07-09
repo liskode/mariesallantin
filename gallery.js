@@ -88,6 +88,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target.tagName === 'A') {
         e.preventDefault();
         const code = e.target.getAttribute('href').replace('#','');
+        if (typeof showSection === 'function') showSection('gallery');
+        else {
+          document.getElementById('welcome-section').style.display = 'none';
+          document.getElementById('series-overview').style.display = 'none';
+          document.getElementById('gallery').style.display = '';
+        }
         displaySeries(code);
         // Update active class
         Array.from(seriesList.querySelectorAll('a')).forEach(a => a.classList.remove('active'));
@@ -109,6 +115,43 @@ document.addEventListener('DOMContentLoaded', () => {
       gallery.appendChild(item);
     });
   }
+
+  window.showSeriesOverview = function() {
+    const overview = document.getElementById('series-overview');
+    const gallery = document.getElementById('gallery');
+    overview.innerHTML = '';
+    if (typeof showSection === 'function') showSection('series-overview');
+    else {
+      overview.style.display = '';
+      gallery.style.display = 'none';
+      document.getElementById('welcome-section').style.display = 'none';
+    }
+    // Affiche la première image de chaque série
+    Object.keys(allSeries).forEach(code => {
+      if (!allSeries[code].length) return;
+      const serieDiv = document.createElement('div');
+      serieDiv.className = 'series-overview-item';
+      const title = document.createElement('div');
+      title.className = 'series-overview-title';
+      title.textContent = seriesNames[code];
+      const img = document.createElement('img');
+      img.src = `media/${allSeries[code][0].filePath}`;
+      img.alt = seriesNames[code];
+      img.className = 'series-overview-img';
+      img.style.cursor = 'pointer';
+      img.onclick = () => {
+        if (typeof showSection === 'function') showSection('gallery');
+        else {
+          overview.style.display = 'none';
+          gallery.style.display = '';
+        }
+        displaySeries(code);
+      };
+      serieDiv.appendChild(title);
+      serieDiv.appendChild(img);
+      overview.appendChild(serieDiv);
+    });
+  };
 
   createLightbox();
 }); 

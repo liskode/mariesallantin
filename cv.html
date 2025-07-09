@@ -15,7 +15,7 @@
         <p class="subtitle">La Compagnie de Vénus</p>
       </div>
       <nav class="main-nav">
-        <a href="index.html">Peintures</a>
+        <a href="index.html?gallery">Peintures</a>
         <a href="cv.html" class="active">CV</a>
         <a href="liens.html">Liens</a>
         <a href="https://www.artmajeur.com/marie-sallantin" target="_blank" rel="noopener">
@@ -111,5 +111,15 @@
   <footer>
     &copy; 2025 Marie Sallantin. Tous droits réservés.
   </footer>
+  <script>
+    document.querySelectorAll('.main-nav a').forEach(a => {
+      if (a.textContent.trim().toLowerCase() === 'peintures') {
+        a.addEventListener('click', function(e) {
+          // Forcer un rechargement complet
+          window.location.replace(a.href);
+        });
+      }
+    });
+  </script>
 </body>
 </html>
