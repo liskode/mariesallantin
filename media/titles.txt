@@ -26,11 +26,7 @@ ANG/anges-musiciens00010.jpg;ange musicien 2014 acrylique/toile 61x50cm
 ANG/anges-musiciens00011.jpg;ange musicien 2014 acrylique/toile 61x50cm
 ANG/anges-musiciens00013.jpg;ange musicien 2014 acrylique/toile 61x50cm
 ANG/anges-musiciens00014.jpg;ange musicien 2014 acrylique/toile 61x50cm
-ANG/anges-musiciens00015.jpg;ange musicien 2014 acrylique/toile 61x50cm
-ANG/anges-musiciens00016.jpg;ange musicien 2014 acrylique/toile 61x50cm
-ANG/anges-musiciens00017.jpg;ange musicien 2014 acrylique/toile 61x50cm
 ANG/anges-musiciens00018.jpg;ange musicien 2014 acrylique/toile 61x50cm
-ANG/anges-musiciens00019.jpg;ange musicien 2014 acrylique/toile 61x50cm
 ANG/anges-musiciens00020.jpg;ange musicien 2014 acrylique/toile 61x50cm
 ANG/anges-musiciens00021.JPG;ange musicien 2014 acrylique/toile 61x50cm
 ANG/anges-musiciens00022.JPG;ange musicien 2014 acrylique/toile 61x50cm
@@ -98,7 +94,6 @@ FOR/Foret09.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
 FOR/Foret10.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
 FOR/Foret11.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
 FOR/Foret12.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
-FOR/Foret14.jpg;Forêt, Saisons 2015 acrylique/toile 80x80cm
 MIN/mini01.jpg;Mini format 2014 acrylique/toile 20x20cm
 MIN/mini02.jpg;Mini format 2014 acrylique/toile 20x20cm
 MIN/mini03.jpg;Mini format 2014 acrylique/toile 20x20cm
@@ -123,9 +118,7 @@ MIN/mini21.jpg;Mini format 2014 acrylique/toile 20x20cm
 MMS/MasqueMiroirStatuette00001.JPG;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00002.JPG;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00003.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
-MMS/MasqueMiroirStatuette00004.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00005.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
-MMS/MasqueMiroirStatuette00006.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00007.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00008.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00009.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
