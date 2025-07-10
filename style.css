@@ -405,6 +405,11 @@ footer {
   box-shadow: 0 4px 16px rgba(0,0,0,0.13);
 }
 
+header {
+  position: relative;
+  z-index: 10;
+}
+
 /* Responsive sidebar */
 @media (max-width: 900px) {
   .site-grid {
