@@ -146,6 +146,12 @@ document.addEventListener('DOMContentLoaded', () => {
           gallery.style.display = '';
         }
         displaySeries(code);
+        // Update active class in sidebar menu
+        if (seriesList) {
+          Array.from(seriesList.querySelectorAll('a')).forEach(a => a.classList.remove('active'));
+          const menuItem = seriesList.querySelector(`a[href="#${code}"]`);
+          if (menuItem) menuItem.classList.add('active');
+        }
       };
       serieDiv.appendChild(title);
       serieDiv.appendChild(img);
