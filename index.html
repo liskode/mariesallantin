@@ -21,6 +21,16 @@
     ]
   }
   </script>
+  <style>
+    .menu-item-disabled {
+      color: #aaa !important;
+      cursor: pointer;
+      font-style: italic;
+    }
+    .menu-item-disabled:hover {
+      text-decoration: underline;
+    }
+  </style>
 </head>
 <body>
   <div class="site-grid">
@@ -112,19 +122,41 @@
           const [code, name] = l.replace('#','').split(';');
           return { code: code.trim(), name: name.trim() };
         });
+        // Détecter les séries vides
+        const artworks = lines.filter(l => l.includes('/') && l.includes(';')).map(l => {
+          const [filePath] = l.split(';');
+          return filePath.split('/')[0];
+        });
+        const seriesCounts = {};
+        series.forEach(s => { seriesCounts[s.code] = 0; });
+        artworks.forEach(folder => { if (seriesCounts[folder] !== undefined) seriesCounts[folder]++; });
         const ul = document.getElementById('series-list');
         series.forEach(s => {
           const li = document.createElement('li');
-          const a = document.createElement('a');
-          a.href = `#${s.code}`;
-          a.textContent = s.name;
-          a.onclick = (e) => {
-            e.preventDefault();
-            // You can trigger gallery filtering here
-            window.scrollTo({ top: document.getElementById('gallery').offsetTop - 40, behavior: 'smooth' });
-            // Optionally: filterGalleryBySeries(s.code);
-          };
-          li.appendChild(a);
+          if (seriesCounts[s.code] === 0) {
+            // Série vide : style différent et message au clic
+            const a = document.createElement('a');
+            a.href = '#';
+            a.textContent = s.name;
+            a.className = 'menu-item-disabled';
+            a.onclick = (e) => {
+              e.preventDefault();
+              alert('Le travail de catalogage est en cours et les tableaux correspondant à cette série seront rajoutés ultérieurement.');
+              return false;
+            };
+            li.appendChild(a);
+          } else {
+            // Série normale
+            const a = document.createElement('a');
+            a.href = `#${s.code}`;
+            a.textContent = s.name;
+            a.onclick = (e) => {
+              e.preventDefault();
+              window.scrollTo({ top: document.getElementById('gallery').offsetTop - 40, behavior: 'smooth' });
+              // Optionally: filterGalleryBySeries(s.code);
+            };
+            li.appendChild(a);
+          }
           ul.appendChild(li);
         });
       });
