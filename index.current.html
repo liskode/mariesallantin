@@ -1,0 +1,281 @@
+<!-- BACKUP: The original index.html is saved as index.backup.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Marie Sallantin – Artiste Peintre</title>
+  <meta name="description" content="Portfolio de Marie Sallantin, artiste peintre française. Découvrez ses séries thématiques et œuvres originales."/>
+  <link rel="stylesheet" href="style.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="images/logo-artmajeur.png"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Marie Sallantin",
+    "jobTitle": "Artiste peintre",
+    "url": "https://www.artmajeur.com/marie-sallantin",
+    "sameAs": [
+      "https://www.artmajeur.com/marie-sallantin"
+    ]
+  }
+  </script>
+  <style>
+    .menu-item-disabled {
+      color: #aaa !important;
+      cursor: pointer;
+      font-style: italic;
+    }
+    .menu-item-disabled:hover {
+      text-decoration: underline;
+    }
+    .side-menu-title {
+      color: #3771d7;
+    }
+    .subtitle {
+      color: #3771d7;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <button class="mobile-menu-btn" aria-label="Ouvrir le menu séries" onclick="openMobileMenu()">☰</button>
+    <nav class="mobile-series-menu" id="mobileSeriesMenu">
+      <button class="close-mobile-menu" onclick="closeMobileMenu()">×</button>
+      <ul>
+        <li><a href="index.html?gallery#ANG">Anges musiciens</a></li>
+        <li><a href="index.html?gallery#BAI">Grandes baigneuses</a></li>
+        <li><a href="index.html?gallery#DAM">Dame et licorne</a></li>
+        <li><a href="index.html?gallery#ETA">Étangs et Reflets</a></li>
+        <li><a href="index.html?gallery#FOR">Forêt, Saisons</a></li>
+        <li><a href="index.html?gallery#MIN">Mini formats</a></li>
+        <li><a href="index.html?gallery#MMS">Masque Miroir et Statuette</a></li>
+        <li><a href="index.html?gallery#TOI">La toilette, d'après Corot</a></li>
+        <li><a href="index.html?gallery#Dante">Dante</a></li>
+        <li><a href="index.html?gallery#Enfer">Enfer</a></li>
+      </ul>
+    </nav>
+  </header>
+  <div class="site-grid">
+    <header class="main-header">
+      <div class="header-content">
+        <a href="index.html">
+          <img src="images/logoMS.png" alt="Logo du site" />
+        </a>
+        <nav class="main-nav">
+          <a href="index.html?gallery" class="active">Peintures</a>
+          <a href="cv.html">CV</a>
+          <a href="liens.html">Liens</a>
+          <a href="https://www.artmajeur.com/marie-sallantin" target="_blank" rel="noopener">
+            <img src="images/logo-artmajeur.png" alt="ArtMajeur" class="nav-logo"/>
+          </a>
+        </nav>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="side-menu" id="side-menu">
+        <h2 class="side-menu-title">Séries</h2>
+        <ul id="series-list">
+          <!-- Dynamically filled by JS -->
+        </ul>
+      </aside>
+      <main>
+        <h1 style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Marie Sallantin - Artiste Peintre</h1>
+        
+        <!-- Section Hero avec image aléatoire -->
+        <section class="hero-section" id="hero-section">
+          <div class="hero-image-container">
+            <img id="hero-image" class="hero-image" alt="Œuvre de Marie Sallantin" />
+            <div class="hero-overlay">
+              <div class="hero-title" id="hero-title"></div>
+              <div class="hero-series" id="hero-series"></div>
+            </div>
+          </div>
+        </section>
+        
+        <!-- Section de bienvenue -->
+        <section class="welcome-section">
+          <div class="welcome-text">
+            <h1>Bienvenue sur le site de Marie Sallantin</h1>
+            <p>Découvrez l'univers artistique de Marie Sallantin, peintre contemporaine installée à Paris. Son œuvre explore les thèmes de la figure humaine, de la nature et de la spiritualité à travers différentes séries picturales.</p>
+            <p>Naviguez dans les séries ci-contre pour explorer son travail, ou consultez son <a href="cv.html">CV</a> pour plus d'informations sur son parcours artistique.</p>
+          </div>
+        </section>
+        
+        <!-- Galerie des séries (desktop uniquement) -->
+        <section class="series-gallery" id="series-gallery">
+          <h2>Découvrez les séries</h2>
+          <div class="series-grid" id="series-grid">
+            <!-- Rempli dynamiquement par JavaScript -->
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Marie Sallantin. Tous droits réservés.
+  </footer>
+
+  <script src="gallery.js"></script>
+  <script>
+    // Données des images et séries
+    let imageData = [];
+    let currentImageIndex = 0;
+    
+    // Charger les données des images
+    fetch('media/titles.txt')
+      .then(response => response.text())
+      .then(data => {
+        const lines = data.split('\n');
+        imageData = lines
+          .filter(line => line.trim() && !line.startsWith('#'))
+          .map(line => {
+            const [filePath, title, series] = line.split(';').map(s => s.trim());
+            return { filePath, title, series };
+          });
+        
+        if (imageData.length > 0) {
+          updateHeroImage();
+          // Changer l'image toutes les 6 secondes
+          setInterval(updateHeroImage, 6000);
+        }
+      })
+      .catch(error => {
+        console.error('Erreur lors du chargement des données:', error);
+      });
+    
+    function updateHeroImage() {
+      if (imageData.length === 0) return;
+      
+      // Sélectionner une image aléatoire
+      const randomIndex = Math.floor(Math.random() * imageData.length);
+      const imageInfo = imageData[randomIndex];
+      
+      // Extraire le code de la série du chemin de fichier
+      const seriesCode = imageInfo.filePath.split('/')[0];
+      
+      // Mettre à jour l'image et les informations
+      const img = document.getElementById('hero-image');
+      const titleElement = document.getElementById('hero-title');
+      const seriesElement = document.getElementById('hero-series');
+      
+      img.src = `media/${imageInfo.filePath}`;
+      titleElement.textContent = imageInfo.title;
+      seriesElement.textContent = `Série : ${imageInfo.series}`;
+    }
+    
+    // Gestionnaire de clic pour la série
+    document.addEventListener('click', function(e) {
+      // Navigation vers les séries via le menu mobile ou sidebar
+      if (e.target.matches('.mobile-series-menu a, .side-menu a')) {
+        e.preventDefault();
+        const href = e.target.getAttribute('href');
+        if (href && href.includes('#')) {
+          // Rediriger vers la galerie avec la série sélectionnée
+          window.location.href = href;
+        }
+      }
+    });
+    
+    // Gestionnaire pour le menu mobile
+    function openMobileMenu() {
+      document.getElementById('mobileSeriesMenu').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    function closeMobileMenu() {
+      document.getElementById('mobileSeriesMenu').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    
+    // Événements pour le menu mobile
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeMobileMenu();
+    });
+    
+    document.getElementById('mobileSeriesMenu').addEventListener('click', function(e) {
+      if (e.target === this) closeMobileMenu();
+    });
+    
+    // Génération dynamique du menu des séries
+    fetch('media/titles.txt')
+      .then(r => r.text())
+      .then(text => {
+        const lines = text.split('\n');
+        const series = lines.filter(l => l.startsWith('#')).map(l => {
+          const [code, name] = l.replace('#','').split(';');
+          return { code: code.trim(), name: name.trim() };
+        });
+        const ul = document.getElementById('series-list');
+        series.forEach(s => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = `index.html?gallery#${s.code}`;
+          a.textContent = s.name;
+          li.appendChild(a);
+          ul.appendChild(li);
+        });
+        
+        // Générer la galerie des séries pour desktop
+        generateSeriesGallery(series, lines);
+      });
+    
+    // Fonction pour générer la galerie des séries
+    function generateSeriesGallery(series, allLines) {
+      const seriesGrid = document.getElementById('series-grid');
+      if (!seriesGrid) return;
+      
+      series.forEach(s => {
+        // Trouver une image représentative pour cette série
+        const seriesImages = allLines.filter(line => 
+          line.includes('/') && 
+          line.split('/')[0] === s.code && 
+          !line.startsWith('#')
+        );
+        
+        if (seriesImages.length > 0) {
+          const representativeImage = seriesImages[0].split(';')[0];
+          
+          const card = document.createElement('div');
+          card.className = 'series-card';
+          card.onclick = () => {
+            window.location.href = `index.html?gallery#${s.code}`;
+          };
+          
+          card.innerHTML = `
+            <img src="media/${representativeImage}" alt="${s.name}" class="series-card-image">
+            <div class="series-card-content">
+              <h3 class="series-card-title">${s.name}</h3>
+              <p class="series-card-description">Cliquez pour découvrir cette série</p>
+            </div>
+          `;
+          
+          seriesGrid.appendChild(card);
+        }
+      });
+    }
+    
+    // Optimisation pour mobile : ajuster la taille des images selon l'orientation
+    function adjustHeroImage() {
+      const heroImage = document.getElementById('hero-image');
+      if (heroImage) {
+        const isMobile = window.innerWidth <= 700;
+        const isLandscape = window.innerWidth > window.innerHeight;
+        
+        if (isMobile) {
+          heroImage.style.height = isLandscape ? '50vh' : '60vh';
+        } else {
+          heroImage.style.height = '70vh';
+        }
+      }
+    }
+    
+    // Ajuster au chargement et au redimensionnement
+    window.addEventListener('load', adjustHeroImage);
+    window.addEventListener('resize', adjustHeroImage);
+  </script>
+</body>
+</html>
