@@ -503,8 +503,8 @@ footer {
   gap: 14px;
 }
 .link-thumb {
-  width: 48px;
-  height: 48px;
+  width: 96px;
+  height: 96px;
   object-fit: cover;
   border-radius: 8px;
   flex-shrink: 0;
@@ -668,8 +668,8 @@ header {
     padding-left: 12px;
   }
   .link-thumb {
-    width: 36px;
-    height: 36px;
+    width: 72px;
+    height: 72px;
   }
   .header-content {
     padding-left: 0;
