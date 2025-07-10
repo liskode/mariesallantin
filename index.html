@@ -69,11 +69,17 @@
         <h1 style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">Marie Sallantin – Artiste peintre</h1>
         <section class="welcome" id="welcome-section">
           <div class="welcome-vertical">
-            <img src="media/cv.jpg" alt="Marie Sallantin" class="welcome-img"/>
+            <div class="random-image-container">
+              <img id="random-image" src="" alt="Œuvre de Marie Sallantin" class="random-image"/>
+              <div class="image-info">
+                <h3 id="image-title">Chargement...</h3>
+                <p id="image-series">Série</p>
+              </div>
+            </div>
             <div class="welcome-text">
               <p>
                 Bienvenue sur le site de Marie Sallantin, artiste peintre française née en 1946 à Paris.<br>
-                Formée à l’École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle vit et travaille à Paris.<br>
+                Formée à l'École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle vit et travaille à Paris.<br>
                 Son œuvre explore des thèmes classiques et contemporains à travers des séries thématiques : Anges musiciens, Grandes baigneuses, Dame et licorne, Étangs et Reflets, Forêt, Mini formats, Masque Miroir et Statuette, La toilette d'après Corot, et d'autres.<br>
                 Chaque série propose une vision singulière, entre figuration et abstraction, où la couleur et la lumière occupent une place centrale.<br>
               </p>
@@ -194,6 +200,47 @@
       document.getElementById('welcome-section').style.display = (section === 'welcome-section') ? '' : 'none';
       document.getElementById('series-overview').style.display = (section === 'series-overview') ? '' : 'none';
       document.getElementById('gallery').style.display = (section === 'gallery') ? '' : 'none';
+    }
+
+    // Fonction pour charger et afficher une image aléatoire
+    function loadRandomImage() {
+      fetch('media/titles.txt')
+        .then(response => response.text())
+        .then(text => {
+          const lines = text.split('\n');
+          const imageLines = lines.filter(line => line.includes('/') && line.includes(';'));
+          
+          if (imageLines.length > 0) {
+            // Sélectionner une image aléatoire
+            const randomLine = imageLines[Math.floor(Math.random() * imageLines.length)];
+            const [filePath, title] = randomLine.split(';');
+            
+            // Extraire le nom de la série du chemin
+            const seriesCode = filePath.split('/')[0];
+            
+            // Trouver le nom de la série
+            const seriesLine = lines.find(line => line.startsWith('#') && line.includes(seriesCode));
+            const seriesName = seriesLine ? seriesLine.split(';')[1].trim() : seriesCode;
+            
+            // Mettre à jour l'image et les informations
+            const img = document.getElementById('random-image');
+            const titleElement = document.getElementById('image-title');
+            const seriesElement = document.getElementById('image-series');
+            
+            img.src = `media/${filePath}`;
+            titleElement.textContent = title.trim();
+            seriesElement.textContent = seriesName;
+          }
+        })
+        .catch(error => {
+          console.error('Erreur lors du chargement de l\'image aléatoire:', error);
+        });
+    }
+
+    // Charger une première image et démarrer le cycle
+    if (document.getElementById('welcome-section').style.display !== 'none') {
+      loadRandomImage();
+      setInterval(loadRandomImage, 6000); // Changer toutes les 6 secondes
     }
   </script>
 </body>

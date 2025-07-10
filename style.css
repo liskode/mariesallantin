@@ -95,11 +95,11 @@ html, body {
   justify-content: center;
   gap: 32px;
   max-width: 900px;
-  margin: 48px auto 32px auto;
+  margin: 24px auto 16px auto;
   background: var(--surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
-  padding: 32px 24px;
+  padding: 16px 12px;
   flex-wrap: wrap;
 }
 
@@ -131,7 +131,44 @@ html, body {
 }
 .welcome-vertical .welcome-text {
   text-align: center;
-  max-width: 630px;
+  max-width: 800px;
+}
+
+.random-image-container {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.random-image {
+  width: 280px;
+  height: 280px;
+  object-fit: cover;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 12px;
+  transition: transform 0.3s ease;
+}
+
+.random-image:hover {
+  transform: scale(1.02);
+}
+
+.image-info {
+  text-align: center;
+}
+
+.image-info h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--primary);
+  margin: 0 0 4px 0;
+}
+
+.image-info p {
+  font-size: 0.9rem;
+  color: var(--accent);
+  margin: 0;
+  font-weight: 500;
 }
 
 /* Lightbox styles */
