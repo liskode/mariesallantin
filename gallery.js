@@ -77,9 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
           }
         }
       });
-      // Show first series by default
-      const firstSeries = Object.keys(allSeries)[0];
-      if (firstSeries) displaySeries(firstSeries);
+      // Afficher la liste des séries par défaut
+      if (window.showSeriesOverview) window.showSeriesOverview();
     });
 
   // Listen for menu clicks
@@ -107,13 +106,24 @@ document.addEventListener('DOMContentLoaded', () => {
     currentSeries = allSeries[code] || [];
     currentSeriesCode = code;
     if (!currentSeries.length) return;
-    currentSeries.forEach(({ filePath, title }, idx) => {
-      const item = document.createElement('div');
-      item.className = 'gallery-item';
-      item.innerHTML = `<img src="media/${filePath}" alt="${title.replace(/\"/g, '&quot;')} – Marie Sallantin" loading="lazy">`;
-      item.onclick = () => showLightbox(idx);
-      gallery.appendChild(item);
+    // Si mobile (<900px), ouvrir la lightbox directement
+    if (window.innerWidth < 900) {
+      showLightbox(0);
+      return;
+    }
+    // Sinon (desktop), afficher uniquement la grille des peintures
+    const paintingsContainer = document.createElement('div');
+    paintingsContainer.className = 'paintings-container';
+    currentSeries.forEach((painting, idx) => {
+      const img = document.createElement('img');
+      img.src = `media/${painting.filePath}`;
+      img.alt = painting.title;
+      img.className = 'painting-thumb';
+      img.tabIndex = 0;
+      img.addEventListener('click', () => showLightbox(idx));
+      paintingsContainer.appendChild(img);
     });
+    gallery.appendChild(paintingsContainer);
   }
 
   window.showSeriesOverview = function() {

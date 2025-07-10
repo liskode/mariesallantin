@@ -42,14 +42,19 @@
 <body>
   <header>
   </header>
+  <nav class="mobile-nav">
+    <a href="index.html?gallery?v=5" class="mobile-nav-link">Peinturesv5</a>
+    <a href="cv.html" class="mobile-nav-link">CV</a>
+    <a href="liens.html" class="mobile-nav-link">Liens</a>
+  </nav>
   <div class="site-grid">
     <header class="main-header">
       <div class="header-content">
-        <a href="index.html">
+        <a href="index.html" id="logo-link">
           <img src="images/logoMS.png" alt="Logo du site" />
         </a>
         <nav class="main-nav">
-          <a href="index.html?gallery" class="active">Peintures</a>
+          <a href="index.html?gallery" class="">Peintures</a>
           <a href="cv.html">CV</a>
           <a href="liens.html">Liens</a>
           <a href="https://www.artmajeur.com/marie-sallantin" target="_blank" rel="noopener">
@@ -266,6 +271,17 @@
             }, 100);
           }
         }
+      }
+    });
+
+    // Gestionnaire pour le logo : affiche l'accueil avec animation
+    document.getElementById('logo-link').addEventListener('click', function(e) {
+      e.preventDefault();
+      showSection('welcome-section');
+      // Relancer l'animation d'image aléatoire
+      loadRandomImage();
+      if (!window._randomImageInterval) {
+        window._randomImageInterval = setInterval(loadRandomImage, 6000);
       }
     });
   </script>
