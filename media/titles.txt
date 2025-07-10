@@ -131,8 +131,6 @@ MMS/MasqueMiroirStatuette00015.jpeg;Masque miroir statuette 1989 acrylique sur t
 MMS/MasqueMiroirStatuette00016.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00017.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00018.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
-MMS/MasqueMiroirStatuette00019.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
-MMS/MasqueMiroirStatuette00020.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00021.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 MMS/MasqueMiroirStatuette00022.jpeg;Masque miroir statuette 1989 acrylique sur toile 80x80cm
 TOI/Toilette00001.jpg;Corot, la toilette
