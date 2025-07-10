@@ -107,10 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
     currentSeries = allSeries[code] || [];
     currentSeriesCode = code;
     if (!currentSeries.length) return;
-    currentSeries.forEach(({ filePath }, idx) => {
+    currentSeries.forEach(({ filePath, title }, idx) => {
       const item = document.createElement('div');
       item.className = 'gallery-item';
-      item.innerHTML = `<img src="media/${filePath}" alt="" loading="lazy">`;
+      item.innerHTML = `<img src="media/${filePath}" alt="${title.replace(/\"/g, '&quot;')} – Marie Sallantin" loading="lazy">`;
       item.onclick = () => showLightbox(idx);
       gallery.appendChild(item);
     });

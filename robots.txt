@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://www.artmajeur.com/marie-sallantin/sitemap.xml 
