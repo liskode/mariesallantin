@@ -171,6 +171,144 @@ html, body {
   font-weight: 500;
 }
 
+/* Nouveaux styles pour l'effet hero */
+.welcome-hero {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  border-radius: 0;
+}
+
+.hero-image-container {
+  position: relative;
+  width: 100%;
+  height: 70vh;
+  min-height: 500px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.hero-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 40px;
+  background: linear-gradient(
+    to bottom,
+    rgba(0,0,0,0.3) 0%,
+    rgba(0,0,0,0.1) 50%,
+    rgba(0,0,0,0.6) 100%
+  );
+}
+
+.hero-title {
+  color: white;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.hero-title h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 8px 0;
+  color: white;
+}
+
+.hero-title p {
+  font-size: 1.1rem;
+  margin: 0;
+  color: rgba(255,255,255,0.9);
+  font-weight: 500;
+}
+
+.clickable-series {
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.3s ease;
+  position: relative;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  padding-bottom: 1px;
+}
+
+.clickable-series:hover {
+  color: rgba(255,255,255,1);
+  text-shadow: 0 0 8px rgba(255,255,255,0.5);
+  transform: scale(1.05);
+}
+
+.clickable-series::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: rgba(255,255,255,0.8);
+  transition: width 0.3s ease;
+}
+
+.clickable-series:hover::after {
+  width: 100%;
+}
+
+.link-indicator {
+  font-size: 0.8em;
+  opacity: 0.7;
+  margin-left: 4px;
+  transition: all 0.3s ease;
+}
+
+.clickable-series:hover .link-indicator {
+  opacity: 1;
+  transform: translateX(2px);
+}
+
+@keyframes gentle-pulse {
+  0%, 100% { opacity: 0.6; }
+  50% { opacity: 1; }
+}
+
+.clickable-series {
+  animation: gentle-pulse 3s ease-in-out infinite;
+}
+
+.clickable-series:hover {
+  animation: none;
+}
+
+.hero-text {
+  background: rgba(255,255,255,0.4);
+  padding: 32px;
+  border-radius: var(--radius);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  height: 35%;
+  display: flex;
+  align-items: center;
+}
+
+.hero-text p {
+  font-size: 1rem;
+  color: var(--primary);
+  line-height: 1.6;
+  margin: 0;
+}
+
 /* Lightbox styles */
 .lightbox {
   display: none;
@@ -535,6 +673,32 @@ header {
   }
   .header-content {
     padding-left: 0;
+  }
+  
+  /* Styles responsifs pour l'effet hero */
+  .hero-image-container {
+    height: 60vh;
+    min-height: 400px;
+  }
+  
+  .hero-overlay {
+    padding: 24px;
+  }
+  
+  .hero-title h3 {
+    font-size: 1.6rem;
+  }
+  
+  .hero-title p {
+    font-size: 1rem;
+  }
+  
+  .hero-text {
+    padding: 24px;
+  }
+  
+  .hero-text p {
+    font-size: 1rem;
   }
 }
 
