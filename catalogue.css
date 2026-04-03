@@ -356,8 +356,8 @@ body.catalogue-standalone {
   position: fixed;
   z-index: 9999;
   pointer-events: none;
-  max-width: min(90vw, 560px);
-  max-height: min(85vh, 560px);
+  max-width: min(90vw, 1120px);
+  max-height: min(85vh, 1120px);
   object-fit: contain;
   border-radius: 10px;
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
