@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Catalogue des œuvres – Marie Sallantin</title>
+  <meta name="description" content="Tableau de synthèse des peintures : fichiers, séries, légendes et métadonnées techniques." />
+  <link rel="stylesheet" href="catalogue.css" />
+  <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body class="catalogue-standalone">
+  <div id="catalogue-login" class="catalogue-login-screen" role="dialog" aria-labelledby="catalogue-login-title">
+    <form id="catalogue-login-form" class="catalogue-login-box" autocomplete="on">
+      <h2 id="catalogue-login-title" class="catalogue-login-title">Catalogue — accès restreint</h2>
+      <label class="catalogue-login-label" for="catalogue-login-input">Mot de passe</label>
+      <input
+        id="catalogue-login-input"
+        class="catalogue-login-input"
+        type="password"
+        name="password"
+        autocomplete="current-password"
+        required
+      />
+      <button type="submit" class="catalogue-login-submit">Accéder</button>
+      <p id="catalogue-login-error" class="catalogue-login-error" hidden>Mot de passe incorrect.</p>
+    </form>
+  </div>
+  <div id="catalogue-app" class="catalogue-app" hidden>
+  <header class="catalogue-standalone-header">
+    <div class="catalogue-standalone-inner">
+      <h1>Catalogue des œuvres</h1>
+      <p class="catalogue-standalone-meta">
+        Outil de gestion — <a href="index.html">Retour au site public</a>
+      </p>
+    </div>
+  </header>
+  <main class="catalogue-page" id="catalogue-root">
+    <div class="catalogue-standalone-inner catalogue-standalone-main">
+      <p class="catalogue-intro">
+        Cliquer pour trier une colonne, passer le pointeur au-dessus du tableau pour agrandir, filtrer avec les menus déroulants.
+      </p>
+      <div class="catalogue-toolbar">
+        <p class="catalogue-count" id="catalogue-count" aria-live="polite">0 affiché sur 0</p>
+      </div>
+      <p class="catalogue-loading">Chargement du catalogue…</p>
+      <div class="catalogue-table-wrap">
+        <table class="catalogue-table">
+          <thead id="catalogue-thead">
+            <tr>
+              <th class="col-thumb catalogue-th" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="order" title="Trier par ordre dans titles.txt">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Vignette</span>
+                </button>
+              </th>
+              <th class="catalogue-th catalogue-th--has-filter" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="folder" title="Trier par dossier">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Dossier</span>
+                </button>
+                <select id="catalogue-filter-dossier" class="catalogue-select catalogue-select--header" aria-label="Filtrer par dossier"></select>
+              </th>
+              <th class="catalogue-th" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="fileName" title="Trier par nom de fichier">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Fichier</span>
+                </button>
+              </th>
+              <th class="catalogue-th" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="ext" title="Trier par extension">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Ext.</span>
+                </button>
+              </th>
+              <th class="catalogue-th catalogue-th--has-filter" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="seriesName" title="Trier par série">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Série</span>
+                </button>
+                <select id="catalogue-filter-serie" class="catalogue-select catalogue-select--header" aria-label="Filtrer par série"></select>
+              </th>
+              <th class="col-legende catalogue-th" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="title" title="Trier par légende">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Légende</span>
+                </button>
+              </th>
+              <th class="col-url catalogue-th" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="mediaUrl" title="Trier par URL">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">URL <code>media/</code></span>
+                </button>
+              </th>
+              <th class="catalogue-th" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="bytes" title="Trier par poids">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Poids (Ko)</span>
+                </button>
+              </th>
+              <th class="catalogue-th" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="pixels" title="Trier par résolution">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Résolution (px)</span>
+                </button>
+              </th>
+              <th class="catalogue-th catalogue-th--has-filter" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="etat" title="Trier par état">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">État</span>
+                </button>
+                <select id="catalogue-filter-etat" class="catalogue-select catalogue-select--header" aria-label="Filtrer par état">
+                  <option value="">Tous</option>
+                  <option value="P">Publié</option>
+                  <option value="S">Suspendu</option>
+                  <option value="none">Non renseigné</option>
+                </select>
+              </th>
+            </tr>
+          </thead>
+          <tbody id="catalogue-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+  <img id="catalogue-preview-img" class="catalogue-preview" alt="" aria-hidden="true" />
+  </div>
+  <script src="catalogue.js"></script>
+</body>
+</html>

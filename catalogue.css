@@ -1,0 +1,429 @@
+/* Page catalogue autonome (hors navigation du site public) */
+
+:root {
+  --background: #f8f8fa;
+  --surface: #fff;
+  --primary: #222;
+  --secondary: #6a6a6a;
+  --accent: #3771d7;
+  --border: #e0e0e0;
+  --shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  --radius: 14px;
+  --transition: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+html,
+body.catalogue-standalone {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', Arial, sans-serif;
+  background: var(--background);
+  color: var(--primary);
+  min-height: 100vh;
+}
+
+.catalogue-standalone-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  padding: 20px 24px 18px;
+}
+
+.catalogue-standalone-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+.catalogue-standalone-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: var(--primary);
+}
+
+.catalogue-standalone-meta {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--secondary);
+}
+
+.catalogue-standalone-meta a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.catalogue-standalone-meta a:hover {
+  text-decoration: underline;
+}
+
+.catalogue-standalone-main {
+  padding-top: 8px;
+}
+
+/* Écran mot de passe (protection légère côté navigateur) */
+.catalogue-login-screen {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  box-sizing: border-box;
+  background: linear-gradient(160deg, #e8ecf4 0%, #f8f8fa 45%, #eef1f8 100%);
+}
+
+.catalogue-login-box {
+  width: 100%;
+  max-width: 360px;
+  padding: 28px 28px 24px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--border);
+}
+
+.catalogue-login-title {
+  margin: 0 0 8px;
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.catalogue-login-label {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--secondary);
+  margin-bottom: 6px;
+}
+
+.catalogue-login-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  font-size: 1rem;
+  font-family: inherit;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.catalogue-login-input:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.catalogue-login-submit {
+  width: 100%;
+  padding: 10px 16px;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #fff;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.catalogue-login-submit:hover {
+  filter: brightness(1.05);
+}
+
+.catalogue-login-error {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+  color: #b00020;
+}
+
+.catalogue-app[hidden] {
+  display: none !important;
+}
+
+/* Page catalogue — tableau des œuvres */
+
+.catalogue-page {
+  max-width: 100%;
+  padding: 0 24px 48px;
+  box-sizing: border-box;
+}
+
+.catalogue-intro {
+  color: var(--secondary);
+  font-size: 0.78rem;
+  line-height: 1.45;
+  margin: 0 0 14px;
+  max-width: 52em;
+}
+
+.catalogue-toolbar {
+  margin-bottom: 12px;
+}
+
+.catalogue-select {
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--primary);
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.catalogue-select:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+.catalogue-select--header {
+  font-size: 0.75rem;
+  padding: 5px 6px;
+  margin-top: 6px;
+  width: 100%;
+  min-width: 0;
+}
+
+.catalogue-count {
+  font-size: 0.95rem;
+  color: var(--primary);
+  margin: 0;
+  font-weight: 500;
+}
+
+.catalogue-count strong {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.catalogue-loading {
+  padding: 32px;
+  color: var(--secondary);
+}
+
+.catalogue-error {
+  padding: 16px;
+  background: #fff3f0;
+  border: 1px solid #e8b4a8;
+  border-radius: var(--radius);
+  color: #8a2c0d;
+}
+
+.catalogue-table-wrap {
+  overflow-x: auto;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.catalogue-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+.catalogue-table th,
+.catalogue-table td {
+  padding: 10px 12px;
+  text-align: left;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--border);
+}
+
+.catalogue-table th {
+  background: #f0f2f7;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  vertical-align: top;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.catalogue-th {
+  padding: 8px 10px !important;
+}
+
+.catalogue-th--has-filter {
+  min-width: 112px;
+}
+
+.catalogue-sort-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 4px;
+  width: 100%;
+  margin: 0;
+  padding: 4px 2px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  font: inherit;
+  font-weight: 600;
+  color: var(--primary);
+  cursor: pointer;
+  text-align: center;
+  line-height: 1.25;
+  position: relative;
+  z-index: 2;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Le clic doit cibler le <button> (y compris sous <code> dans le libellé URL). */
+.catalogue-sort-btn * {
+  pointer-events: none;
+}
+
+.catalogue-sort-btn:hover {
+  background: rgba(55, 113, 215, 0.08);
+  color: var(--accent);
+}
+
+.catalogue-sort-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.catalogue-sort-btn--active {
+  color: var(--accent);
+}
+
+.catalogue-sort-icons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  line-height: 0.75;
+  font-size: 0.55rem;
+  color: var(--secondary);
+  user-select: none;
+}
+
+.catalogue-sort-up,
+.catalogue-sort-down {
+  opacity: 0.35;
+  transition: opacity var(--transition), color var(--transition);
+}
+
+.catalogue-sort-up.is-active,
+.catalogue-sort-down.is-active {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.catalogue-sort-label {
+  font-size: 0.8rem;
+  white-space: normal;
+}
+
+.catalogue-sort-label code {
+  font-size: 0.72rem;
+}
+
+.catalogue-table tbody tr:hover {
+  background: #fafbfd;
+}
+
+.catalogue-table .col-thumb {
+  width: 72px;
+  min-width: 72px;
+}
+
+.catalogue-thumb-cell {
+  position: relative;
+  padding: 8px !important;
+}
+
+.catalogue-thumb {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  cursor: zoom-in;
+  background: #eee;
+}
+
+.catalogue-preview {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+  max-width: min(90vw, 560px);
+  max-height: min(85vh, 560px);
+  object-fit: contain;
+  border-radius: 10px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+  border: 2px solid #fff;
+}
+
+.catalogue-preview.is-visible {
+  display: block;
+}
+
+.catalogue-table .col-legende {
+  min-width: 220px;
+  max-width: 360px;
+}
+
+.catalogue-table td.col-legende {
+  line-height: 1.4;
+  color: var(--primary);
+}
+
+.catalogue-table .col-url code {
+  font-size: 0.78rem;
+  word-break: break-all;
+  color: var(--secondary);
+}
+
+.catalogue-table .metric-pending {
+  color: #999;
+}
+
+.catalogue-etat {
+  display: inline-block;
+  text-align: center;
+  font-weight: 600;
+  padding: 2px 10px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+}
+
+/* P = publié sur le site public */
+.catalogue-etat--pub {
+  background: #e8f4ea;
+  color: #1b5e20;
+}
+
+/* S = suspendu (ne doit pas apparaître sur le site public) */
+.catalogue-etat--sus {
+  background: #fce8e6;
+  color: #8a1c12;
+}
+
+.catalogue-etat--none {
+  background: #f0f0f0;
+  color: var(--secondary);
+  font-weight: 400;
+}
+
+@media (max-width: 900px) {
+  .catalogue-page {
+    padding: 0 12px 32px;
+  }
+
+  .catalogue-table th,
+  .catalogue-table td {
+    padding: 8px;
+    font-size: 0.8rem;
+  }
+}
