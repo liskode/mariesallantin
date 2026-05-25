@@ -4,18 +4,18 @@
   <meta charset="UTF-8" />
   <script>
     (function () {
-      var CATALOGUE_ORIGIN = 'https://cataloque.mariesallantin.art';
+      var CATALOGUE_ORIGIN = 'https://catalogue.mariesallantin.art';
       var h = location.hostname;
       var p = location.pathname.replace(/\/+$/, '') || '/';
+      if (h === 'cataloque.mariesallantin.art') {
+        location.replace(CATALOGUE_ORIGIN + p + location.search + location.hash);
+        return;
+      }
       if (h === 'mariesallantin.art' || h === 'www.mariesallantin.art') {
         if (p === '/catalogue-legende' || p === '/catalogue-legende.html') {
           var np = p === '/catalogue-legende' ? '/catalogue-legende.html' : p;
           location.replace(CATALOGUE_ORIGIN + np + location.search + location.hash);
         }
-        return;
-      }
-      if (h === 'catalogue.mariesallantin.art') {
-        location.replace(CATALOGUE_ORIGIN + p + location.search + location.hash);
       }
     })();
   </script>
