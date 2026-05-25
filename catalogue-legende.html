@@ -2,6 +2,23 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
+  <script>
+    (function () {
+      var CATALOGUE_ORIGIN = 'https://cataloque.mariesallantin.art';
+      var h = location.hostname;
+      var p = location.pathname.replace(/\/+$/, '') || '/';
+      if (h === 'mariesallantin.art' || h === 'www.mariesallantin.art') {
+        if (p === '/catalogue-legende' || p === '/catalogue-legende.html') {
+          var np = p === '/catalogue-legende' ? '/catalogue-legende.html' : p;
+          location.replace(CATALOGUE_ORIGIN + np + location.search + location.hash);
+        }
+        return;
+      }
+      if (h === 'catalogue.mariesallantin.art') {
+        location.replace(CATALOGUE_ORIGIN + p + location.search + location.hash);
+      }
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
   <meta name="catalogue-save-api" content="http://127.0.0.1:47831" />

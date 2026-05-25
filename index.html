@@ -4,10 +4,21 @@
 <head>
   <script>
     (function () {
-      if (location.hostname !== 'catalogue.mariesallantin.art') return;
-      var path = location.pathname.replace(/\/+$/, '') || '/';
-      if (path !== '/') return;
-      location.replace(location.origin + '/catalogue.html' + location.search + location.hash);
+      var CATALOGUE_ORIGIN = 'https://cataloque.mariesallantin.art';
+      var h = location.hostname;
+      var p = (location.pathname.replace(/\/+$/, '') || '/');
+      // Site public : anciennes URL /catalogue* → sous-domaine dédié
+      if (h === 'mariesallantin.art' || h === 'www.mariesallantin.art') {
+        if (p === '/catalogue' || p === '/catalogue.html' || p === '/catalogue-legende.html') {
+          var np = p === '/catalogue' ? '/catalogue.html' : p;
+          location.replace(CATALOGUE_ORIGIN + np + location.search + location.hash);
+        }
+        return;
+      }
+      // Sous-domaine cataloque (ou ancien catalogue.) : racine → tableau
+      if ((h === 'cataloque.mariesallantin.art' || h === 'catalogue.mariesallantin.art') && p === '/') {
+        location.replace(CATALOGUE_ORIGIN + '/catalogue.html' + location.search + location.hash);
+      }
     })();
   </script>
   <meta charset="UTF-8" />
