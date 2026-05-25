@@ -2,23 +2,6 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <script>
-    (function () {
-      var h = location.hostname;
-      var path = location.pathname.replace(/\/+$/, '') || '/';
-      var tail = location.search + location.hash;
-
-      if (h === 'catalogue.mariesallantin.art' && path === '/') {
-        location.replace(location.origin + '/catalogue.html' + tail);
-        return;
-      }
-
-      var isMain = h === 'mariesallantin.art' || h === 'www.mariesallantin.art';
-      if (isMain && (path === '/catalogue' || path === '/catalogue.html')) {
-        location.replace('https://catalogue.mariesallantin.art/' + tail);
-      }
-    })();
-  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Marie Sallantin – Artiste Peintre</title>
