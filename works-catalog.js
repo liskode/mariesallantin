@@ -36,11 +36,13 @@
       const [filePath, title] = line.split(';');
       const media = filePath.trim();
       const folder = media.split('/')[0];
+      const seriesFromFolder =
+        folder && String(folder).toLowerCase() !== 'catalogue' ? [folder] : [];
       works.push({
         id: media,
         media,
         title: (title || '').trim(),
-        series: uniqSeriesCodes([folder]),
+        series: uniqSeriesCodes(seriesFromFolder),
         photo: 'OK',
         publish: 'ON',
         dimensions: '',
@@ -89,7 +91,10 @@
       if (Array.isArray(w.series)) series = w.series.map((x) => String(x).trim()).filter(Boolean);
       else if (w.seriesCode) series = [String(w.seriesCode).trim()].filter(Boolean);
       const folderFromMedia = media.includes('/') ? media.split('/')[0] : '';
-      if (!series.length && folderFromMedia) series = [folderFromMedia];
+      const folderLower = String(folderFromMedia).toLowerCase();
+      if (!series.length && folderFromMedia && folderLower !== 'catalogue') {
+        series = [folderFromMedia];
+      }
       series = uniqSeriesCodes(series);
       const photo = w.photo != null ? String(w.photo).trim() : 'OK';
       const dimensions = w.dimensions != null ? String(w.dimensions).trim() : '';

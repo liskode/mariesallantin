@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "description": "Catalogue v2 : fichiers sous media/catalogue/. id MS####. publish = toujours VAL (à valider) dans works.json ; état Suspendu (S) dans catalog-state.json pour les chemins contenant _OFF_. Légende : tirets ou underscores (works_numero). photo = OK | Redo. tailleMo / dimensions si fichiers présents.",
+  "description": "Catalogue v2 : fichiers sous media/catalogue/. id MS####. publish = toujours VAL (à valider) dans works.json ; état Suspendu (S) dans catalog-state.json pour les chemins contenant _OFF_. Légende : tirets ou underscores (works_numero). photo = OK | Redo | HQ (fichier) ; sur la page catalogue, HQ/LQ peuvent aussi dériver de la taille (≥10 Mo / <2 Mo). tailleMo / dimensions (px) renseignés par scripts/enrich-catalogue-works-json.mjs.",
   "series": [
     [
       "ABSTR",
@@ -78,7 +78,9 @@
       "title": "petite variation blanche 41x50cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.163,
+      "dimensions": "3454 × 2767 px"
     },
     {
       "id": "MS0002",
@@ -88,7 +90,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.768,
+      "dimensions": "4036 × 3045 px"
     },
     {
       "id": "MS0003",
@@ -98,7 +102,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.723,
+      "dimensions": "2092 × 2616 px"
     },
     {
       "id": "MS0004",
@@ -108,7 +114,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 17.167,
+      "dimensions": "4628 × 3497 px"
     },
     {
       "id": "MS0005",
@@ -118,7 +126,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.917,
+      "dimensions": "2717 × 3814 px"
     },
     {
       "id": "MS0006",
@@ -128,7 +138,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.383,
+      "dimensions": "1339 × 2025 px"
     },
     {
       "id": "MS0007",
@@ -138,7 +150,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 9.572,
+      "dimensions": "2993 × 3566 px"
     },
     {
       "id": "MS0008",
@@ -148,7 +162,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.292,
+      "dimensions": "2277 × 2784 px"
     },
     {
       "id": "MS0009",
@@ -158,7 +174,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 19.37,
+      "dimensions": "3501 × 4507 px"
     },
     {
       "id": "MS0010",
@@ -168,7 +186,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 14.845,
+      "dimensions": "3232 × 4882 px"
     },
     {
       "id": "MS0011",
@@ -178,7 +198,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.968,
+      "dimensions": "2631 × 3276 px"
     },
     {
       "id": "MS0012",
@@ -188,7 +210,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.595,
+      "dimensions": "2628 × 3267 px"
     },
     {
       "id": "MS0013",
@@ -198,7 +222,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.437,
+      "dimensions": "2648 × 3309 px"
     },
     {
       "id": "MS0014",
@@ -208,7 +234,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.824,
+      "dimensions": "2703 × 3391 px"
     },
     {
       "id": "MS0015",
@@ -218,7 +246,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 18.325,
+      "dimensions": "4927 × 3509 px"
     },
     {
       "id": "MS0016",
@@ -228,7 +258,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.063,
+      "dimensions": "3754 × 2313 px"
     },
     {
       "id": "MS0017",
@@ -238,7 +270,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.901,
+      "dimensions": "1051 × 1459 px"
     },
     {
       "id": "MS0018",
@@ -248,7 +282,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.399,
+      "dimensions": "1335 × 1860 px"
     },
     {
       "id": "MS0019",
@@ -258,7 +294,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 14.741,
+      "dimensions": "2582 × 5297 px"
     },
     {
       "id": "MS0020",
@@ -268,7 +306,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.084,
+      "dimensions": "1186 × 2380 px"
     },
     {
       "id": "MS0021",
@@ -278,7 +318,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.331,
+      "dimensions": "1260 × 1610 px"
     },
     {
       "id": "MS0022",
@@ -288,7 +330,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.958,
+      "dimensions": "1950 × 2330 px"
     },
     {
       "id": "MS0023",
@@ -298,7 +342,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.83,
+      "dimensions": "3193 × 1831 px"
     },
     {
       "id": "MS0024",
@@ -308,7 +354,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 17.623,
+      "dimensions": "3493 × 5251 px"
     },
     {
       "id": "MS0025",
@@ -318,7 +366,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.376,
+      "dimensions": "692 × 1060 px"
     },
     {
       "id": "MS0026",
@@ -328,7 +378,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 8.134,
+      "dimensions": "2198 × 4525 px"
     },
     {
       "id": "MS0027",
@@ -338,7 +390,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 13.696,
+      "dimensions": "2520 × 5335 px"
     },
     {
       "id": "MS0028",
@@ -348,7 +402,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.768,
+      "dimensions": "1357 × 2113 px"
     },
     {
       "id": "MS0029",
@@ -358,7 +414,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.232,
+      "dimensions": "408 × 825 px"
     },
     {
       "id": "MS0030",
@@ -368,7 +426,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.31,
+      "dimensions": "2314 × 2406 px"
     },
     {
       "id": "MS0031",
@@ -378,7 +438,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.9,
+      "dimensions": "2302 × 2444 px"
     },
     {
       "id": "MS0032",
@@ -388,7 +450,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.454,
+      "dimensions": "1093 × 2217 px"
     },
     {
       "id": "MS0033",
@@ -398,7 +462,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 14.477,
+      "dimensions": "3420 × 4342 px"
     },
     {
       "id": "MS0034",
@@ -408,7 +474,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 13.366,
+      "dimensions": "2508 × 5367 px"
     },
     {
       "id": "MS0035",
@@ -418,7 +486,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 14.051,
+      "dimensions": "2573 × 5290 px"
     },
     {
       "id": "MS0036",
@@ -428,7 +498,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 14.588,
+      "dimensions": "2621 × 5369 px"
     },
     {
       "id": "MS0037",
@@ -438,7 +510,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.819,
+      "dimensions": "2281 × 2776 px"
     },
     {
       "id": "MS0038",
@@ -448,7 +522,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.938,
+      "dimensions": "1463 × 2265 px"
     },
     {
       "id": "MS0039",
@@ -458,7 +534,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.814,
+      "dimensions": "1328 × 1317 px"
     },
     {
       "id": "MS0040",
@@ -468,7 +546,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 13.308,
+      "dimensions": "3520 × 3515 px"
     },
     {
       "id": "MS0041",
@@ -478,7 +558,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 22.274,
+      "dimensions": "3655 × 4955 px"
     },
     {
       "id": "MS0042",
@@ -488,7 +570,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.926,
+      "dimensions": "1141 × 1521 px"
     },
     {
       "id": "MS0043",
@@ -498,7 +582,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.477,
+      "dimensions": "1285 × 1825 px"
     },
     {
       "id": "MS0044",
@@ -508,7 +594,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.428,
+      "dimensions": "2023 × 2056 px"
     },
     {
       "id": "MS0045",
@@ -518,7 +606,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.368,
+      "dimensions": "2058 × 2046 px"
     },
     {
       "id": "MS0046",
@@ -528,7 +618,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.241,
+      "dimensions": "2016 × 2058 px"
     },
     {
       "id": "MS0047",
@@ -538,7 +630,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.645,
+      "dimensions": "1513 × 2220 px"
     },
     {
       "id": "MS0048",
@@ -548,7 +642,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.847,
+      "dimensions": "2282 × 3161 px"
     },
     {
       "id": "MS0049",
@@ -558,7 +654,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.576,
+      "dimensions": "1299 × 1855 px"
     },
     {
       "id": "MS0050",
@@ -568,7 +666,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.007,
+      "dimensions": "1736 × 1724 px"
     },
     {
       "id": "MS0051",
@@ -578,7 +678,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.98,
+      "dimensions": "1800 × 1788 px"
     },
     {
       "id": "MS0052",
@@ -588,7 +690,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.295,
+      "dimensions": "1840 × 1836 px"
     },
     {
       "id": "MS0053",
@@ -598,7 +702,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.113,
+      "dimensions": "2082 × 2758 px"
     },
     {
       "id": "MS0054",
@@ -608,7 +714,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.005,
+      "dimensions": "2066 × 2736 px"
     },
     {
       "id": "MS0055",
@@ -618,7 +726,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 20.825,
+      "dimensions": "3445 × 3442 px"
     },
     {
       "id": "MS0056",
@@ -628,7 +738,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.33,
+      "dimensions": "2301 × 2315 px"
     },
     {
       "id": "MS0057",
@@ -638,7 +750,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.06,
+      "dimensions": "3430 × 3475 px"
     },
     {
       "id": "MS0058",
@@ -648,7 +762,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.835,
+      "dimensions": "3495 × 3480 px"
     },
     {
       "id": "MS0059",
@@ -658,7 +774,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.271,
+      "dimensions": "1289 × 1690 px"
     },
     {
       "id": "MS0060",
@@ -668,7 +786,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 16.325,
+      "dimensions": "3647 × 3631 px"
     },
     {
       "id": "MS0061",
@@ -678,7 +798,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 24.656,
+      "dimensions": "3095 × 4503 px"
     },
     {
       "id": "MS0062",
@@ -688,7 +810,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.991,
+      "dimensions": "2155 × 3144 px"
     },
     {
       "id": "MS0063",
@@ -698,7 +822,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.805,
+      "dimensions": "1177 × 1904 px"
     },
     {
       "id": "MS0064",
@@ -708,7 +834,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.118,
+      "dimensions": "1222 × 1982 px"
     },
     {
       "id": "MS0065",
@@ -718,7 +846,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.994,
+      "dimensions": "1191 × 1907 px"
     },
     {
       "id": "MS0066",
@@ -728,7 +858,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 20.854,
+      "dimensions": "3097 × 4487 px"
     },
     {
       "id": "MS0067",
@@ -738,7 +870,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.177,
+      "dimensions": "1267 × 2049 px"
     },
     {
       "id": "MS0068",
@@ -748,7 +882,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.402,
+      "dimensions": "1401 × 2202 px"
     },
     {
       "id": "MS0069",
@@ -758,7 +894,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.592,
+      "dimensions": "1235 × 1981 px"
     },
     {
       "id": "MS0070",
@@ -768,7 +906,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.707,
+      "dimensions": "3179 × 3165 px"
     },
     {
       "id": "MS0071",
@@ -778,7 +918,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.288,
+      "dimensions": "3447 × 3457 px"
     },
     {
       "id": "MS0072",
@@ -788,7 +930,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.001,
+      "dimensions": "1537 × 1554 px"
     },
     {
       "id": "MS0073",
@@ -798,7 +942,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 15.423,
+      "dimensions": "4224 × 3237 px"
     },
     {
       "id": "MS0074",
@@ -808,7 +954,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 25.812,
+      "dimensions": "3164 × 4793 px"
     },
     {
       "id": "MS0075",
@@ -818,7 +966,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 21.274,
+      "dimensions": "3484 × 4580 px"
     },
     {
       "id": "MS0076",
@@ -828,7 +978,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.634,
+      "dimensions": "1388 × 2106 px"
     },
     {
       "id": "MS0077",
@@ -838,7 +990,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.836,
+      "dimensions": "1435 × 2122 px"
     },
     {
       "id": "MS0078",
@@ -848,7 +1002,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 16.421,
+      "dimensions": "3084 × 5366 px"
     },
     {
       "id": "MS0079",
@@ -858,7 +1014,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 15.519,
+      "dimensions": "3210 × 5507 px"
     },
     {
       "id": "MS0080",
@@ -868,7 +1026,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.334,
+      "dimensions": "1278 × 2173 px"
     },
     {
       "id": "MS0081",
@@ -878,7 +1038,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.434,
+      "dimensions": "1278 × 2161 px"
     },
     {
       "id": "MS0082",
@@ -888,7 +1050,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.865,
+      "dimensions": "1298 × 2232 px"
     },
     {
       "id": "MS0083",
@@ -898,7 +1062,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.96,
+      "dimensions": "1275 × 2189 px"
     },
     {
       "id": "MS0084",
@@ -908,7 +1074,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 17.007,
+      "dimensions": "3501 × 5231 px"
     },
     {
       "id": "MS0085",
@@ -918,7 +1086,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.528,
+      "dimensions": "1294 × 2177 px"
     },
     {
       "id": "MS0086",
@@ -928,7 +1098,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.13,
+      "dimensions": "1521 × 2004 px"
     },
     {
       "id": "MS0087",
@@ -938,7 +1110,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.865,
+      "dimensions": "3543 × 3542 px"
     },
     {
       "id": "MS0088",
@@ -948,7 +1122,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.346,
+      "dimensions": "2287 × 3709 px"
     },
     {
       "id": "MS0089",
@@ -958,7 +1134,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.645,
+      "dimensions": "2251 × 3638 px"
     },
     {
       "id": "MS0090",
@@ -968,7 +1146,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 8.484,
+      "dimensions": "2280 × 3671 px"
     },
     {
       "id": "MS0091",
@@ -978,7 +1158,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.289,
+      "dimensions": "1577 × 2005 px"
     },
     {
       "id": "MS0092",
@@ -988,7 +1170,9 @@
         "CIEUX"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.544,
+      "dimensions": "1745 × 1777 px"
     },
     {
       "id": "MS0093",
@@ -998,7 +1182,9 @@
         "CIEUX"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.307,
+      "dimensions": "2375 × 1732 px"
     },
     {
       "id": "MS0094",
@@ -1008,7 +1194,9 @@
         "DANAE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.074,
+      "dimensions": "2737 × 2732 px"
     },
     {
       "id": "MS0095",
@@ -1018,7 +1206,9 @@
         "DANAE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.079,
+      "dimensions": "2722 × 2710 px"
     },
     {
       "id": "MS0096",
@@ -1028,7 +1218,9 @@
         "DANTE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.578,
+      "dimensions": "2901 × 4134 px"
     },
     {
       "id": "MS0097",
@@ -1038,7 +1230,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.601,
+      "dimensions": "1791 × 2396 px"
     },
     {
       "id": "MS0098",
@@ -1049,7 +1243,9 @@
         "ENFER"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.157,
+      "dimensions": "2979 × 3736 px"
     },
     {
       "id": "MS0099",
@@ -1060,7 +1256,9 @@
         "ENFER"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.481,
+      "dimensions": "4566 × 3661 px"
     },
     {
       "id": "MS0100",
@@ -1070,7 +1268,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.361,
+      "dimensions": "2821 × 1938 px"
     },
     {
       "id": "MS0101",
@@ -1081,7 +1281,9 @@
         "PURGA"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.395,
+      "dimensions": "3705 × 4442 px"
     },
     {
       "id": "MS0102",
@@ -1092,7 +1294,9 @@
         "PURGA"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.101,
+      "dimensions": "2410 × 1766 px"
     },
     {
       "id": "MS0103",
@@ -1103,7 +1307,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.894,
+      "dimensions": "3264 × 2448 px"
     },
     {
       "id": "MS0104",
@@ -1114,7 +1320,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.201,
+      "dimensions": "2600 × 3391 px"
     },
     {
       "id": "MS0105",
@@ -1125,7 +1333,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.712,
+      "dimensions": "1277 × 1374 px"
     },
     {
       "id": "MS0106",
@@ -1136,7 +1346,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.072,
+      "dimensions": "1894 × 1525 px"
     },
     {
       "id": "MS0107",
@@ -1147,7 +1359,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.826,
+      "dimensions": "2688 × 3411 px"
     },
     {
       "id": "MS0108",
@@ -1158,7 +1372,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.326,
+      "dimensions": "1194 × 1727 px"
     },
     {
       "id": "MS0109",
@@ -1169,7 +1385,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.764,
+      "dimensions": "2810 × 3892 px"
     },
     {
       "id": "MS0110",
@@ -1179,7 +1397,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.048,
+      "dimensions": "2551 × 3510 px"
     },
     {
       "id": "MS0111",
@@ -1189,7 +1409,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.388,
+      "dimensions": "2551 × 3510 px"
     },
     {
       "id": "MS0112",
@@ -1199,7 +1421,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.616,
+      "dimensions": "2551 × 3510 px"
     },
     {
       "id": "MS0113",
@@ -1209,7 +1433,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.564,
+      "dimensions": "2551 × 3510 px"
     },
     {
       "id": "MS0114",
@@ -1219,7 +1445,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.912,
+      "dimensions": "2548 × 3510 px"
     },
     {
       "id": "MS0115",
@@ -1229,7 +1457,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.736,
+      "dimensions": "2551 × 3510 px"
     },
     {
       "id": "MS0116",
@@ -1239,7 +1469,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.289,
+      "dimensions": "2551 × 3510 px"
     },
     {
       "id": "MS0117",
@@ -1249,7 +1481,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.294,
+      "dimensions": "2537 × 3461 px"
     },
     {
       "id": "MS0118",
@@ -1259,7 +1493,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.969,
+      "dimensions": "2551 × 3510 px"
     },
     {
       "id": "MS0119",
@@ -1269,7 +1505,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.96,
+      "dimensions": "2535 × 3496 px"
     },
     {
       "id": "MS0120",
@@ -1279,7 +1517,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.369,
+      "dimensions": "2548 × 3510 px"
     },
     {
       "id": "MS0121",
@@ -1289,7 +1529,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.986,
+      "dimensions": "2543 × 3502 px"
     },
     {
       "id": "MS0122",
@@ -1299,7 +1541,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.789,
+      "dimensions": "2543 × 3495 px"
     },
     {
       "id": "MS0123",
@@ -1309,7 +1553,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.889,
+      "dimensions": "2538 × 3497 px"
     },
     {
       "id": "MS0124",
@@ -1319,7 +1565,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.682,
+      "dimensions": "2528 × 3496 px"
     },
     {
       "id": "MS0125",
@@ -1329,7 +1577,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.463,
+      "dimensions": "2513 × 3449 px"
     },
     {
       "id": "MS0126",
@@ -1339,7 +1589,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.097,
+      "dimensions": "2542 × 3510 px"
     },
     {
       "id": "MS0127",
@@ -1349,7 +1601,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.878,
+      "dimensions": "2540 × 3510 px"
     },
     {
       "id": "MS0128",
@@ -1359,7 +1613,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.453,
+      "dimensions": "2537 × 3468 px"
     },
     {
       "id": "MS0129",
@@ -1370,7 +1626,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 9.731,
+      "dimensions": "4009 × 3256 px"
     },
     {
       "id": "MS0130",
@@ -1381,7 +1639,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.196,
+      "dimensions": "1474 × 2175 px"
     },
     {
       "id": "MS0131",
@@ -1392,7 +1652,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.554,
+      "dimensions": "1664 × 2311 px"
     },
     {
       "id": "MS0132",
@@ -1403,7 +1665,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.232,
+      "dimensions": "1465 × 2175 px"
     },
     {
       "id": "MS0133",
@@ -1414,7 +1678,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.25,
+      "dimensions": "1456 × 2139 px"
     },
     {
       "id": "MS0134",
@@ -1425,7 +1691,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.31,
+      "dimensions": "1469 × 1648 px"
     },
     {
       "id": "MS0135",
@@ -1436,7 +1704,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.276,
+      "dimensions": "1696 × 1677 px"
     },
     {
       "id": "MS0136",
@@ -1447,7 +1717,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.571,
+      "dimensions": "4624 × 3543 px"
     },
     {
       "id": "MS0137",
@@ -1458,7 +1730,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 8.691,
+      "dimensions": "3797 × 3095 px"
     },
     {
       "id": "MS0138",
@@ -1469,7 +1743,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.345,
+      "dimensions": "4078 × 3276 px"
     },
     {
       "id": "MS0139",
@@ -1480,7 +1756,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.467,
+      "dimensions": "3040 × 2569 px"
     },
     {
       "id": "MS0140",
@@ -1491,7 +1769,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.686,
+      "dimensions": "4470 × 3662 px"
     },
     {
       "id": "MS0141",
@@ -1502,7 +1782,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.868,
+      "dimensions": "3060 × 3559 px"
     },
     {
       "id": "MS0142",
@@ -1510,7 +1792,9 @@
       "title": "Mauvais temps pour les anges 200",
       "series": [],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.939,
+      "dimensions": "2548 × 3510 px"
     },
     {
       "id": "MS0143",
@@ -1520,7 +1804,9 @@
         "ENFER"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.174,
+      "dimensions": "1779 × 2140 px"
     },
     {
       "id": "MS0144",
@@ -1531,7 +1817,9 @@
         "ENFER"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.393,
+      "dimensions": "1773 × 2257 px"
     },
     {
       "id": "MS0145",
@@ -1542,7 +1830,9 @@
         "JUGEM"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.343,
+      "dimensions": "3264 × 2448 px"
     },
     {
       "id": "MS0146",
@@ -1553,7 +1843,9 @@
         "JUGEM"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.578,
+      "dimensions": "3264 × 2448 px"
     },
     {
       "id": "MS0147",
@@ -1563,7 +1855,9 @@
         "JUGEM"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.248,
+      "dimensions": "1498 × 1487 px"
     },
     {
       "id": "MS0148",
@@ -1573,7 +1867,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.34,
+      "dimensions": "2929 × 2957 px"
     },
     {
       "id": "MS0149",
@@ -1583,7 +1879,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 8.784,
+      "dimensions": "3009 × 3003 px"
     },
     {
       "id": "MS0150",
@@ -1593,7 +1891,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 8.794,
+      "dimensions": "2956 × 2980 px"
     },
     {
       "id": "MS0151",
@@ -1603,7 +1903,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.679,
+      "dimensions": "2928 × 2973 px"
     },
     {
       "id": "MS0152",
@@ -1613,7 +1915,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.919,
+      "dimensions": "2969 × 2970 px"
     },
     {
       "id": "MS0153",
@@ -1623,7 +1927,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.848,
+      "dimensions": "2968 × 2903 px"
     },
     {
       "id": "MS0154",
@@ -1633,7 +1939,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.249,
+      "dimensions": "2955 × 2971 px"
     },
     {
       "id": "MS0155",
@@ -1643,7 +1951,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 8.962,
+      "dimensions": "2983 × 2965 px"
     },
     {
       "id": "MS0156",
@@ -1653,7 +1963,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.347,
+      "dimensions": "2459 × 3000 px"
     },
     {
       "id": "MS0157",
@@ -1663,7 +1975,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.559,
+      "dimensions": "2448 × 3000 px"
     },
     {
       "id": "MS0158",
@@ -1673,7 +1987,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.011,
+      "dimensions": "2455 × 3000 px"
     },
     {
       "id": "MS0159",
@@ -1683,7 +1999,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.566,
+      "dimensions": "2416 × 3000 px"
     },
     {
       "id": "MS0160",
@@ -1693,7 +2011,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.729,
+      "dimensions": "1983 × 1944 px"
     },
     {
       "id": "MS0161",
@@ -1703,7 +2023,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.156,
+      "dimensions": "2114 × 2007 px"
     },
     {
       "id": "MS0162",
@@ -1713,7 +2035,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.444,
+      "dimensions": "1997 × 1953 px"
     },
     {
       "id": "MS0163",
@@ -1723,7 +2047,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.277,
+      "dimensions": "2976 × 2952 px"
     },
     {
       "id": "MS0164",
@@ -1733,7 +2059,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.58,
+      "dimensions": "3006 × 3009 px"
     },
     {
       "id": "MS0165",
@@ -1743,7 +2071,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 9.839,
+      "dimensions": "2989 × 2985 px"
     },
     {
       "id": "MS0166",
@@ -1753,7 +2083,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.795,
+      "dimensions": "2970 × 3000 px"
     },
     {
       "id": "MS0167",
@@ -1763,7 +2095,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.406,
+      "dimensions": "2971 × 2978 px"
     },
     {
       "id": "MS0168",
@@ -1773,7 +2107,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.128,
+      "dimensions": "2998 × 2954 px"
     },
     {
       "id": "MS0169",
@@ -1783,7 +2119,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.896,
+      "dimensions": "2289 × 2800 px"
     },
     {
       "id": "MS0170",
@@ -1793,7 +2131,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.491,
+      "dimensions": "2273 × 2824 px"
     },
     {
       "id": "MS0171",
@@ -1803,7 +2143,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.118,
+      "dimensions": "2285 × 2775 px"
     },
     {
       "id": "MS0172",
@@ -1813,7 +2155,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.676,
+      "dimensions": "2283 × 2763 px"
     },
     {
       "id": "MS0173",
@@ -1823,7 +2167,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.8,
+      "dimensions": "2261 × 2744 px"
     },
     {
       "id": "MS0174",
@@ -1833,7 +2179,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.082,
+      "dimensions": "2298 × 2770 px"
     },
     {
       "id": "MS0175",
@@ -1843,7 +2191,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.66,
+      "dimensions": "2247 × 2713 px"
     },
     {
       "id": "MS0176",
@@ -1853,7 +2203,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.167,
+      "dimensions": "1518 × 1893 px"
     },
     {
       "id": "MS0177",
@@ -1863,7 +2215,9 @@
         "MASQU"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.727,
+      "dimensions": "2085 × 2504 px"
     },
     {
       "id": "MS0178",
@@ -1873,7 +2227,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.837,
+      "dimensions": "2842 × 3478 px"
     },
     {
       "id": "MS0179",
@@ -1883,7 +2239,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.004,
+      "dimensions": "2886 × 3516 px"
     },
     {
       "id": "MS0180",
@@ -1893,7 +2251,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.638,
+      "dimensions": "2860 × 3475 px"
     },
     {
       "id": "MS0181",
@@ -1903,7 +2263,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.81,
+      "dimensions": "2568 × 3065 px"
     },
     {
       "id": "MS0182",
@@ -1913,7 +2275,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.585,
+      "dimensions": "2814 × 3471 px"
     },
     {
       "id": "MS0183",
@@ -1923,7 +2287,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.545,
+      "dimensions": "2887 × 3526 px"
     },
     {
       "id": "MS0184",
@@ -1933,7 +2299,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.309,
+      "dimensions": "2866 × 3482 px"
     },
     {
       "id": "MS0185",
@@ -1943,7 +2311,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.466,
+      "dimensions": "2956 × 3572 px"
     },
     {
       "id": "MS0186",
@@ -1953,7 +2323,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.001,
+      "dimensions": "2956 × 3523 px"
     },
     {
       "id": "MS0187",
@@ -1963,7 +2335,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.944,
+      "dimensions": "2872 × 3462 px"
     },
     {
       "id": "MS0188",
@@ -1973,7 +2347,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.414,
+      "dimensions": "2944 × 3536 px"
     },
     {
       "id": "MS0189",
@@ -1983,7 +2359,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.261,
+      "dimensions": "2166 × 2560 px"
     },
     {
       "id": "MS0190",
@@ -1993,7 +2371,9 @@
         "MUSEE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.361,
+      "dimensions": "3003 × 3600 px"
     },
     {
       "id": "MS0191",
@@ -2003,7 +2383,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.56,
+      "dimensions": "2002 × 2431 px"
     },
     {
       "id": "MS0192",
@@ -2013,7 +2395,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 14.636,
+      "dimensions": "2614 × 3129 px"
     },
     {
       "id": "MS0193",
@@ -2023,7 +2407,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.9,
+      "dimensions": "2608 × 3128 px"
     },
     {
       "id": "MS0194",
@@ -2033,7 +2419,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.17,
+      "dimensions": "1674 × 1984 px"
     },
     {
       "id": "MS0195",
@@ -2043,7 +2431,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 19.186,
+      "dimensions": "3472 × 4181 px"
     },
     {
       "id": "MS0196",
@@ -2051,7 +2441,9 @@
       "title": "NUITS",
       "series": [],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.896,
+      "dimensions": "2706 × 2411 px"
     },
     {
       "id": "MS0197",
@@ -2061,7 +2453,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.935,
+      "dimensions": "1573 × 1886 px"
     },
     {
       "id": "MS0198",
@@ -2071,7 +2465,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.495,
+      "dimensions": "1508 × 1860 px"
     },
     {
       "id": "MS0199",
@@ -2081,7 +2477,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.077,
+      "dimensions": "3482 × 3441 px"
     },
     {
       "id": "MS0200",
@@ -2091,7 +2489,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.528,
+      "dimensions": "3501 × 3473 px"
     },
     {
       "id": "MS0201",
@@ -2101,7 +2501,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.804,
+      "dimensions": "3476 × 3482 px"
     },
     {
       "id": "MS0202",
@@ -2111,7 +2513,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 13.057,
+      "dimensions": "2570 × 5506 px"
     },
     {
       "id": "MS0203",
@@ -2121,7 +2525,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 11.896,
+      "dimensions": "2626 × 5338 px"
     },
     {
       "id": "MS0204",
@@ -2131,7 +2537,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.004,
+      "dimensions": "2138 × 4374 px"
     },
     {
       "id": "MS0205",
@@ -2141,7 +2549,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.758,
+      "dimensions": "2260 × 1603 px"
     },
     {
       "id": "MS0206",
@@ -2151,7 +2561,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.914,
+      "dimensions": "3036 × 1726 px"
     },
     {
       "id": "MS0207",
@@ -2161,7 +2573,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 8.127,
+      "dimensions": "2714 × 3935 px"
     },
     {
       "id": "MS0208",
@@ -2171,7 +2585,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.229,
+      "dimensions": "1619 × 2350 px"
     },
     {
       "id": "MS0209",
@@ -2181,7 +2597,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.218,
+      "dimensions": "2917 × 2867 px"
     },
     {
       "id": "MS0210",
@@ -2191,7 +2609,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 13.439,
+      "dimensions": "3528 × 3531 px"
     },
     {
       "id": "MS0211",
@@ -2201,7 +2621,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.838,
+      "dimensions": "3460 × 3455 px"
     },
     {
       "id": "MS0212",
@@ -2211,7 +2633,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.286,
+      "dimensions": "2718 × 2726 px"
     },
     {
       "id": "MS0213",
@@ -2221,7 +2645,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.402,
+      "dimensions": "2241 × 2254 px"
     },
     {
       "id": "MS0214",
@@ -2231,7 +2657,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.254,
+      "dimensions": "2447 × 1821 px"
     },
     {
       "id": "MS0215",
@@ -2241,7 +2669,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.492,
+      "dimensions": "1110 × 1594 px"
     },
     {
       "id": "MS0216",
@@ -2251,7 +2681,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.718,
+      "dimensions": "1544 × 2271 px"
     },
     {
       "id": "MS0217",
@@ -2261,7 +2693,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.744,
+      "dimensions": "1032 × 722 px"
     },
     {
       "id": "MS0218",
@@ -2271,7 +2705,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.953,
+      "dimensions": "1463 × 2080 px"
     },
     {
       "id": "MS0219",
@@ -2281,7 +2717,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 14.347,
+      "dimensions": "2668 × 5398 px"
     },
     {
       "id": "MS0220",
@@ -2291,7 +2729,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 10.239,
+      "dimensions": "2811 × 3808 px"
     },
     {
       "id": "MS0221",
@@ -2301,7 +2741,9 @@
         "ABSTR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.109,
+      "dimensions": "5616 × 3744 px"
     },
     {
       "id": "MS0222",
@@ -2311,7 +2753,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.379,
+      "dimensions": "2610 × 3500 px"
     },
     {
       "id": "MS0223",
@@ -2321,7 +2765,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.994,
+      "dimensions": "1558 × 2244 px"
     },
     {
       "id": "MS0224",
@@ -2331,7 +2777,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.639,
+      "dimensions": "3612 × 2085 px"
     },
     {
       "id": "MS0225",
@@ -2341,7 +2789,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.705,
+      "dimensions": "1390 × 1821 px"
     },
     {
       "id": "MS0226",
@@ -2351,7 +2801,9 @@
         "APHRO"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 9.412,
+      "dimensions": "2770 × 3378 px"
     },
     {
       "id": "MS0227",
@@ -2362,7 +2814,9 @@
         "ATELI"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 13.953,
+      "dimensions": "5616 × 3744 px"
     },
     {
       "id": "MS0228",
@@ -2372,7 +2826,9 @@
         "DANTE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.338,
+      "dimensions": "1257 × 2042 px"
     },
     {
       "id": "MS0229",
@@ -2383,7 +2839,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.187,
+      "dimensions": "1694 × 1155 px"
     },
     {
       "id": "MS0230",
@@ -2391,7 +2849,9 @@
       "title": "ATELI",
       "series": [],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.566,
+      "dimensions": "2448 × 3264 px"
     },
     {
       "id": "MS0231",
@@ -2399,7 +2859,9 @@
       "title": "APHRO",
       "series": [],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.753,
+      "dimensions": "3026 × 2958 px"
     },
     {
       "id": "MS0232",
@@ -2409,7 +2871,9 @@
         "ENFER"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.019,
+      "dimensions": "3186 × 2250 px"
     },
     {
       "id": "MS0233",
@@ -2419,7 +2883,9 @@
         "JUGEM"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.369,
+      "dimensions": "3264 × 2448 px"
     },
     {
       "id": "MS0234",
@@ -2429,7 +2895,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.149,
+      "dimensions": "3264 × 2448 px"
     },
     {
       "id": "MS0235",
@@ -2439,7 +2907,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.138,
+      "dimensions": "3264 × 2448 px"
     },
     {
       "id": "MS0236",
@@ -2449,7 +2919,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.154,
+      "dimensions": "3264 × 2448 px"
     },
     {
       "id": "MS0237",
@@ -2459,7 +2931,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.985,
+      "dimensions": "2448 × 3264 px"
     },
     {
       "id": "MS0238",
@@ -2469,7 +2943,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.137,
+      "dimensions": "3264 × 2448 px"
     },
     {
       "id": "MS0239",
@@ -2480,7 +2956,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.895,
+      "dimensions": "1307 × 1631 px"
     },
     {
       "id": "MS0240",
@@ -2490,7 +2968,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.579,
+      "dimensions": "2338 × 1889 px"
     },
     {
       "id": "MS0241",
@@ -2500,7 +2980,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.958,
+      "dimensions": "1297 × 1674 px"
     },
     {
       "id": "MS0242",
@@ -2510,7 +2992,9 @@
         "ENFER"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.007,
+      "dimensions": "1274 × 2014 px"
     },
     {
       "id": "MS0243",
@@ -2520,7 +3004,9 @@
         "ENFER"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.965,
+      "dimensions": "2048 × 1536 px"
     },
     {
       "id": "MS0244",
@@ -2530,7 +3016,9 @@
         "JUGEM"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.781,
+      "dimensions": "2565 × 1942 px"
     },
     {
       "id": "MS0245",
@@ -2541,7 +3029,9 @@
         "RESUR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.829,
+      "dimensions": "1595 × 1776 px"
     },
     {
       "id": "MS0246",
@@ -2552,7 +3042,9 @@
         "RESUR"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.927,
+      "dimensions": "1524 × 1672 px"
     },
     {
       "id": "MS0247",
@@ -2563,7 +3055,9 @@
         "JUGEM"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.101,
+      "dimensions": "1358 × 1344 px"
     },
     {
       "id": "MS0248",
@@ -2573,7 +3067,9 @@
         "JUGEM"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.323,
+      "dimensions": "1668 × 1956 px"
     },
     {
       "id": "MS0249",
@@ -2584,7 +3080,9 @@
         "JUGEM"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.952,
+      "dimensions": "1728 × 1587 px"
     },
     {
       "id": "MS0250",
@@ -2592,7 +3090,9 @@
       "title": "ABSTR",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.786,
+      "dimensions": "933 × 1152 px"
     },
     {
       "id": "MS0251",
@@ -2600,7 +3100,9 @@
       "title": "SANS TITRE  220x130cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.234,
+      "dimensions": "1287 × 2080 px"
     },
     {
       "id": "MS0252",
@@ -2610,7 +3112,9 @@
         "ABSTR"
       ],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.607,
+      "dimensions": "1312 × 1691 px"
     },
     {
       "id": "MS0253",
@@ -2618,7 +3122,9 @@
       "title": "PHOTO",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.328,
+      "dimensions": "2177 × 4527 px"
     },
     {
       "id": "MS0254",
@@ -2626,7 +3132,9 @@
       "title": "APHRO_ (1)",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.039,
+      "dimensions": "1582 × 2309 px"
     },
     {
       "id": "MS0255",
@@ -2634,7 +3142,9 @@
       "title": "APHRO_ (2)",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 6.097,
+      "dimensions": "3451 × 2068 px"
     },
     {
       "id": "MS0256",
@@ -2642,7 +3152,9 @@
       "title": "APHRO_ (3)",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.132,
+      "dimensions": "1790 × 2246 px"
     },
     {
       "id": "MS0257",
@@ -2650,7 +3162,9 @@
       "title": "COMPA_060_1994",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.964,
+      "dimensions": "1162 × 1194 px"
     },
     {
       "id": "MS0258",
@@ -2658,7 +3172,9 @@
       "title": "APHRO",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.636,
+      "dimensions": "2360 × 1380 px"
     },
     {
       "id": "MS0259",
@@ -2666,7 +3182,9 @@
       "title": "APHRO_0060",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.009,
+      "dimensions": "1155 × 1140 px"
     },
     {
       "id": "MS0260",
@@ -2674,7 +3192,9 @@
       "title": "la course",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.061,
+      "dimensions": "867 × 1110 px"
     },
     {
       "id": "MS0261",
@@ -2682,7 +3202,9 @@
       "title": "la fessée",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.634,
+      "dimensions": "1414 × 1403 px"
     },
     {
       "id": "MS0262",
@@ -2690,7 +3212,9 @@
       "title": "UNIVE",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.129,
+      "dimensions": "956 × 1283 px"
     },
     {
       "id": "MS0263",
@@ -2701,7 +3225,9 @@
         "PURGA"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.3,
+      "dimensions": "1639 × 1144 px"
     },
     {
       "id": "MS0264",
@@ -2711,7 +3237,9 @@
         "ENCRE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.878,
+      "dimensions": "1181 × 1554 px"
     },
     {
       "id": "MS0265",
@@ -2721,7 +3249,9 @@
         "UNIVE"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.238,
+      "dimensions": "978 × 1427 px"
     },
     {
       "id": "MS0266",
@@ -2731,7 +3261,9 @@
         "NUITS"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.081,
+      "dimensions": "3263 × 2692 px"
     },
     {
       "id": "MS0267",
@@ -2739,7 +3271,9 @@
       "title": "Composition (fenêtre) 116x89cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.592,
+      "dimensions": "1244 × 1625 px"
     },
     {
       "id": "MS0268",
@@ -2749,7 +3283,9 @@
         "ABSTR"
       ],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.005,
+      "dimensions": "1899 × 1472 px"
     },
     {
       "id": "MS0269",
@@ -2757,7 +3293,9 @@
       "title": "petite variation bleue N°8 huile sur toile 1984",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.803,
+      "dimensions": "1336 × 1618 px"
     },
     {
       "id": "MS0270",
@@ -2765,7 +3303,9 @@
       "title": "petite variation bleue N°7 huile sur toile 1984",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.369,
+      "dimensions": "1682 × 2026 px"
     },
     {
       "id": "MS0271",
@@ -2773,7 +3313,9 @@
       "title": "petite variation blancheN°2  65X54cm, huile sur toile",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.786,
+      "dimensions": "1876 × 2317 px"
     },
     {
       "id": "MS0272",
@@ -2781,7 +3323,9 @@
       "title": "Composition (fenêtre) 92x73cm 1979",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.85,
+      "dimensions": "956 × 1205 px"
     },
     {
       "id": "MS0273",
@@ -2789,7 +3333,9 @@
       "title": "huile sur toile 73X92cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 5.776,
+      "dimensions": "3603 × 2860 px"
     },
     {
       "id": "MS0274",
@@ -2797,7 +3343,9 @@
       "title": "sans titre, 73x92cm, huile sur toile 1982",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.9,
+      "dimensions": "1272 × 1009 px"
     },
     {
       "id": "MS0275",
@@ -2805,7 +3353,9 @@
       "title": "Composition (fenêtre) 100x81cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.063,
+      "dimensions": "1076 × 1318 px"
     },
     {
       "id": "MS0276",
@@ -2813,7 +3363,9 @@
       "title": "acryliquesur toile _ 89X116cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.821,
+      "dimensions": "1927 × 1462 px"
     },
     {
       "id": "MS0277",
@@ -2821,7 +3373,9 @@
       "title": "grande abstraction sans titre 300x220cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.426,
+      "dimensions": "1389 × 1996 px"
     },
     {
       "id": "MS0278",
@@ -2829,7 +3383,9 @@
       "title": "SANS TITRE  205x130cm (1)",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.479,
+      "dimensions": "1366 × 2403 px"
     },
     {
       "id": "MS0279",
@@ -2837,7 +3393,9 @@
       "title": "SANS TITRE  205x130cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.254,
+      "dimensions": "1229 × 2013 px"
     },
     {
       "id": "MS0280",
@@ -2845,7 +3403,9 @@
       "title": "petite métamorphose 60x33cm 1982 N°10",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.598,
+      "dimensions": "1184 × 2373 px"
     },
     {
       "id": "MS0281",
@@ -2853,7 +3413,9 @@
       "title": "Petite variation bleue N°2, 80X40cm, huile sur toile 1982.",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.937,
+      "dimensions": "1270 × 2630 px"
     },
     {
       "id": "MS0282",
@@ -2861,7 +3423,9 @@
       "title": "Petite variation bleue N°2, 80X40cm, huile sur toile 1982",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.307,
+      "dimensions": "1136 × 2342 px"
     },
     {
       "id": "MS0283",
@@ -2869,7 +3433,9 @@
       "title": "Variation rouge de Bergues  N°1 , 210x 130cm acrylique sur toile libre",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 7.2,
+      "dimensions": "2867 × 4098 px"
     },
     {
       "id": "MS0284",
@@ -2877,7 +3443,9 @@
       "title": "Métamorphose n°6 acrylique sur toile 195x130cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 19.823,
+      "dimensions": "3495 × 5275 px"
     },
     {
       "id": "MS0285",
@@ -2887,7 +3455,9 @@
         "METAM"
       ],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.925,
+      "dimensions": "1398 × 1463 px"
     },
     {
       "id": "MS0286",
@@ -2897,7 +3467,9 @@
         "NUITS"
       ],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.795,
+      "dimensions": "1488 × 1801 px"
     },
     {
       "id": "MS0287",
@@ -2905,7 +3477,9 @@
       "title": "la course d'Aphrodite 50x50cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 8.478,
+      "dimensions": "3587 × 3233 px"
     },
     {
       "id": "MS0288",
@@ -2913,7 +3487,9 @@
       "title": "Le bain d'Aphrodite 1993 tempera sur toile 60X60cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.739,
+      "dimensions": "1842 × 1842 px"
     },
     {
       "id": "MS0289",
@@ -2921,7 +3497,9 @@
       "title": "TST le bain.  Le bain d'Aphrodite",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.671,
+      "dimensions": "1760 × 1748 px"
     },
     {
       "id": "MS0290",
@@ -2929,7 +3507,9 @@
       "title": "La chute d'Aphrodite",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.404,
+      "dimensions": "1747 × 1767 px"
     },
     {
       "id": "MS0291",
@@ -2937,7 +3517,9 @@
       "title": "Le bain d'Aphrodite 1994 tempera sur toile 60X60cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.503,
+      "dimensions": "1789 × 1783 px"
     },
     {
       "id": "MS0292",
@@ -2945,7 +3527,9 @@
       "title": "Le bain d'Aphrodite 1993 tempera sur toile 80X80cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 4.145,
+      "dimensions": "3013 × 3001 px"
     },
     {
       "id": "MS0293",
@@ -2953,7 +3537,9 @@
       "title": "salutations tempera sur toile 55x38cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.865,
+      "dimensions": "874 × 1424 px"
     },
     {
       "id": "MS0294",
@@ -2961,7 +3547,9 @@
       "title": "la plongée d'Aphrodite tempera sur toile 61x50cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.019,
+      "dimensions": "1009 × 1276 px"
     },
     {
       "id": "MS0295",
@@ -2969,7 +3557,9 @@
       "title": "Le bain d'Aphrodite 1994 61x50cm tempera sur toile.",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 0.677,
+      "dimensions": "756 × 990 px"
     },
     {
       "id": "MS0296",
@@ -2977,7 +3567,9 @@
       "title": "Le bain d'Aphrodite en été à Belle île (la course) 150x150cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 1.243,
+      "dimensions": "1193 × 1193 px"
     },
     {
       "id": "MS0297",
@@ -2985,7 +3577,9 @@
       "title": "Les heures d'Aphrodite la chute au loin 195x114cm",
       "series": [],
       "photo": "Redo",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 3.238,
+      "dimensions": "1420 × 2142 px"
     },
     {
       "id": "MS0298",
@@ -2995,7 +3589,9 @@
         "POLYP"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 12.899,
+      "dimensions": "2953 × 2964 px"
     },
     {
       "id": "MS0299",
@@ -3005,7 +3601,9 @@
         "POLYP"
       ],
       "photo": "OK",
-      "publish": "VAL"
+      "publish": "VAL",
+      "tailleMo": 2.77,
+      "dimensions": "3054 × 1826 px"
     }
   ]
 }

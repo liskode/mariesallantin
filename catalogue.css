@@ -63,6 +63,41 @@ body.catalogue-standalone {
   padding-top: 8px;
 }
 
+.catalogue-sponsor {
+  margin-top: 28px;
+  padding: 20px 0 12px;
+  border-top: 1px solid var(--border);
+  text-align: center;
+}
+
+.catalogue-sponsor-label {
+  margin: 0 0 12px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--secondary);
+}
+
+.catalogue-sponsor-link {
+  display: inline-block;
+  line-height: 0;
+}
+
+.catalogue-sponsor-link:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.catalogue-sponsor-logo {
+  height: 48px;
+  width: auto;
+  max-width: min(320px, 92vw);
+  object-fit: contain;
+  vertical-align: middle;
+}
+
 /* Écran mot de passe (protection légère côté navigateur) */
 .catalogue-login-screen {
   min-height: 100vh;

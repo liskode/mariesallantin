@@ -20,6 +20,7 @@ import {
   photoStatusFromBase,
   stripCatalogueIdPrefix,
 } from '../legend-filename.mjs';
+import { readJpegDimensionsFromFile } from './jpeg-dimensions.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -102,10 +103,14 @@ function probeImage(absPath) {
       });
       const m1 = /pixelWidth:\s*(\d+)/.exec(out);
       const m2 = /pixelHeight:\s*(\d+)/.exec(out);
-      if (m1 && m2) dimensions = `${m1[1]}x${m2[1]}`;
+      if (m1 && m2) dimensions = `${m1[1]} × ${m2[1]} px`;
     } catch {
       /* ignore */
     }
+  }
+  if (!dimensions && /\.jpe?g$/i.test(absPath)) {
+    const dim = readJpegDimensionsFromFile(absPath);
+    if (dim) dimensions = `${dim.w} × ${dim.h} px`;
   }
   return { tailleMo, dimensions };
 }
@@ -187,7 +192,7 @@ fs.writeFileSync(statePath, JSON.stringify(catalogState, null, 2) + '\n', 'utf8'
 const payload = {
   version: 2,
   description:
-    'Catalogue v2 : fichiers sous media/catalogue/. id MS####. publish = toujours VAL (à valider) dans works.json ; état Suspendu (S) dans catalog-state.json pour les chemins contenant _OFF_. Légende : tirets ou underscores (works_numero). photo = OK | Redo. tailleMo / dimensions si fichiers présents.',
+    'Catalogue v2 : fichiers sous media/catalogue/. id MS####. publish = toujours VAL (à valider) dans works.json ; état Suspendu (S) dans catalog-state.json pour les chemins contenant _OFF_. Légende : tirets ou underscores (works_numero). photo = OK | Redo | HQ (nom de fichier). tailleMo / dimensions (px) via probeImage. Sur catalogue.html, HQ/LQ peuvent aussi dériver de la taille fichier (≥10 Mo / <2 Mo).',
   series,
   works,
 };

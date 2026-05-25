@@ -45,8 +45,14 @@
 
   function effectivePhoto(row) {
     const j = (row.photo || 'OK').trim();
-    if (j === 'HQ') return 'HQ';
     if (j === 'Redo' || fileNameImpliesPhotoRedo(row.fileName)) return 'Redo';
+    const mo = row.tailleMo;
+    if (mo != null && !Number.isNaN(Number(mo))) {
+      const n = Number(mo);
+      if (n >= 10) return 'HQ';
+      if (n < 2) return 'LQ';
+    }
+    if (j === 'HQ') return 'HQ';
     return 'OK';
   }
 
@@ -54,6 +60,7 @@
     const e = effectivePhoto(row);
     if (e === 'Redo') return 'A refaire';
     if (e === 'HQ') return 'HQ';
+    if (e === 'LQ') return 'LQ';
     return 'OK';
   }
 
@@ -67,7 +74,10 @@
       const lastDot = fileName.lastIndexOf('.');
       const ext = lastDot >= 0 ? fileName.slice(lastDot) : '';
       const codes = w.series || [];
-      const seriesName = codes.map((c) => catalogSeriesNames[c] || c).join(' · ');
+      const seriesName =
+        codes.length > 0
+          ? codes.map((c) => catalogSeriesNames[c] || c).join(' · ')
+          : 'non renseigné';
       const photo = w.photo || 'OK';
       const publish = w.publish || 'ON';
       const dimensions =
@@ -183,8 +193,11 @@
         return row.ext;
       case 'seriesName':
         return row.seriesName;
-      case 'photo':
-        return effectivePhoto(row);
+      case 'photo': {
+        const e = effectivePhoto(row);
+        const rank = { Redo: 0, LQ: 1, OK: 2, HQ: 3 };
+        return rank[e] != null ? rank[e] : 2;
+      }
       case 'dimensions':
         return row.dimensions || '';
       case 'tailleMo':
@@ -239,7 +252,9 @@
     const pub = fpub ? fpub.value : '';
 
     return rows.filter((r) => {
-      if (serie && !(r.seriesCodes && r.seriesCodes.includes(serie))) return false;
+      if (serie === '__none_series__') {
+        if (r.seriesCodes && r.seriesCodes.length) return false;
+      } else if (serie && !(r.seriesCodes && r.seriesCodes.includes(serie))) return false;
       if (photo && effectivePhoto(r) !== photo) return false;
       if (pub && (r.publish || 'ON').trim().toUpperCase() !== pub) return false;
       if (etat === 'none') {
@@ -388,6 +403,10 @@
     optAllS.value = '';
     optAllS.textContent = 'Toutes';
     fs.appendChild(optAllS);
+    const optNoneS = document.createElement('option');
+    optNoneS.value = '__none_series__';
+    optNoneS.textContent = 'Non renseigné';
+    fs.appendChild(optNoneS);
     seriesCodesOrdered.forEach((code) => {
       const o = document.createElement('option');
       o.value = code;
@@ -418,6 +437,7 @@
     fph.appendChild(optAllPh);
     [
       ['OK', 'OK'],
+      ['LQ', 'LQ'],
       ['Redo', 'A refaire'],
       ['HQ', 'HQ'],
     ].forEach(([val, label]) => {
