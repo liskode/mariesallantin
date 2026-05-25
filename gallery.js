@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const seriesList = document.getElementById('series-list');
   let allSeries = {};
   let seriesNames = {};
+  /** @type {string[]} ordre d’affichage des séries (rempli après WorksCatalog.load) */
+  let seriesOrder = [];
   let currentSeries = [];
   let currentSeriesCode = '';
   let currentIndex = 0;
@@ -57,29 +59,29 @@ document.addEventListener('DOMContentLoaded', () => {
     lightbox.style.display = 'flex';
   }
 
-  // Load titles.txt and parse series and artworks
-  fetch('media/titles.txt')
-    .then(r => r.text())
-    .then(text => {
-      const lines = text.split('\n');
-      let current = '';
-      lines.forEach(line => {
-        if (line.startsWith('#')) {
-          const [code, name] = line.replace('#','').split(';');
-          current = code.trim();
-          seriesNames[current] = name.trim();
-          allSeries[current] = [];
-        } else if (line.includes('/') && line.includes(';')) {
-          const [filePath, title] = line.split(';');
-          const folder = filePath.split('/')[0];
-          if (allSeries[folder]) {
-            allSeries[folder].push({ filePath: filePath.trim(), title: title.trim() });
-          }
-        }
-      });
-      // Afficher la liste des séries par défaut
-      if (window.showSeriesOverview) window.showSeriesOverview();
-    });
+  function seriesCodesForGallery(data) {
+    const order = data.seriesOrder || [];
+    const withArt = order.filter((c) => allSeries[c] && allSeries[c].length);
+    const extra = Object.keys(allSeries).filter(
+      (c) => !order.includes(c) && allSeries[c] && allSeries[c].length
+    );
+    return withArt.concat(extra);
+  }
+
+  if (typeof WorksCatalog === 'undefined') {
+    console.error('Charger works-catalog.js avant gallery.js');
+  } else {
+    WorksCatalog.load()
+      .then((data) => {
+        seriesOrder = data.seriesOrder || [];
+        Object.assign(seriesNames, data.seriesNames);
+        Object.keys(data.allSeries).forEach((k) => {
+          allSeries[k] = data.allSeries[k];
+        });
+        if (window.showSeriesOverview) window.showSeriesOverview();
+      })
+      .catch((err) => console.error('Chargement du catalogue œuvres:', err));
+  }
 
   // Listen for menu clicks
   if (seriesList) {
@@ -137,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('welcome-section').style.display = 'none';
     }
     // Affiche la première image de chaque série
-    Object.keys(allSeries).forEach(code => {
+    seriesCodesForGallery({ seriesOrder, allSeries }).forEach((code) => {
       if (!allSeries[code].length) return;
       const serieDiv = document.createElement('div');
       serieDiv.className = 'series-overview-item';

@@ -1,10 +1,9 @@
 /**
- * Catalogue : charge media/titles.txt et media/catalog-state.json,
- * filtres, tri, compteur affiché / total.
+ * Catalogue : charge media/works.json (ou titles.txt) et media/catalog-state.json.
+ * Clés d’état : id œuvre (ex. MS0001), avec repli sur l’ancien chemin fichier.
  */
 (function () {
   const MEDIA_BASE = 'media/';
-  const titlesUrl = MEDIA_BASE + 'titles.txt';
   const stateUrl = MEDIA_BASE + 'catalog-state.json';
 
   const container = document.getElementById('catalogue-root');
@@ -13,76 +12,94 @@
 
   /** @type {Array<object>} */
   let allRows = [];
-  /** @type {Map<string, { bytes?: number, w?: number, h?: number }>} */
-  const metricsCache = new Map();
 
   let sortColumn = 'order';
   let sortDir = 'asc';
 
-  function parseTitles(text) {
-    const lines = text.split('\n');
-    const seriesNames = {};
-    const rows = [];
+  /** @type {string[]} */
+  let catalogSeriesOrder = [];
+  /** @type {Record<string,string>} */
+  let catalogSeriesNames = {};
 
-    lines.forEach((line) => {
-      if (line.startsWith('#')) {
-        const [code, name] = line.replace('#', '').split(';');
-        if (code && name) {
-          seriesNames[code.trim()] = name.trim();
-        }
-      } else if (line.includes('/') && line.includes(';')) {
-        const [filePath, title] = line.split(';');
-        const fp = filePath.trim();
-        const folder = fp.split('/')[0];
-        const fileName = fp.includes('/') ? fp.slice(fp.indexOf('/') + 1) : fp;
-        const lastDot = fileName.lastIndexOf('.');
-        const ext = lastDot >= 0 ? fileName.slice(lastDot) : '';
-        rows.push({
-          filePath: fp,
-          folder,
-          fileName,
-          ext: ext || '—',
-          seriesName: seriesNames[folder] || folder,
-          title: (title || '').trim(),
-          mediaUrl: MEDIA_BASE + fp,
-        });
-      }
+  function stripAccentsSa(s) {
+    return String(s)
+      .normalize('NFD')
+      .replace(/\p{M}/gu, '');
+  }
+
+  /** Code PHOTO dans le nom de fichier (aligné sur scripts/build-works-from-list.mjs). */
+  function fileNameImpliesPhotoRedo(fileName) {
+    let base = String(fileName).replace(/\.[^.]+$/i, '');
+    base = base.replace(/^MS\d{4}[\s_-]+/i, '');
+    const compact = stripAccentsSa(base).toUpperCase().replace(/\s+/g, '');
+    if (compact.startsWith('PHOTO')) return true;
+    const tokens = base.split(/[-_]+/).map((seg) =>
+      stripAccentsSa(seg.trim())
+        .toUpperCase()
+        .replace(/[^A-Z0-9]/g, '')
+    );
+    if (tokens.includes('PHOTO')) return true;
+    if (/(^|[^A-Z0-9])PHOTO([^A-Z0-9]|$)/.test(compact)) return true;
+    return false;
+  }
+
+  function effectivePhoto(row) {
+    const j = (row.photo || 'OK').trim();
+    if (j === 'HQ') return 'HQ';
+    if (j === 'Redo' || fileNameImpliesPhotoRedo(row.fileName)) return 'Redo';
+    return 'OK';
+  }
+
+  function photoCellLabel(row) {
+    const e = effectivePhoto(row);
+    if (e === 'Redo') return 'A refaire';
+    if (e === 'HQ') return 'HQ';
+    return 'OK';
+  }
+
+  function buildRowsFromWorksData(data) {
+    catalogSeriesOrder = data.seriesOrder || [];
+    catalogSeriesNames = data.seriesNames || {};
+    return data.works.map((w, i) => {
+      const fp = w.media;
+      const id = w.id || fp;
+      const fileName = fp.includes('/') ? fp.slice(fp.indexOf('/') + 1) : fp;
+      const lastDot = fileName.lastIndexOf('.');
+      const ext = lastDot >= 0 ? fileName.slice(lastDot) : '';
+      const codes = w.series || [];
+      const seriesName = codes.map((c) => catalogSeriesNames[c] || c).join(' · ');
+      const photo = w.photo || 'OK';
+      const publish = w.publish || 'ON';
+      const dimensions =
+        w.dimensions != null && String(w.dimensions).trim() !== ''
+          ? String(w.dimensions).trim()
+          : '—';
+      const tailleMo =
+        w.tailleMo != null && w.tailleMo !== '' && !Number.isNaN(Number(w.tailleMo))
+          ? Number(w.tailleMo)
+          : null;
+      const thumbUrl = MEDIA_BASE + fp;
+      return {
+        id,
+        filePath: fp,
+        fileName,
+        ext: ext || '—',
+        seriesName,
+        seriesCodes: codes,
+        title: w.title || '',
+        thumbUrl,
+        orderIndex: i,
+        photo,
+        publish,
+        dimensions,
+        tailleMo,
+      };
     });
-
-    return { rows, seriesNames };
   }
 
-  function formatWeightKo(bytes) {
-    if (bytes == null || Number.isNaN(bytes)) return '—';
-    const ko = Math.round(bytes / 1024);
-    return ko + ' Ko';
-  }
-
-  function fetchFileSize(url) {
-    return fetch(url, { method: 'HEAD', cache: 'no-store' })
-      .then((res) => {
-        const cl = res.headers.get('Content-Length');
-        if (cl) return parseInt(cl, 10);
-        return null;
-      })
-      .catch(() => null);
-  }
-
-  function fetchFileSizeGet(url) {
-    return fetch(url, { cache: 'no-store' })
-      .then((res) => res.blob())
-      .then((b) => b.size)
-      .catch(() => null);
-  }
-
-  function loadImageDimensions(url) {
-    return new Promise((resolve) => {
-      const img = new Image();
-      img.onload = () =>
-        resolve({ w: img.naturalWidth, h: img.naturalHeight });
-      img.onerror = () => resolve({ w: null, h: null });
-      img.src = url;
-    });
+  function msIdSortKey(id) {
+    const m = /^MS(\d+)$/i.exec(String(id));
+    return m ? parseInt(m[1], 10) : 0;
   }
 
   function renderEtat(code) {
@@ -141,59 +158,11 @@
     }
   }
 
-  function mergeMetrics(filePath, patch) {
-    const prev = metricsCache.get(filePath) || {};
-    metricsCache.set(filePath, { ...prev, ...patch });
-  }
-
-  function fillMetrics(rowEl, filePath, mediaUrl) {
-    const sizeEl = rowEl.querySelector('[data-metric="size"]');
-    const resEl = rowEl.querySelector('[data-metric="res"]');
-    const cached = metricsCache.get(filePath);
-
-    function applyRes(w, h) {
-      if (w && h) {
-        resEl.textContent = w + ' × ' + h;
-      } else {
-        resEl.textContent = '—';
-      }
-      resEl.classList.remove('metric-pending');
-    }
-
-    function applySize(bytes) {
-      if (bytes != null) {
-        sizeEl.textContent = formatWeightKo(bytes);
-      } else {
-        sizeEl.textContent = '—';
-      }
-      sizeEl.classList.remove('metric-pending');
-    }
-
-    if (cached && cached.w != null && cached.h != null) {
-      applyRes(cached.w, cached.h);
-    } else {
-      loadImageDimensions(mediaUrl).then(({ w, h }) => {
-        mergeMetrics(filePath, { w: w || undefined, h: h || undefined });
-        applyRes(w, h);
-      });
-    }
-
-    if (cached && cached.bytes != null) {
-      applySize(cached.bytes);
-    } else {
-      sizeEl.classList.add('metric-pending');
-      fetchFileSize(mediaUrl).then((size) => {
-        if (size != null) {
-          mergeMetrics(filePath, { bytes: size });
-          applySize(size);
-          return;
-        }
-        return fetchFileSizeGet(mediaUrl).then((s) => {
-          if (s != null) mergeMetrics(filePath, { bytes: s });
-          applySize(s);
-        });
-      });
-    }
+  function publishCellLabel(row) {
+    const p = (row.publish || 'ON').trim().toUpperCase();
+    if (p === 'OFF') return 'Non publié';
+    if (p === 'VAL') return 'À valider';
+    return 'Publié';
   }
 
   function getEtatSortKey(etatDisplay) {
@@ -203,27 +172,27 @@
   }
 
   function getSortValue(row, col) {
-    const m = metricsCache.get(row.filePath) || {};
     switch (col) {
       case 'order':
         return row.orderIndex;
-      case 'folder':
-        return row.folder;
+      case 'id':
+        return msIdSortKey(row.id);
       case 'fileName':
         return row.fileName;
       case 'ext':
         return row.ext;
       case 'seriesName':
         return row.seriesName;
+      case 'photo':
+        return effectivePhoto(row);
+      case 'dimensions':
+        return row.dimensions || '';
+      case 'tailleMo':
+        return row.tailleMo;
       case 'title':
         return row.title;
-      case 'mediaUrl':
-        return row.mediaUrl;
-      case 'bytes':
-        return m.bytes != null ? m.bytes : null;
-      case 'pixels':
-        if (m.w != null && m.h != null) return m.w * m.h;
-        return null;
+      case 'publish':
+        return (row.publish || 'ON').trim().toUpperCase();
       case 'etat':
         return getEtatSortKey(row.etatDisplay);
       default:
@@ -231,12 +200,11 @@
     }
   }
 
-  /** Valeurs manquantes (métriques pas encore chargées) en fin de liste. */
   function compareSort(a, b, col, dir) {
     const va = getSortValue(a, col);
     const vb = getSortValue(b, col);
 
-    if (col === 'bytes' || col === 'pixels') {
+    if (col === 'tailleMo') {
       const aNull = va == null;
       const bNull = vb == null;
       if (aNull && bNull) return a.orderIndex - b.orderIndex;
@@ -261,16 +229,19 @@
   }
 
   function filterRows(rows) {
-    const fd = document.getElementById('catalogue-filter-dossier');
     const fs = document.getElementById('catalogue-filter-serie');
+    const fph = document.getElementById('catalogue-filter-photo');
     const fe = document.getElementById('catalogue-filter-etat');
-    const dossier = fd ? fd.value : '';
+    const fpub = document.getElementById('catalogue-filter-publish');
     const serie = fs ? fs.value : '';
+    const photo = fph ? fph.value : '';
     const etat = fe ? fe.value : '';
+    const pub = fpub ? fpub.value : '';
 
     return rows.filter((r) => {
-      if (dossier && r.folder !== dossier) return false;
-      if (serie && r.seriesName !== serie) return false;
+      if (serie && !(r.seriesCodes && r.seriesCodes.includes(serie))) return false;
+      if (photo && effectivePhoto(r) !== photo) return false;
+      if (pub && (r.publish || 'ON').trim().toUpperCase() !== pub) return false;
       if (etat === 'none') {
         if (r.etatDisplay === 'P' || r.etatDisplay === 'S') return false;
       } else if (etat && r.etatDisplay !== etat) return false;
@@ -329,20 +300,27 @@
     });
   }
 
+  function fmtMo(v) {
+    if (v == null || Number.isNaN(v)) return '—';
+    return v + ' Mo';
+  }
+
   function buildRowHtml(r) {
     const etatDisplay = r.etatDisplay;
     return (
-      '<tr data-path="' +
+      '<tr data-id="' +
+      escapeHtml(r.id) +
+      '" data-path="' +
       escapeHtml(r.filePath) +
       '">' +
       '<td class="col-thumb catalogue-thumb-cell">' +
       '<img class="catalogue-thumb" src="' +
-      escapeHtml(r.mediaUrl) +
+      escapeHtml(r.thumbUrl) +
       '" alt="" loading="lazy" />' +
       '</td>' +
-      '<td>' +
-      escapeHtml(r.folder) +
-      '</td>' +
+      '<td><code>' +
+      escapeHtml(r.id) +
+      '</code></td>' +
       '<td>' +
       escapeHtml(r.fileName) +
       '</td>' +
@@ -352,14 +330,21 @@
       '<td>' +
       escapeHtml(r.seriesName) +
       '</td>' +
+      '<td>' +
+      escapeHtml(photoCellLabel(r)) +
+      '</td>' +
+      '<td>' +
+      escapeHtml(r.dimensions || '—') +
+      '</td>' +
+      '<td>' +
+      escapeHtml(fmtMo(r.tailleMo)) +
+      '</td>' +
       '<td class="col-legende">' +
       escapeHtml(r.title) +
       '</td>' +
-      '<td class="col-url"><code>' +
-      escapeHtml(r.mediaUrl) +
-      '</code></td>' +
-      '<td data-metric="size" class="metric-pending">…</td>' +
-      '<td data-metric="res" class="metric-pending">…</td>' +
+      '<td>' +
+      escapeHtml(publishCellLabel(r)) +
+      '</td>' +
       '<td>' +
       renderEtat(etatDisplay) +
       '</td>' +
@@ -382,49 +367,77 @@
   }
 
   function populateFilterSelects() {
-    const fd = document.getElementById('catalogue-filter-dossier');
     const fs = document.getElementById('catalogue-filter-serie');
-    if (!fd || !fs) return;
+    const fph = document.getElementById('catalogue-filter-photo');
+    const fpub = document.getElementById('catalogue-filter-publish');
+    if (!fs || !fph || !fpub) return;
 
-    const folders = [...new Set(allRows.map((r) => r.folder))].sort((a, b) =>
-      a.localeCompare(b, 'fr')
-    );
-    const series = [...new Set(allRows.map((r) => r.seriesName))].sort((a, b) =>
-      a.localeCompare(b, 'fr')
-    );
-
-    fd.innerHTML = '';
-    const optAllD = document.createElement('option');
-    optAllD.value = '';
-    optAllD.textContent = 'Tous';
-    fd.appendChild(optAllD);
-    folders.forEach((f) => {
-      const o = document.createElement('option');
-      o.value = f;
-      o.textContent = f;
-      fd.appendChild(o);
+    const codesFromRows = new Set();
+    allRows.forEach((r) => {
+      (r.seriesCodes || []).forEach((c) => codesFromRows.add(c));
     });
+    const seriesCodesOrdered = [
+      ...catalogSeriesOrder.filter((c) => codesFromRows.has(c)),
+      ...[...codesFromRows].filter((c) => !catalogSeriesOrder.includes(c)).sort((a, b) =>
+        a.localeCompare(b, 'fr')
+      ),
+    ];
 
     fs.innerHTML = '';
     const optAllS = document.createElement('option');
     optAllS.value = '';
     optAllS.textContent = 'Toutes';
     fs.appendChild(optAllS);
-    series.forEach((name) => {
+    seriesCodesOrdered.forEach((code) => {
       const o = document.createElement('option');
-      o.value = name;
-      o.textContent = name;
+      o.value = code;
+      o.textContent = catalogSeriesNames[code] || code;
       fs.appendChild(o);
+    });
+
+    fpub.innerHTML = '';
+    const optAllPub = document.createElement('option');
+    optAllPub.value = '';
+    optAllPub.textContent = 'Tous';
+    fpub.appendChild(optAllPub);
+    [
+      ['ON', 'Publié'],
+      ['VAL', 'À valider'],
+      ['OFF', 'Non publié'],
+    ].forEach(([val, label]) => {
+      const o = document.createElement('option');
+      o.value = val;
+      o.textContent = label;
+      fpub.appendChild(o);
+    });
+
+    fph.innerHTML = '';
+    const optAllPh = document.createElement('option');
+    optAllPh.value = '';
+    optAllPh.textContent = 'Toutes';
+    fph.appendChild(optAllPh);
+    [
+      ['OK', 'OK'],
+      ['Redo', 'A refaire'],
+      ['HQ', 'HQ'],
+    ].forEach(([val, label]) => {
+      const o = document.createElement('option');
+      o.value = val;
+      o.textContent = label;
+      fph.appendChild(o);
     });
   }
 
   function bindFilterSelects() {
-    ['catalogue-filter-dossier', 'catalogue-filter-serie', 'catalogue-filter-etat'].forEach(
-      (id) => {
-        const el = document.getElementById(id);
-        if (el) el.addEventListener('change', renderCatalogue);
-      }
-    );
+    [
+      'catalogue-filter-serie',
+      'catalogue-filter-photo',
+      'catalogue-filter-publish',
+      'catalogue-filter-etat',
+    ].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.addEventListener('change', renderCatalogue);
+    });
   }
 
   function renderCatalogue() {
@@ -440,39 +453,43 @@
     sorted.forEach((r, i) => {
       const rowEl = trs[i];
       if (!rowEl) return;
-      const mediaUrl = r.mediaUrl;
+      const mediaUrl = r.thumbUrl;
       const thumb = rowEl.querySelector('.catalogue-thumb');
       if (thumb) attachPreview(thumb, mediaUrl);
-      fillMetrics(rowEl, r.filePath, mediaUrl);
     });
 
     updateCount(sorted.length, allRows.length);
   }
 
-  /** Mot de passe côté client (visible dans le code source ; protection légère). */
   const CATALOGUE_AUTH_KEY = 'catalogue_ms75_ok';
   const CATALOGUE_PASSWORD = 'MS75';
 
   function startCatalogue() {
+    if (typeof WorksCatalog === 'undefined') {
+      console.error('works-catalog.js doit être chargé avant catalogue.js');
+      const ld = container && container.querySelector('.catalogue-loading');
+      if (ld) {
+        ld.className = 'catalogue-error';
+        ld.textContent = 'Erreur : script works-catalog.js manquant.';
+      }
+      return;
+    }
+
     Promise.all([
-      fetch(titlesUrl).then((r) => {
-        if (!r.ok) throw new Error('Impossible de charger titles.txt');
-        return r.text();
-      }),
+      WorksCatalog.load(),
       fetch(stateUrl)
         .then((r) => (r.ok ? r.json() : {}))
         .catch(() => ({})),
     ])
-      .then(([text, state]) => {
-        const { rows } = parseTitles(text);
-        allRows = rows.map((r, i) => {
-          const etatRaw = state[r.filePath];
+      .then(([data, state]) => {
+        const baseRows = buildRowsFromWorksData(data);
+        allRows = baseRows.map((r) => {
+          const etatRaw = state[r.id] != null ? state[r.id] : state[r.filePath];
           const etatCode = normalizeEtat(etatRaw);
           const etatDisplay =
             etatCode === 'P' || etatCode === 'S' ? etatCode : null;
           return {
             ...r,
-            orderIndex: i,
             etatDisplay,
           };
         });
@@ -491,7 +508,7 @@
         if (ld) {
           ld.className = 'catalogue-error';
           ld.textContent =
-            'Erreur de chargement du catalogue. Ouvrez la page via un serveur HTTP local (les requêtes vers titles.txt et les images peuvent être bloquées en file://).';
+            'Erreur de chargement du catalogue. Ouvrez la page via un serveur HTTP local (works.json / titles.txt et images peuvent être bloqués en file://).';
         }
       });
   }

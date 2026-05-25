@@ -2,6 +2,14 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <script>
+    (function () {
+      if (location.hostname !== 'catalogue.mariesallantin.art') return;
+      var path = location.pathname.replace(/\/+$/, '') || '/';
+      if (path !== '/') return;
+      location.replace(location.origin + '/catalogue.html' + location.search + location.hash);
+    })();
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Marie Sallantin – Artiste Peintre</title>
@@ -103,6 +111,7 @@
     &copy; 2025 Marie Sallantin. Tous droits réservés.
   </footer>
 
+  <script src="works-catalog.js"></script>
   <script src="gallery.js"></script>
   <script>
     // Masquer immédiatement l'accueil si on arrive sur ?gallery ou #gallery, même si le DOM n'est pas prêt
@@ -134,53 +143,45 @@
         }, 100);
       }
     });
-    // Dynamically populate the series menu from titles.txt
-    fetch('media/titles.txt')
-      .then(r => r.text())
-      .then(text => {
-        const lines = text.split('\n');
-        const series = lines.filter(l => l.startsWith('#')).map(l => {
-          const [code, name] = l.replace('#','').split(';');
-          return { code: code.trim(), name: name.trim() };
+    // Menu des séries (works.json / titles.txt via WorksCatalog)
+    if (typeof WorksCatalog !== 'undefined') {
+      WorksCatalog.load()
+        .then(function (data) {
+          var counts = WorksCatalog.getSeriesCounts(data.works, data.seriesOrder);
+          var ul = document.getElementById('series-list');
+          data.seriesOrder.forEach(function (code) {
+            var name = data.seriesNames[code];
+            if (!name) return;
+            var li = document.createElement('li');
+            var count = counts[code] || 0;
+            if (count === 0) {
+              var a = document.createElement('a');
+              a.href = '#';
+              a.textContent = name;
+              a.className = 'menu-item-disabled';
+              a.onclick = function (e) {
+                e.preventDefault();
+                alert('Le travail de catalogage est en cours et les tableaux correspondant à cette série seront rajoutés ultérieurement.');
+                return false;
+              };
+              li.appendChild(a);
+            } else {
+              var a2 = document.createElement('a');
+              a2.href = '#' + code;
+              a2.textContent = name;
+              a2.onclick = function (e) {
+                e.preventDefault();
+                window.scrollTo({ top: document.getElementById('gallery').offsetTop - 40, behavior: 'smooth' });
+              };
+              li.appendChild(a2);
+            }
+            ul.appendChild(li);
+          });
+        })
+        .catch(function (err) {
+          console.error('Menu séries:', err);
         });
-        // Détecter les séries vides
-        const artworks = lines.filter(l => l.includes('/') && l.includes(';')).map(l => {
-          const [filePath] = l.split(';');
-          return filePath.split('/')[0];
-        });
-        const seriesCounts = {};
-        series.forEach(s => { seriesCounts[s.code] = 0; });
-        artworks.forEach(folder => { if (seriesCounts[folder] !== undefined) seriesCounts[folder]++; });
-        const ul = document.getElementById('series-list');
-        series.forEach(s => {
-          const li = document.createElement('li');
-          if (seriesCounts[s.code] === 0) {
-            // Série vide : style différent et message au clic
-            const a = document.createElement('a');
-            a.href = '#';
-            a.textContent = s.name;
-            a.className = 'menu-item-disabled';
-            a.onclick = (e) => {
-              e.preventDefault();
-              alert('Le travail de catalogage est en cours et les tableaux correspondant à cette série seront rajoutés ultérieurement.');
-              return false;
-            };
-            li.appendChild(a);
-          } else {
-            // Série normale
-            const a = document.createElement('a');
-            a.href = `#${s.code}`;
-            a.textContent = s.name;
-            a.onclick = (e) => {
-              e.preventDefault();
-              window.scrollTo({ top: document.getElementById('gallery').offsetTop - 40, behavior: 'smooth' });
-              // Optionally: filterGalleryBySeries(s.code);
-            };
-            li.appendChild(a);
-          }
-          ul.appendChild(li);
-        });
-      });
+    }
 
     // Menu Peintures : affiche la galerie des séries
     document.querySelectorAll('.main-nav a').forEach(a => {
@@ -211,39 +212,29 @@
 
     // Fonction pour charger et afficher une image aléatoire
     function loadRandomImage() {
-      fetch('media/titles.txt')
-        .then(response => response.text())
-        .then(text => {
-          const lines = text.split('\n');
-          const imageLines = lines.filter(line => line.includes('/') && line.includes(';'));
-          
-          if (imageLines.length > 0) {
-            // Sélectionner une image aléatoire
-            const randomLine = imageLines[Math.floor(Math.random() * imageLines.length)];
-            const [filePath, title] = randomLine.split(';');
-            
-            // Extraire le nom de la série du chemin
-            const seriesCode = filePath.split('/')[0];
-            
-            // Trouver le nom de la série
-            const seriesLine = lines.find(line => line.startsWith('#') && line.includes(seriesCode));
-            const seriesName = seriesLine ? seriesLine.split(';')[1].trim() : seriesCode;
-            
-            // Mettre à jour l'image et les informations
-            const img = document.getElementById('random-image');
-            const titleElement = document.getElementById('image-title');
-            const seriesNameElement = document.getElementById('series-name');
-            
-            img.src = `media/${filePath}`;
-            titleElement.textContent = title.trim();
-            seriesNameElement.textContent = seriesName;
-            
-            // Stocker le code de la série pour le clic
-            seriesNameElement.dataset.seriesCode = seriesCode;
-          }
+      if (typeof WorksCatalog === 'undefined') return;
+      WorksCatalog.load()
+        .then(function (data) {
+          var works = data.works;
+          if (!works.length) return;
+          var w = works[Math.floor(Math.random() * works.length)];
+          var codes = w.series || [];
+          var seriesName = codes
+            .map(function (c) {
+              return data.seriesNames[c] || c;
+            })
+            .join(' · ');
+          var seriesCode = codes[0] || '';
+          var img = document.getElementById('random-image');
+          var titleElement = document.getElementById('image-title');
+          var seriesNameElement = document.getElementById('series-name');
+          img.src = 'media/' + w.media;
+          titleElement.textContent = w.title;
+          seriesNameElement.textContent = seriesName || '—';
+          seriesNameElement.dataset.seriesCode = seriesCode;
         })
-        .catch(error => {
-          console.error('Erreur lors du chargement de l\'image aléatoire:', error);
+        .catch(function (error) {
+          console.error("Erreur lors du chargement de l'image aléatoire:", error);
         });
     }
 

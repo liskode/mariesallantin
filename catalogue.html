@@ -31,7 +31,7 @@
   <header class="catalogue-standalone-header">
     <div class="catalogue-standalone-inner">
       <h1>Catalogue des œuvres</h1>
-      <p class="catalogue-standalone-meta">Outil de gestion</p>
+      <p class="catalogue-standalone-meta">Outil de gestion · <a href="catalogue-legende.html">Éditer les légendes</a></p>
     </div>
   </header>
   <main class="catalogue-page" id="catalogue-root">
@@ -48,7 +48,7 @@
           <thead id="catalogue-thead">
             <tr>
               <th class="col-thumb catalogue-th" scope="col">
-                <button type="button" class="catalogue-sort-btn" data-sort-key="order" title="Trier par ordre dans titles.txt">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="order" title="Trier par ordre dans works.json">
                   <span class="catalogue-sort-icons" aria-hidden="true">
                     <span class="catalogue-sort-up">▲</span>
                     <span class="catalogue-sort-down">▼</span>
@@ -56,15 +56,14 @@
                   <span class="catalogue-sort-label">Vignette</span>
                 </button>
               </th>
-              <th class="catalogue-th catalogue-th--has-filter" scope="col">
-                <button type="button" class="catalogue-sort-btn" data-sort-key="folder" title="Trier par dossier">
+              <th class="catalogue-th" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="id" title="Trier par id MS">
                   <span class="catalogue-sort-icons" aria-hidden="true">
                     <span class="catalogue-sort-up">▲</span>
                     <span class="catalogue-sort-down">▼</span>
                   </span>
-                  <span class="catalogue-sort-label">Dossier</span>
+                  <span class="catalogue-sort-label">Id</span>
                 </button>
-                <select id="catalogue-filter-dossier" class="catalogue-select catalogue-select--header" aria-label="Filtrer par dossier"></select>
               </th>
               <th class="catalogue-th" scope="col">
                 <button type="button" class="catalogue-sort-btn" data-sort-key="fileName" title="Trier par nom de fichier">
@@ -94,6 +93,34 @@
                 </button>
                 <select id="catalogue-filter-serie" class="catalogue-select catalogue-select--header" aria-label="Filtrer par série"></select>
               </th>
+              <th class="catalogue-th catalogue-th--has-filter" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="photo" title="Trier par statut photo">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Photo</span>
+                </button>
+                <select id="catalogue-filter-photo" class="catalogue-select catalogue-select--header" aria-label="Filtrer par photo"></select>
+              </th>
+              <th class="catalogue-th" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="dimensions" title="Trier par dimensions">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Dimensions</span>
+                </button>
+              </th>
+              <th class="catalogue-th" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="tailleMo" title="Trier par taille fichier (Mo)">
+                  <span class="catalogue-sort-icons" aria-hidden="true">
+                    <span class="catalogue-sort-up">▲</span>
+                    <span class="catalogue-sort-down">▼</span>
+                  </span>
+                  <span class="catalogue-sort-label">Taille (Mo)</span>
+                </button>
+              </th>
               <th class="col-legende catalogue-th" scope="col">
                 <button type="button" class="catalogue-sort-btn" data-sort-key="title" title="Trier par légende">
                   <span class="catalogue-sort-icons" aria-hidden="true">
@@ -103,32 +130,15 @@
                   <span class="catalogue-sort-label">Légende</span>
                 </button>
               </th>
-              <th class="col-url catalogue-th" scope="col">
-                <button type="button" class="catalogue-sort-btn" data-sort-key="mediaUrl" title="Trier par URL">
+              <th class="catalogue-th catalogue-th--has-filter" scope="col">
+                <button type="button" class="catalogue-sort-btn" data-sort-key="publish" title="Trier par statut de publication (fichier)">
                   <span class="catalogue-sort-icons" aria-hidden="true">
                     <span class="catalogue-sort-up">▲</span>
                     <span class="catalogue-sort-down">▼</span>
                   </span>
-                  <span class="catalogue-sort-label">URL <code>media/</code></span>
+                  <span class="catalogue-sort-label">Publication</span>
                 </button>
-              </th>
-              <th class="catalogue-th" scope="col">
-                <button type="button" class="catalogue-sort-btn" data-sort-key="bytes" title="Trier par poids">
-                  <span class="catalogue-sort-icons" aria-hidden="true">
-                    <span class="catalogue-sort-up">▲</span>
-                    <span class="catalogue-sort-down">▼</span>
-                  </span>
-                  <span class="catalogue-sort-label">Poids (Ko)</span>
-                </button>
-              </th>
-              <th class="catalogue-th" scope="col">
-                <button type="button" class="catalogue-sort-btn" data-sort-key="pixels" title="Trier par résolution">
-                  <span class="catalogue-sort-icons" aria-hidden="true">
-                    <span class="catalogue-sort-up">▲</span>
-                    <span class="catalogue-sort-down">▼</span>
-                  </span>
-                  <span class="catalogue-sort-label">Résolution (px)</span>
-                </button>
+                <select id="catalogue-filter-publish" class="catalogue-select catalogue-select--header" aria-label="Filtrer par publication fichier"></select>
               </th>
               <th class="catalogue-th catalogue-th--has-filter" scope="col">
                 <button type="button" class="catalogue-sort-btn" data-sort-key="etat" title="Trier par état">
@@ -154,6 +164,7 @@
   </main>
   <img id="catalogue-preview-img" class="catalogue-preview" alt="" aria-hidden="true" />
   </div>
+  <script src="works-catalog.js"></script>
   <script src="catalogue.js"></script>
 </body>
 </html>

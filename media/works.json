@@ -1,0 +1,3011 @@
+{
+  "version": 2,
+  "description": "Catalogue v2 : fichiers sous media/catalogue/. id MS####. publish = toujours VAL (à valider) dans works.json ; état Suspendu (S) dans catalog-state.json pour les chemins contenant _OFF_. Légende : tirets ou underscores (works_numero). photo = OK | Redo. tailleMo / dimensions si fichiers présents.",
+  "series": [
+    [
+      "ABSTR",
+      "Abstractions"
+    ],
+    [
+      "APHRO",
+      "Aphrodite"
+    ],
+    [
+      "ATELI",
+      "Atelier"
+    ],
+    [
+      "CIEUX",
+      "Cieux"
+    ],
+    [
+      "DANAE",
+      "Danaé"
+    ],
+    [
+      "DANTE",
+      "Dante"
+    ],
+    [
+      "ENCRE",
+      "Encre de Chine"
+    ],
+    [
+      "ENFER",
+      "Enfer"
+    ],
+    [
+      "JUGEM",
+      "Jugement dernier"
+    ],
+    [
+      "MASQU",
+      "Masques, miroir et statuette"
+    ],
+    [
+      "METAM",
+      "Métamorphoses"
+    ],
+    [
+      "MUSEE",
+      "Musées"
+    ],
+    [
+      "NUITS",
+      "Nuits perdues"
+    ],
+    [
+      "POLYP",
+      "Polyptyques"
+    ],
+    [
+      "PURGA",
+      "Purgatoire"
+    ],
+    [
+      "RESUR",
+      "Résurrection"
+    ],
+    [
+      "UNIVE",
+      "Univers"
+    ]
+  ],
+  "works": [
+    {
+      "id": "MS0001",
+      "media": "catalogue/MS0001_ PHOTO_ABSTR_HOFO_1982_HST_ petite variation blanche 41x50cm.jpeg",
+      "title": "petite variation blanche 41x50cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0002",
+      "media": "catalogue/MS0002_ABSTR_012P_1982_HST_ sans titre 1982 huile sur toile _ 46X61cm.jpeg",
+      "title": "sans titre 1982 huile sur toile _ 46X61cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0003",
+      "media": "catalogue/MS0003_ABSTR_015F_1982_HST_ petite variation blanche n°8 huile sur toile 65X54cm*ROSSET.jpeg",
+      "title": "petite variation blanche n°8 huile sur toile 65X54cm*ROSSET",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0004",
+      "media": "catalogue/MS0004_ABSTR_050F_1984_AST_Abstraction sans titre 89X116cm.jpeg",
+      "title": "Abstraction sans titre 89X116cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0005",
+      "media": "catalogue/MS0005_ABSTR_080F_1979_HST_Sans titre huile sur toile 146x114cm.jpeg",
+      "title": "Sans titre huile sur toile 146x114cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0006",
+      "media": "catalogue/MS0006_ABSTR_100P_1983_HST_variation bleue achat du FNAC. 162X114cm*FNAC.jpeg",
+      "title": "variation bleue achat du FNAC. 162X114cm*FNAC",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0007",
+      "media": "catalogue/MS0007_ABSTR_BLEUE_010F_1983_HST_Variation bleue, huile sur toile 55X46cm.jpeg",
+      "title": "Variation bleue, huile sur toile 55X46cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0008",
+      "media": "catalogue/MS0008_ABSTR_BLEUE_010F_1984_HST_Petite variation bleue , huile sur toile N°6, 55X46cm.jpeg",
+      "title": "Petite variation bleue , huile sur toile N°6, 55X46cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0009",
+      "media": "catalogue/MS0009_ABSTR_BLEUE_080F_1983_HST_Variation bleue, huile sur toile 146x114cm.jpeg",
+      "title": "Variation bleue, huile sur toile 146x114cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0010",
+      "media": "catalogue/MS0010_ABSTR_BLEUE_080P_1983_HST_Variation bleue, huile sur toile 146x97cm.jpeg",
+      "title": "Variation bleue, huile sur toile 146x97cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0011",
+      "media": "catalogue/MS0011_ABSTR_BLEUE_100F_1983_HST_Variation bleue, huile sur toile162X130cm (1).jpeg",
+      "title": "Variation bleue, huile sur toile162X130cm (1)",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0012",
+      "media": "catalogue/MS0012_ABSTR_BLEUE_100F_1983_HST_Variation bleue, huile sur toile162X130cm (2).jpeg",
+      "title": "Variation bleue, huile sur toile162X130cm (2)",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0013",
+      "media": "catalogue/MS0013_ABSTR_BLEUE_100F_1983_HST_Variation bleue, huile sur toile162X130cm (3).jpeg",
+      "title": "Variation bleue, huile sur toile162X130cm (3)",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0014",
+      "media": "catalogue/MS0014_ABSTR_BLEUE_100F_1983_HST_Variation bleue, huile sur toile162X130cm.jpeg",
+      "title": "Variation bleue, huile sur toile162X130cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0015",
+      "media": "catalogue/MS0015_ABSTR_BLEUE_HOFO_1983_HST_Variation bleue huile sur toile 146x204 cm .jpeg",
+      "title": "Variation bleue huile sur toile 146x204 cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0016",
+      "media": "catalogue/MS0016_ABSTR_HOFO_1983_HST_Variation bleue, huile sur toile162x260cm.jpeg",
+      "title": "Variation bleue, huile sur toile162x260cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0017",
+      "media": "catalogue/MS0017_ABSTR_HOFO_1984_AST_GRANDE ABSTRACTION sur toile libre N°1 , sans titre 300X22Ocm 1984.jpeg",
+      "title": "GRANDE ABSTRACTION sur toile libre N°1 , sans titre 300X22Ocm 1984",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0018",
+      "media": "catalogue/MS0018_ABSTR_HOFO_1984_AST_GRANDE ABSTRACTION sur toile libre N°2 , sans titre 300X22Ocm 1984.jpeg",
+      "title": "GRANDE ABSTRACTION sur toile libre N°2 , sans titre 300X22Ocm 1984",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0019",
+      "media": "catalogue/MS0019_ABSTR_HOFO_1985_AST_abstraction sans titre 80x40cm.jpeg",
+      "title": "abstraction sans titre 80x40cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0020",
+      "media": "catalogue/MS0020_ABSTR_HOFO_1987_ASB_petite métamorphose 60x33cm 1987 N°11 acrylique sur bois.jpeg",
+      "title": "petite métamorphose 60x33cm 1987 N°11 acrylique sur bois",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0021",
+      "media": "catalogue/MS0021_ABSTR_HOFO_1987_AST_grande variation rouge N°7 acrylique et pigments sur toile , 205x170cm*col part NF.jpeg",
+      "title": "grande variation rouge N°7 acrylique et pigments sur toile , 205x170cm*col part NF",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0022",
+      "media": "catalogue/MS0022_ABSTR_HOFO_AST_1986_SANS TITRE 210x180cm.jpeg",
+      "title": "SANS TITRE 210x180cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0023",
+      "media": "catalogue/MS0023_ABSTR_M8_1982_HST_sans titre 1982 huile sur toile 27x46cm.jpeg",
+      "title": "sans titre 1982 huile sur toile 27x46cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0024",
+      "media": "catalogue/MS0024_ABSTR_META_120F_1987_AST_Métamorphose n°1 acrylique sur toile 195x130cm.jpeg",
+      "title": "Métamorphose n°1 acrylique sur toile 195x130cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0025",
+      "media": "catalogue/MS0025_ABSTR_META_120F_1987_AST_Métamorphose n°6 acrylique sur toile 195x130cm.jpeg",
+      "title": "Métamorphose n°6 acrylique sur toile 195x130cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0026",
+      "media": "catalogue/MS0026_ABSTR_META_HOFO_1988_ HST_petite MÉTAMORPHOSE , 120X60cm acrylique sur toile.jpeg",
+      "title": "petite MÉTAMORPHOSE , 120X60cm acrylique sur toile",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0027",
+      "media": "catalogue/MS0027_ABSTR_META_HOFO_1989_AST_Métamorphose  acrylique sur toile, 210x130cm.jpeg",
+      "title": "Métamorphose  acrylique sur toile, 210x130cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0028",
+      "media": "catalogue/MS0028_ABSTR_METAM_120F_1987_AST_ MÉTAMORPHOSE N°3 acrylique et pigments sur toile,195x130cm*Bruno Gelis.jpeg",
+      "title": "MÉTAMORPHOSE N°3 acrylique et pigments sur toile,195x130cm*Bruno Gelis",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0029",
+      "media": "catalogue/MS0029_ABSTR_METAM_120F_1987_AST_Métamorphose n°10, acrylique sur toile, 195X130cm*galerie Nicole Ferry.jpeg",
+      "title": "Métamorphose n°10, acrylique sur toile, 195X130cm*galerie Nicole Ferry",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0030",
+      "media": "catalogue/MS0030_ABSTR_METAM_HOFO_1987_ASB_Petite métamorphose N°1 60X66cm acrylique sur bois.jpeg",
+      "title": "Petite métamorphose N°1 60X66cm acrylique sur bois",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0031",
+      "media": "catalogue/MS0031_ABSTR_METAM_HOFO_1987_ASB_Petite métamorphose N°5 60X66cm acrylique sur bois.jpeg",
+      "title": "Petite métamorphose N°5 60X66cm acrylique sur bois",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0032",
+      "media": "catalogue/MS0032_ABSTR_METAM_HOFO_1987_AST_MÉTAMORPHOSES N°10 acrylique et pigments sur toile, 205x103cm *col NF.jpeg",
+      "title": "MÉTAMORPHOSES N°10 acrylique et pigments sur toile, 205x103cm *col NF",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0033",
+      "media": "catalogue/MS0033_ABSTR_METAM_HOFO_1988_AST_ MÉTAMORPHOSE N° acrylique et pigments sur toile,210X165cm.jpeg",
+      "title": "MÉTAMORPHOSE N° acrylique et pigments sur toile,210X165cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0034",
+      "media": "catalogue/MS0034_ABSTR_METAM_HOFO_1989_AST_Metamorphose,  acrylique sur toile 210x130cm.jpeg",
+      "title": "Metamorphose,  acrylique sur toile 210x130cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0035",
+      "media": "catalogue/MS0035_ABSTR_METAM_HOFO_1989_AST_Metamorphose, acrylique sur toile  210x130cm.jpeg",
+      "title": "Metamorphose, acrylique sur toile  210x130cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0036",
+      "media": "catalogue/MS0036_ABSTR_METAM_HOFO_1989_AST_Metamorphose, acrylique sur toile 210x130cm.jpeg",
+      "title": "Metamorphose, acrylique sur toile 210x130cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0037",
+      "media": "catalogue/MS0037_ABSTR_ROUGE_HFO_1986_AST_Variation rouge de Bergues N°4 210x 150cm acrylique sur toile libre.jpeg",
+      "title": "Variation rouge de Bergues N°4 210x 150cm acrylique sur toile libre",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0038",
+      "media": "catalogue/MS0038_ABSTR_ROUGE_HOFO_1987_AST_Grande variation rouge de Bergues N°3 210X 130 _ * col Bruno Gelis.jpeg",
+      "title": "Grande variation rouge de Bergues N°3 210X 130 _ * col Bruno Gelis",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0039",
+      "media": "catalogue/MS0039_APHRO_0070_1994_AST_La sieste d'Aphrodite, acrylique sur toile, 70x70cm.jpeg",
+      "title": "La sieste d'Aphrodite, acrylique sur toile, 70x70cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0040",
+      "media": "catalogue/MS0040_APHRO_0100_1994_AST_Aphrodite et la Méditerranée 1994; 100x100cm , acrylique sur toile.jpeg",
+      "title": "Aphrodite et la Méditerranée 1994; 100x100cm , acrylique sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0041",
+      "media": "catalogue/MS0041_APHRO_060F_1993_TST_Le repos d'Aphrodite, tempera sur toile, 130X97CM.jpeg",
+      "title": "Le repos d'Aphrodite, tempera sur toile, 130X97CM",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0042",
+      "media": "catalogue/MS0042_APHRO_000F_1994_AST_Course d'Aphrodite , acrylique sur toile 18x14cm.jpeg",
+      "title": "Course d'Aphrodite , acrylique sur toile 18x14cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0043",
+      "media": "catalogue/MS0043_APHRO_001P_1994_AST_Profil rusé  d'Aphrodite,22x16cm acrylique sur toile.jpeg",
+      "title": "Profil rusé  d'Aphrodite,22x16cm acrylique sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0044",
+      "media": "catalogue/MS0044_APHRO_0025_1994_AST_La chute, acrylique sur toile 25x25cm.jpeg",
+      "title": "La chute, acrylique sur toile 25x25cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0045",
+      "media": "catalogue/MS0045_APHRO_0025_1994_AST_Le bain d'Aphrodite par mauvais temps, acrylique sur toile 25x25cm.jpeg",
+      "title": "Le bain d'Aphrodite par mauvais temps, acrylique sur toile 25x25cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0046",
+      "media": "catalogue/MS0046_APHRO_0025_AST_d'après Botero acrylique sur toile 25x25cm.jpeg",
+      "title": "d'après Botero acrylique sur toile 25x25cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0047",
+      "media": "catalogue/MS0047_APHRO_003P_1994_AST_Chute et course d'Aphrodite, 27x19cm acrylique sur toile.jpeg",
+      "title": "Chute et course d'Aphrodite, 27x19cm acrylique sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0048",
+      "media": "catalogue/MS0048_APHRO_003P_1994_AST_Course et bain d'AphroditeN°2, 27X19cm.jpeg",
+      "title": "Course et bain d'AphroditeN°2, 27X19cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0049",
+      "media": "catalogue/MS0049_APHRO_003P_1994_TST_Course et bain d'AphroditeN°1, tempera sur toile, 27x19cm.jpeg",
+      "title": "Course et bain d'AphroditeN°1, tempera sur toile, 27x19cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0050",
+      "media": "catalogue/MS0050_APHRO_0050_1993_AST_ Le bain d'Aphrodite Acrylique sur toile 50x50cm (1).jpeg",
+      "title": "Le bain d'Aphrodite Acrylique sur toile 50x50cm (1)",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0051",
+      "media": "catalogue/MS0051_APHRO_0050_1993_AST_ Le bain d'Aphrodite Acrylique sur toile 50x50cm.jpeg",
+      "title": "Le bain d'Aphrodite Acrylique sur toile 50x50cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0052",
+      "media": "catalogue/MS0052_APHRO_0050_1993_AST_Le bain d'Aphrodite Acrylique sur toile 50x50cm.jpeg",
+      "title": "Le bain d'Aphrodite Acrylique sur toile 50x50cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0053",
+      "media": "catalogue/MS0053_APHRO_005F_1994_AST_Aphrodite n°1 acrylique sur toile , 35x27cm.jpeg",
+      "title": "Aphrodite n°1 acrylique sur toile , 35x27cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0054",
+      "media": "catalogue/MS0054_APHRO_005F_1994_AST_Aphrodite n°2 (couverture de carnet 1) acrylique sur toile , 35x27cm.jpeg",
+      "title": "Aphrodite n°2 (couverture de carnet 1) acrylique sur toile , 35x27cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0055",
+      "media": "catalogue/MS0055_APHRO_0060_1993_AST_Le bain d'Aphrodite acrylique sur toile 60x60cm .jpeg",
+      "title": "Le bain d'Aphrodite acrylique sur toile 60x60cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0056",
+      "media": "catalogue/MS0056_APHRO_0070_1994_AST_Méditerranée, acrylique sur toile 70x70cm, Coll.Agnès.jpeg",
+      "title": "Méditerranée, acrylique sur toile 70x70cm, Coll.Agnès",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0057",
+      "media": "catalogue/MS0057_APHRO_0080_1993_AST_Aphrodite retour en Méditerranée. acrylique sur toile 80x80cm.jpeg",
+      "title": "Aphrodite retour en Méditerranée. acrylique sur toile 80x80cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0058",
+      "media": "catalogue/MS0058_APHRO_0080_1993_AST_La gymnastique d'Aphrodite acrylique sur toile 80x80cm.jpeg",
+      "title": "La gymnastique d'Aphrodite acrylique sur toile 80x80cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0059",
+      "media": "catalogue/MS0059_APHRO_008M_1994_AST_Le bain d'Aphrodite 27x46cm acrylique sur toile.jpeg",
+      "title": "Le bain d'Aphrodite 27x46cm acrylique sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0060",
+      "media": "catalogue/MS0060_APHRO_0100_1993_AST_Aphrodite , La méditerranée retrouvée, peinture acrylique sur toile 1993 reprise en 2025.jpeg",
+      "title": "Aphrodite , La méditerranée retrouvée, peinture acrylique sur toile 1993 reprise en 2025",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0061",
+      "media": "catalogue/MS0061_APHRO_010P_1993_AST_La chute d'Aphrodite Acrylique sur toile 55x38cm.jpeg",
+      "title": "La chute d'Aphrodite Acrylique sur toile 55x38cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0062",
+      "media": "catalogue/MS0062_APHRO_010P_1994_AST_La course d'Aphrodite,  acrylique sur toile 55X38cm.jpeg",
+      "title": "La course d'Aphrodite,  acrylique sur toile 55X38cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0063",
+      "media": "catalogue/MS0063_APHRO_010P_1996_TST_Aphrodite 55x38cm.jpeg",
+      "title": "Aphrodite 55x38cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0064",
+      "media": "catalogue/MS0064_APHRO_012M_1993_AST_Aphrodite en Méditerranée_acrylique sur toile 61x38cm (1).jpeg",
+      "title": "acrylique sur toile 61x38cm (1)",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0065",
+      "media": "catalogue/MS0065_APHRO_012M_1993_AST_Aphrodite en Méditerranée_acrylique sur toile 61x38cm.jpeg",
+      "title": "acrylique sur toile 61x38cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0066",
+      "media": "catalogue/MS0066_APHRO_012M_1993_AST_Aphrodite, la course 61x38cm acrylique sur toile.jpeg",
+      "title": "Aphrodite, la course 61x38cm acrylique sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0067",
+      "media": "catalogue/MS0067_APHRO_012M_1996_TST_Le bain 61x38cm  tempera sur toile_ (1).jpeg",
+      "title": "Le bain 61x38cm  tempera sur toile_ (1)",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0068",
+      "media": "catalogue/MS0068_APHRO_012M_1996_TST_Le bain 61x38cm  tempera sur toile_ (2).jpeg",
+      "title": "Le bain 61x38cm  tempera sur toile_ (2)",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0069",
+      "media": "catalogue/MS0069_APHRO_012M_1996_TST_Le bain 61x38cm  tempera sur toile.jpeg",
+      "title": "Le bain 61x38cm  tempera sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0070",
+      "media": "catalogue/MS0070_APHRO_0150_1994_AST_Le bain d'Aphrodite acrylique sur toile 150x150cm.jpeg",
+      "title": "Le bain d'Aphrodite acrylique sur toile 150x150cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0071",
+      "media": "catalogue/MS0071_APHRO_0150_1994_TST_Aphrodite, l'orage, technique mixte sur tpie, 1994 150x150cm.jpeg",
+      "title": "Aphrodite, l'orage, technique mixte sur tpie, 1994 150x150cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0072",
+      "media": "catalogue/MS0072_APHRO_0150_1995_TST_ Aphrodite  en normandie SOUS L'ORAGE) (la course)1995 temper ASToile  150x150cm .jpeg",
+      "title": "Aphrodite  en normandie SOUS L'ORAGE) (la course)1995 temper ASToile  150x150cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0073",
+      "media": "catalogue/MS0073_APHRO_015P_1994_TST_Aphrodite et galatée 50X65cm tempera sur toile.jpeg",
+      "title": "Aphrodite et galatée 50X65cm tempera sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0074",
+      "media": "catalogue/MS0074_APHRO_025M_1993_AST_la chute d'Aphrodite 81x54cm.jpeg",
+      "title": "la chute d'Aphrodite 81x54cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0075",
+      "media": "catalogue/MS0075_APHRO_050F_1993_TST_la sieste d'Aphrodite tempera sur toile 146x89cm.jpeg",
+      "title": "la sieste d'Aphrodite tempera sur toile 146x89cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0076",
+      "media": "catalogue/MS0076_APHRO_120F_1994_AST_Les heures d'Aphrodite , au coucher du soleil, 195x130cm , acrylique sur toile.jpeg",
+      "title": "Les heures d'Aphrodite , au coucher du soleil, 195x130cm , acrylique sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0077",
+      "media": "catalogue/MS0077_APHRO_120F_1994_AST_Les heures d'Aphrodite (l'après_midi)  acrylique_toile  195x130cm.jpeg",
+      "title": "toile  195x130cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0078",
+      "media": "catalogue/MS0078_APHRO_120M_1994_AST_ les heures d'Aphrodite midi trente  acrylique sur toile 195x97cm.jpeg",
+      "title": "les heures d'Aphrodite midi trente  acrylique sur toile 195x97cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0079",
+      "media": "catalogue/MS0079_APHRO_120M_1994_AST_ les heures d'Aphrodite minuit 195x97cm.jpeg",
+      "title": "les heures d'Aphrodite minuit 195x97cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0080",
+      "media": "catalogue/MS0080_APHRO_120P_1993_AST_Les heures d'Aphrodite (la chute)1993 acryl_toile  195x114cm .jpeg",
+      "title": "toile  195x114cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0081",
+      "media": "catalogue/MS0081_APHRO_120P_1993_AST_Les heures d'Aphrodite (la sieste)1993 acrylique_toile  195x114cm.jpeg",
+      "title": "toile  195x114cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0082",
+      "media": "catalogue/MS0082_APHRO_120P_1993_AST_Les heures d'Aphrodite (midi)1993 acrylique_toile  195x114cm.jpeg",
+      "title": "toile  195x114cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0083",
+      "media": "catalogue/MS0083_APHRO_120P_1993_AST_les heures d'Aphrodite 195x114cm acrylique sur toile.jpeg",
+      "title": "les heures d'Aphrodite 195x114cm acrylique sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0084",
+      "media": "catalogue/MS0084_APHRO_120P_1994_AST_la course d'Aphrodite 195X120CM.jpeg",
+      "title": "la course d'Aphrodite 195X120CM",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0085",
+      "media": "catalogue/MS0085_APHRO_120P_1994_AST_Les heures d'Aphrodite (le bain)1994 acrylique_toile  195x114cm.jpeg",
+      "title": "toile  195x114cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0086",
+      "media": "catalogue/MS0086_APHRO_1994_AST_0F12_ Les heures d'Aphrodite(le bain)1994 acrylique sur toile _61X50cm.jpeg",
+      "title": "Les heures d'Aphrodite(le bain)1994 acrylique sur toile _61X50cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0087",
+      "media": "catalogue/MS0087_APHRO_MUSEE_0130_1994_AST_Aphrodite au musée Rodin 130x130cm acrylique sur toile.jpeg",
+      "title": "Aphrodite au musée Rodin 130x130cm acrylique sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0088",
+      "media": "catalogue/MS0088_APHRO_O12M_1994_AST_ Aphrodite fuyant l'orage, acrylique sur toile 61x38cm.jpeg",
+      "title": "Aphrodite fuyant l'orage, acrylique sur toile 61x38cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0089",
+      "media": "catalogue/MS0089_APHRO_O12M_1994_AST_La course d'Aphrodite acrylique sur toile 61x38cm.jpeg",
+      "title": "La course d'Aphrodite acrylique sur toile 61x38cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0090",
+      "media": "catalogue/MS0090_APHRO_O12M_1994_AST_Le bain d'Aphrodite acrylique sur toile 61x38cm.jpeg",
+      "title": "Le bain d'Aphrodite acrylique sur toile 61x38cm",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0091",
+      "media": "catalogue/MS0091_APHRO_UNIVE_002F_1994_AST_Aphrodite avec deux cercles , 24x19cm, acrylique sur toile.jpeg",
+      "title": "Aphrodite avec deux cercles , 24x19cm, acrylique sur toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0092",
+      "media": "catalogue/MS0092_CIEUX_DANTE.jpeg",
+      "title": "DANTE",
+      "series": [
+        "CIEUX"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0093",
+      "media": "catalogue/MS0093_CIEUX_ENCRE_HOFO_2017_ LE PARADIS encre deChine sur papier 79,4cmX112cmcol part Agnès.jpeg",
+      "title": "LE PARADIS encre deChine sur papier 79,4cmX112cmcol part Agnès",
+      "series": [
+        "CIEUX"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0094",
+      "media": "catalogue/MS0094_DANAÉ_NUITS_0150_2014_AST_ Danaé , nuits perdues, acrylique sur toile150x150cm.jpeg",
+      "title": "Danaé , nuits perdues, acrylique sur toile150x150cm",
+      "series": [
+        "DANAE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0095",
+      "media": "catalogue/MS0095_DANAÉ_NUITS_0150_2014_AST_ Danaé, Zeus, 150X150cm acrylique sur toile.jpeg",
+      "title": "Danaé, Zeus, 150X150cm acrylique sur toile",
+      "series": [
+        "DANAE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0096",
+      "media": "catalogue/MS0096_DANTE_PARADIS DU PURGATOIRE.jpeg",
+      "title": "PARADIS DU PURGATOIRE",
+      "series": [
+        "DANTE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0097",
+      "media": "catalogue/MS0097_ENCRE_2010_Mauvais temps pour les anges, 55x44cm.jpeg",
+      "title": "Mauvais temps pour les anges, 55x44cm",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0098",
+      "media": "catalogue/MS0098_ENCRE_DANTE_ENFER_2009_l'Enfer 56cmx44,5cm.jpeg",
+      "title": "l'Enfer 56cmx44,5cm",
+      "series": [
+        "ENCRE",
+        "ENFER"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0099",
+      "media": "catalogue/MS0099_ENCRE_DANTE_ENFER_HOFO_2010_L'Enfer 44x57,5cm.jpeg",
+      "title": "L'Enfer 44x57,5cm",
+      "series": [
+        "ENCRE",
+        "ENFER"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0100",
+      "media": "catalogue/MS0100_ENCRE_DANTE_HOFO_2017_LES DAMNÉS encre sur papier (etat final) 79,4x112cml.jpeg",
+      "title": "LES DAMNÉS encre sur papier (etat final) 79,4x112cml",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0101",
+      "media": "catalogue/MS0101_ENCRE_DANTE_PURGA_0HF0_2017 l'arrivée de Dante et Virgile au pied de la montagne du purgatoire 54cmx44cm2017.jpeg",
+      "title": "PURGA_0HF0_2017 l'arrivée de Dante et Virgile au pied de la montagne du purgatoire 54cmx44cm2017",
+      "series": [
+        "ENCRE",
+        "PURGA"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0102",
+      "media": "catalogue/MS0102_ENCRE_DANTE_PURGA_ATELI_ Divine comédie _combinaison 2  2017_2023.jpeg",
+      "title": "combinaison 2  2017_2023",
+      "series": [
+        "ENCRE",
+        "PURGA"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0103",
+      "media": "catalogue/MS0103_ENCRE_ENFER_DANTE_DETAIL.jpeg",
+      "title": "DETAIL",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0104",
+      "media": "catalogue/MS0104_ENCRE_ENFER_DANTE_HOFO_2010_ L'enfer , chantXVI 7ème cercle 55x42cm _déjà, j'étais là,où s'entendait le bruit _ de l'eau qui tombait dansl'autre cercle_.jpeg",
+      "title": "de l'eau qui tombait dansl'autre cercle_",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0105",
+      "media": "catalogue/MS0105_ENCRE_ENFER_DANTE_HOFO_2010_Dante et Virgile au pied de la cascade de l'Enfer 41x39cm.jpeg",
+      "title": "Dante et Virgile au pied de la cascade de l'Enfer 41x39cm",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0106",
+      "media": "catalogue/MS0106_ENCRE_ENFER_DANTE_HOFO_2010_Dante et Virgile au pied de la cascade de l'Enfer.jpeg",
+      "title": "Dante et Virgile au pied de la cascade de l'Enfer",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0107",
+      "media": "catalogue/MS0107_ENCRE_ENFER_DANTE_HOFO_2017_ l'enfer 55x44cm.jpeg",
+      "title": "l'enfer 55x44cm",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0108",
+      "media": "catalogue/MS0108_ENCRE_ENFER_DANTE_HOFO_2017_Dante et Virgile au pied de la cascade de l'Enfer 55X44CM.jpeg",
+      "title": "Dante et Virgile au pied de la cascade de l'Enfer 55X44CM",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0109",
+      "media": "catalogue/MS0109_ENCRE_ENFER_DANTE_HOFO_20O9_Dante, chant XVII les violents contre l'art _j'entendais déjà  la cascade à main droite _faire au_dessous de nous un horrible fracas_55x39,5cm.jpeg",
+      "title": "dessous de nous un horrible fracas_55x39,5cm",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0110",
+      "media": "catalogue/MS0110_ENCRE_HOFO_2004_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cm (1).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (1)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0111",
+      "media": "catalogue/MS0111_ENCRE_HOFO_2004_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cm (2).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (2)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0112",
+      "media": "catalogue/MS0112_ENCRE_HOFO_2004_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cm (3).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (3)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0113",
+      "media": "catalogue/MS0113_ENCRE_HOFO_2004_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cm (4).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (4)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0114",
+      "media": "catalogue/MS0114_ENCRE_HOFO_2004_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cm (5).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (5)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0115",
+      "media": "catalogue/MS0115_ENCRE_HOFO_2004_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cm (6).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (6)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0116",
+      "media": "catalogue/MS0116_ENCRE_HOFO_2004_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cm (7).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (7)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0117",
+      "media": "catalogue/MS0117_ENCRE_HOFO_2004_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cm 2.jpeg",
+      "title": "encre de Chine sur papier 32x24cm 2",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0118",
+      "media": "catalogue/MS0118_ENCRE_HOFO_2004_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cm.jpeg",
+      "title": "encre de Chine sur papier 32x24cm",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0119",
+      "media": "catalogue/MS0119_ENCRE_HOFO_Mauvais temps pour les anges 2004 (EDITIONS REHAUTS).jpeg",
+      "title": "Mauvais temps pour les anges 2004 (EDITIONS REHAUTS)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0120",
+      "media": "catalogue/MS0120_ENCRE_HOFO_Mauvais temps pour les anges 2004 Encre de Chine sur paier  32X24cm.jpeg",
+      "title": "Mauvais temps pour les anges 2004 Encre de Chine sur paier  32X24cm",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0121",
+      "media": "catalogue/MS0121_ENCRE_HOFO_Mauvais temps pour Les anges_2003_ encre de Chine sur papier 32x24cm (1).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (1)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0122",
+      "media": "catalogue/MS0122_ENCRE_HOFO_Mauvais temps pour Les anges_2003_ encre de Chine sur papier 32x24cm (2).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (2)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0123",
+      "media": "catalogue/MS0123_ENCRE_HOFO_Mauvais temps pour Les anges_2003_ encre de Chine sur papier 32x24cm (3).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (3)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0124",
+      "media": "catalogue/MS0124_ENCRE_HOFO_Mauvais temps pour Les anges_2003_ encre de Chine sur papier 32x24cm (4).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (4)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0125",
+      "media": "catalogue/MS0125_ENCRE_HOFO_Mauvais temps pour Les anges_2003_ encre de Chine sur papier 32x24cm (5).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (5)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0126",
+      "media": "catalogue/MS0126_ENCRE_HOFO_Mauvais temps pour Les anges_2003_ encre de Chine sur papier 32x24cm (6).jpeg",
+      "title": "encre de Chine sur papier 32x24cm (6)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0127",
+      "media": "catalogue/MS0127_ENCRE_HOFO_Mauvais temps pour Les anges_2003_ encre de Chine sur papier 32x24cm.jpeg",
+      "title": "encre de Chine sur papier 32x24cm",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0128",
+      "media": "catalogue/MS0128_ENCRE_HOFO_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cm.jpeg",
+      "title": "encre de Chine sur papier 32x24cm",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0129",
+      "media": "catalogue/MS0129_ENCRE_PURGA_DANTE_HOFO_2009_la Divine Comédie l'attente des élus au pied de la montagne du purgatoire  encre de Chine 44x55cm.jpeg",
+      "title": "la Divine Comédie l'attente des élus au pied de la montagne du purgatoire  encre de Chine 44x55cm",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0130",
+      "media": "catalogue/MS0130_ENCRE_PURGA_DANTE_HOFO_2010_D'après SIGNORELLI ,l'attente des élus encre de Chine sur papier 49x35cm (1).jpeg",
+      "title": "D'après SIGNORELLI ,l'attente des élus encre de Chine sur papier 49x35cm (1)",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0131",
+      "media": "catalogue/MS0131_ENCRE_PURGA_DANTE_HOFO_2010_D'après SIGNORELLI ,l'attente des élus encre de Chine sur papier 49x35cm (2).jpeg",
+      "title": "D'après SIGNORELLI ,l'attente des élus encre de Chine sur papier 49x35cm (2)",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0132",
+      "media": "catalogue/MS0132_ENCRE_PURGA_DANTE_HOFO_2010_D'après SIGNORELLI ,l'attente des élus encre de Chine sur papier 49x35cm.jpeg",
+      "title": "D'après SIGNORELLI ,l'attente des élus encre de Chine sur papier 49x35cm",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0133",
+      "media": "catalogue/MS0133_ENCRE_PURGA_DANTE_HOFO_2010_D'après SIGNORELLI_HOFO_2010_D'après SIGNORELLI ,l'attente des élus encre de Chine sur papier 49x35cm.jpeg",
+      "title": "D'après SIGNORELLI ,l'attente des élus encre de Chine sur papier 49x35cm",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0134",
+      "media": "catalogue/MS0134_ENCRE_PURGA_DANTE_HOFO_2017_D'après BOTTICELLI,l'attente des élus encre sur papier 32x24cm*COLPART.jpeg",
+      "title": "D'après BOTTICELLI,l'attente des élus encre sur papier 32x24cm*COLPART",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0135",
+      "media": "catalogue/MS0135_ENCRE_PURGA_DANTE_HOFO_2017_D'après SIGNORELLI ,l'attente des élus encre sur papier 32x24cm.jpeg",
+      "title": "D'après SIGNORELLI ,l'attente des élus encre sur papier 32x24cm",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0136",
+      "media": "catalogue/MS0136_ENCRE_PURGA_DANTE_HOFO_2017_L'attente des élus au pied du Purgatoire_44x55cm _ (1).jpeg",
+      "title": "L'attente des élus au pied du Purgatoire_44x55cm _ (1)",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0137",
+      "media": "catalogue/MS0137_ENCRE_PURGA_DANTE_HOFO_2017_L'attente des élus au pied du Purgatoire_44x55cm .jpeg",
+      "title": "L'attente des élus au pied du Purgatoire_44x55cm",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0138",
+      "media": "catalogue/MS0138_ENCRE_PURGA_DANTE_HOFO_2017_L'attente des élus au pied du Purgatoire_45x55cm .jpeg",
+      "title": "L'attente des élus au pied du Purgatoire_45x55cm",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0139",
+      "media": "catalogue/MS0139_ENCRE_PURGA_DANTE_HOFO_2017_LE PURGATOIRE l'attente des élus 44cmx55cm.jpeg",
+      "title": "LE PURGATOIRE l'attente des élus 44cmx55cm",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0140",
+      "media": "catalogue/MS0140_ENCRE_PURGA_DANTE_L'arrivée au pied de la montagne du purgatoire 44,5X55CM_2017.jpeg",
+      "title": "L'arrivée au pied de la montagne du purgatoire 44,5X55CM_2017",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0141",
+      "media": "catalogue/MS0141_ENCRE_PURGA_DANTE_l'arrivée de Dante et Virgile au pied de la montagne du purgatoire _ 2017.jpeg",
+      "title": "l'arrivée de Dante et Virgile au pied de la montagne du purgatoire _ 2017",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0142",
+      "media": "catalogue/MS0142_ENCRENCRE_HOFO_2004_Mauvais temps pour Les anges_2004_ encre de Chine sur papier 32x24cmE_HOFO_Mauvais temps pour les anges 200.jpeg",
+      "title": "Mauvais temps pour les anges 200",
+      "series": [],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0143",
+      "media": "catalogue/MS0143_ENFER_ENCRE_45cmx39,5cm Coll. Agnès.jpeg",
+      "title": "ENCRE_45cmx39,5cm Coll. Agnès",
+      "series": [
+        "ENFER"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0144",
+      "media": "catalogue/MS0144_ENFER_ENCRE_DANTE_HOFO_2010_Dante et  Virgile en Enfer.encre de Chine sur papier 54x44cm.jpeg",
+      "title": "Dante et  Virgile en Enfer.encre de Chine sur papier 54x44cm",
+      "series": [
+        "DANTE",
+        "ENFER"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0145",
+      "media": "catalogue/MS0145_JUGEM_ENCRE_ATELI_DANTE_2017_2023_ Combinaison 1.jpeg",
+      "title": "Combinaison 1",
+      "series": [
+        "ATELI",
+        "JUGEM"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0146",
+      "media": "catalogue/MS0146_JUGEM_ENCRE_ATELI_2023_La fin des temps. Combinaison.jpeg",
+      "title": "La fin des temps. Combinaison",
+      "series": [
+        "ATELI",
+        "JUGEM"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0147",
+      "media": "catalogue/MS0147_JUGEM_ENCRE_2023_La fin des temps.jpeg",
+      "title": "La fin des temps",
+      "series": [
+        "JUGEM"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0148",
+      "media": "catalogue/MS0148_MASQU_0080_1989_AST_Masque ,miroir et statuette N°1, acrylique sur toile 80x80cm.jpeg",
+      "title": "Masque ,miroir et statuette N°1, acrylique sur toile 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0149",
+      "media": "catalogue/MS0149_MASQU_0080_1989_AST_Masque, miroir et statuette N°11. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuette N°11. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0150",
+      "media": "catalogue/MS0150_MASQU_0080_1989_AST_Masque, miroir et statuette N°12. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuette N°12. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0151",
+      "media": "catalogue/MS0151_MASQU_0080_1989_AST_Masque, miroir et statuette, acrylique sur toile 80x80cm.jpeg",
+      "title": "Masque, miroir et statuette, acrylique sur toile 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0152",
+      "media": "catalogue/MS0152_MASQU_0080_1989_AST_Masque, miroir et statuetten°13. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuetten°13. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0153",
+      "media": "catalogue/MS0153_MASQU_0080_1989_AST_Masque, miroir et statuetten°15. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuetten°15. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0154",
+      "media": "catalogue/MS0154_MASQU_0080_1989_AST_Masque, miroir et statuetten°8. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuetten°8. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0155",
+      "media": "catalogue/MS0155_MASQU_0080_1989_AST_Masque, miroir et statuetteN°9. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuetteN°9. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0156",
+      "media": "catalogue/MS0156_MASQU_012F_1989_AST_petit masque avec jaune 61X50cm (1).jpeg",
+      "title": "petit masque avec jaune 61X50cm (1)",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0157",
+      "media": "catalogue/MS0157_MASQU_012F_1989_AST_petit masque avec jaune 61X50cm (2).jpeg",
+      "title": "petit masque avec jaune 61X50cm (2)",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0158",
+      "media": "catalogue/MS0158_MASQU_012F_1989_AST_petit masque avec jaune 61X50cm (3).jpeg",
+      "title": "petit masque avec jaune 61X50cm (3)",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0159",
+      "media": "catalogue/MS0159_MASQU_012F_1989_AST_petit masque avec jaune 61X50cm.jpeg",
+      "title": "petit masque avec jaune 61X50cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0160",
+      "media": "catalogue/MS0160_MASQU_080_1989_AST  Masque miroir et statuette 1989 acrylique sur toile 80x80cm (1).jpeg",
+      "title": "AST  Masque miroir et statuette 1989 acrylique sur toile 80x80cm (1)",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0161",
+      "media": "catalogue/MS0161_MASQU_080_1989_AST  Masque miroir et statuette 1989 acrylique sur toile 80x80cm (2).jpeg",
+      "title": "AST  Masque miroir et statuette 1989 acrylique sur toile 80x80cm (2)",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0162",
+      "media": "catalogue/MS0162_MASQU_080_1989_AST  Masque miroir et statuette 1989 acrylique sur toile 80x80cm.jpeg",
+      "title": "AST  Masque miroir et statuette 1989 acrylique sur toile 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0163",
+      "media": "catalogue/MS0163_MASQU_080_1989_AST_Masque, miroir et statuette N°2. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuette N°2. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0164",
+      "media": "catalogue/MS0164_MASQU_080_1989_AST_Masque, miroir et statuette N°3. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuette N°3. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0165",
+      "media": "catalogue/MS0165_MASQU_080_1989_AST_Masque, miroir et statuette N°4. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuette N°4. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0166",
+      "media": "catalogue/MS0166_MASQU_080_1989_AST_Masque, miroir et statuette N°5. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuette N°5. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0167",
+      "media": "catalogue/MS0167_MASQU_080_1989_AST_Masque, miroir et statuette N°6. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuette N°6. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0168",
+      "media": "catalogue/MS0168_MASQU_080_1989_AST_Masque, miroir et statuette N°7. acrylique sur toile, 80x80cm.jpeg",
+      "title": "Masque, miroir et statuette N°7. acrylique sur toile, 80x80cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0169",
+      "media": "catalogue/MS0169_MASQU_F12_1989_AST_petit masque avec jaune 61X50cm (1).jpeg",
+      "title": "petit masque avec jaune 61X50cm (1)",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0170",
+      "media": "catalogue/MS0170_MASQU_F12_1989_AST_petit masque avec jaune 61X50cm.jpeg",
+      "title": "petit masque avec jaune 61X50cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0171",
+      "media": "catalogue/MS0171_MASQU_F12_1989_AST_petit masque de Chine,miroir et statuette 61X50cm.jpeg",
+      "title": "petit masque de Chine,miroir et statuette 61X50cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0172",
+      "media": "catalogue/MS0172_MASQU_F12_1989_AST_petit masque,miroir avec jaune 61X50cm (1).jpeg",
+      "title": "petit masque,miroir avec jaune 61X50cm (1)",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0173",
+      "media": "catalogue/MS0173_MASQU_F12_1989_AST_petit masque,miroir avec jaune 61X50cm (2).jpeg",
+      "title": "petit masque,miroir avec jaune 61X50cm (2)",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0174",
+      "media": "catalogue/MS0174_MASQU_F12_1989_AST_petit masque,miroir avec jaune 61X50cm (3).jpeg",
+      "title": "petit masque,miroir avec jaune 61X50cm (3)",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0175",
+      "media": "catalogue/MS0175_MASQU_F12_1989_AST_petit masque,miroir avec jaune 61X50cm.jpeg",
+      "title": "petit masque,miroir avec jaune 61X50cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0176",
+      "media": "catalogue/MS0176_MASQU_F12_1990_AST  Masque miroir et statuette 1990 acrylique sur toile 61x50cm.jpeg",
+      "title": "AST  Masque miroir et statuette 1990 acrylique sur toile 61x50cm",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0177",
+      "media": "catalogue/MS0177_MASQU_F12_n°6 R.jpeg",
+      "title": "n°6 R",
+      "series": [
+        "MASQU"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0178",
+      "media": "catalogue/MS0178_MUSEE_015F_1992_AST_Musée Rodin acrylique sur toile 65x54cm.jpeg",
+      "title": "Musée Rodin acrylique sur toile 65x54cm",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0179",
+      "media": "catalogue/MS0179_MUSEE_012F_1992_AST_Musée Rodin, acrylique sur toile 61X50cm (1).jpeg",
+      "title": "Musée Rodin, acrylique sur toile 61X50cm (1)",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0180",
+      "media": "catalogue/MS0180_MUSEE_012F_1992_AST_Musée Rodin, acrylique sur toile 61X50cm (2).jpeg",
+      "title": "Musée Rodin, acrylique sur toile 61X50cm (2)",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0181",
+      "media": "catalogue/MS0181_MUSEE_012F_1992_AST_Musée Rodin, acrylique sur toile 61X50cm.jpeg",
+      "title": "Musée Rodin, acrylique sur toile 61X50cm",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0182",
+      "media": "catalogue/MS0182_MUSEE_012F_1992_AST_Musée Rodin, acrylique sur toile 61X50cm.jpeg",
+      "title": "Musée Rodin, acrylique sur toile 61X50cm",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0183",
+      "media": "catalogue/MS0183_MUSEE_012F_AST_1992_Musée Louvre 61X50cm (1).jpeg",
+      "title": "Musée Louvre 61X50cm (1)",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0184",
+      "media": "catalogue/MS0184_MUSEE_012F_AST_1992_Musée Louvre 61X50cm.jpeg",
+      "title": "Musée Louvre 61X50cm",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0185",
+      "media": "catalogue/MS0185_MUSEE_015F_1991_AST_Musée du Louvre, acrylique sur toile 66X54cm (1).jpeg",
+      "title": "Musée du Louvre, acrylique sur toile 66X54cm (1)",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0186",
+      "media": "catalogue/MS0186_MUSEE_015F_1991_AST_Musée du Louvre, acrylique sur toile 66X54cm.jpeg",
+      "title": "Musée du Louvre, acrylique sur toile 66X54cm",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0187",
+      "media": "catalogue/MS0187_MUSEE_015F_1991_AST_Musée Rodin, acrylique sur toile 66X54cm.jpeg",
+      "title": "Musée Rodin, acrylique sur toile 66X54cm",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0188",
+      "media": "catalogue/MS0188_MUSEE_015F_1991_AST_Musée Rodin, acrylique sur toile 66X54cm.jpeg",
+      "title": "Musée Rodin, acrylique sur toile 66X54cm",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0189",
+      "media": "catalogue/MS0189_MUSEE_015F_1992_AST_Musée Rodin, acrylique sur toile 66X54cm.jpeg",
+      "title": "Musée Rodin, acrylique sur toile 66X54cm",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0190",
+      "media": "catalogue/MS0190_MUSEE_015F_AST_1992_musée Rodin_acrylique sur toile_65x54cm.jpeg",
+      "title": "acrylique sur toile_65x54cm",
+      "series": [
+        "MUSEE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0191",
+      "media": "catalogue/MS0191_NUITS_Sans titre.jpeg",
+      "title": "Sans titre",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0192",
+      "media": "catalogue/MS0192_NUITS_010F_1989_AST_petite nuit perdue N° acrylique sur toile 55x46cm.jpeg",
+      "title": "petite nuit perdue N° acrylique sur toile 55x46cm",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0193",
+      "media": "catalogue/MS0193_NUITS_010F_1989_AST_petite nuit perdue N°4 acrylique sur toile 55x46cm.jpeg",
+      "title": "petite nuit perdue N°4 acrylique sur toile 55x46cm",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0194",
+      "media": "catalogue/MS0194_NUITS_010F_1989_AST_petite nuit perdue N°7, acrylique sur toile 55x46cm.jpeg",
+      "title": "petite nuit perdue N°7, acrylique sur toile 55x46cm",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0195",
+      "media": "catalogue/MS0195_NUITS_015F_1988_AST_nuits perdue, la danse, acrylique sur toile 65x54cm.jpeg",
+      "title": "nuits perdue, la danse, acrylique sur toile 65x54cm",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0196",
+      "media": "catalogue/MS0196_NUITS.jpeg",
+      "title": "NUITS",
+      "series": [],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0197",
+      "media": "catalogue/MS0197_NUITS_010F_1989_AST_petite nuit perdue N°2, acrylique sur toile 55x46cm.jpeg",
+      "title": "petite nuit perdue N°2, acrylique sur toile 55x46cm",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0198",
+      "media": "catalogue/MS0198_NUITS_010F_1989_AST_petite nuit perdue N°5, acrylique sur toile 55x46cm.jpeg",
+      "title": "petite nuit perdue N°5, acrylique sur toile 55x46cm",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0199",
+      "media": "catalogue/MS0199_NUITS_0200_1989_AST_nuits perdues hommage à la reine Mathilde la mort de Gyrd  1989 200x200cm acrylique sur toile.jpeg",
+      "title": "nuits perdues hommage à la reine Mathilde la mort de Gyrd  1989 200x200cm acrylique sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0200",
+      "media": "catalogue/MS0200_NUITS_0200_1989_AST_nuits perdues hommage à Matisse 1989 200x200cm acrylique sur toile.jpeg",
+      "title": "nuits perdues hommage à Matisse 1989 200x200cm acrylique sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0201",
+      "media": "catalogue/MS0201_NUITS_0200_1989_AST_nuits perdues hommage à Picasso 1989 200x200cm acrylique sur toile.jpeg",
+      "title": "nuits perdues hommage à Picasso 1989 200x200cm acrylique sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0202",
+      "media": "catalogue/MS0202_NUITS_ABSTR_120M_1989_AST_ Nuits perdues, abstraction sans titre acrylique sur toile .jpeg",
+      "title": "Nuits perdues, abstraction sans titre acrylique sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0203",
+      "media": "catalogue/MS0203_NUITS_ABSTR_HOFO_1989_AST_Nuit perdue abstraite 210x130cm.jpeg",
+      "title": "Nuit perdue abstraite 210x130cm",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0204",
+      "media": "catalogue/MS0204_NUITS_ABSTR_HOFO_1989_petite nuit perdue 120x60cm acrylique sur toile.jpeg",
+      "title": "petite nuit perdue 120x60cm acrylique sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0205",
+      "media": "catalogue/MS0205_NUITS_DANAÉ_MINI_2014_TST_Danaé, Aigle Jupiter(1).jpeg",
+      "title": "Danaé, Aigle Jupiter(1)",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0206",
+      "media": "catalogue/MS0206_NUITS_DANAÉ_MINI_2014_TST_Danaé, Aigle Jupiter(2).jpeg",
+      "title": "Danaé, Aigle Jupiter(2)",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0207",
+      "media": "catalogue/MS0207_NUITS_DANAÉ_MINI_2014_TST_Danaé, Aigle Jupiter(3).jpeg",
+      "title": "Danaé, Aigle Jupiter(3)",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0208",
+      "media": "catalogue/MS0208_NUITS_DANAÉ_MINI_2014_TST_AIGLE JUPITER.jpeg",
+      "title": "AIGLE JUPITER",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0209",
+      "media": "catalogue/MS0209_NUITS_DANAÉ_0070_2014_TST_Danaé tempera sur toile 70x70cm.jpeg",
+      "title": "Danaé tempera sur toile 70x70cm",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0210",
+      "media": "catalogue/MS0210_NUITS_DANAÉ_0080_2014_TST_ centre du triptyque Danaé.jpeg",
+      "title": "centre du triptyque Danaé",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0211",
+      "media": "catalogue/MS0211_NUITS_DANAÉ_0080_2014_TST_Danaé partie droite du triptyque  80x80cm tempera sur toile.jpeg",
+      "title": "Danaé partie droite du triptyque  80x80cm tempera sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0212",
+      "media": "catalogue/MS0212_NUITS_DANAÉ_0080_2014_TST_partie gauche du triptyque .jpeg",
+      "title": "partie gauche du triptyque",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0213",
+      "media": "catalogue/MS0213_NUITS_DANAÉ_0150_2014_AST_ Danaé , nuits perdues, acrylique sur toile 150x150cm.jpeg",
+      "title": "Danaé , nuits perdues, acrylique sur toile 150x150cm",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0214",
+      "media": "catalogue/MS0214_NUITS_DANAÉ_060F_2014_TST_Danaé 97X130CM tempera sur toile.jpeg",
+      "title": "Danaé 97X130CM tempera sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0215",
+      "media": "catalogue/MS0215_NUITS_DANAÉ_2014_MINI_TST_Zeus.jpeg",
+      "title": "Zeus",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0216",
+      "media": "catalogue/MS0216_NUITS_DANAE_MINI_2014_TST_ DANAE_ tempera sur toile.jpeg",
+      "title": "tempera sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0217",
+      "media": "catalogue/MS0217_NUITS_DANAE_MINI_2014_TST_ DANAE_2002 tempera sur toile.jpeg",
+      "title": "DANAE_2002 tempera sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0218",
+      "media": "catalogue/MS0218_NUITS_DANAE_P3_2003_COMPAST_T_ Eté , l'aigle de Mantoue 19x27cm tempera sur toile.jpeg",
+      "title": "Eté , l'aigle de Mantoue 19x27cm tempera sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0219",
+      "media": "catalogue/MS0219_NUITS_OVIRI_120M_AST_1989_nuit perdue, OVIRI (Gauguin) 195x97cm acrylique sur toile.jpeg",
+      "title": "nuit perdue, OVIRI (Gauguin) 195x97cm acrylique sur toile",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0220",
+      "media": "catalogue/MS0220_NUITS_OVIRI_1989_AST_salut à gauguin.jpeg",
+      "title": "salut à gauguin",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0221",
+      "media": "catalogue/MS0221_OFF_ABSTR_ATELI.jpeg",
+      "title": "ATELI",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0222",
+      "media": "catalogue/MS0222_OFF_ANGES MUSICIENS_ENCRE_HOFO_2008_encre de chine sur papier 45X39,5cm.jpeg",
+      "title": "encre de chine sur papier 45X39,5cm",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0223",
+      "media": "catalogue/MS0223_OFF_APHRO_ _1996_AST_Aphrodite, coll.Trichon-Milmani.jpeg",
+      "title": "Aphrodite, coll.Trichon-Milmani",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0224",
+      "media": "catalogue/MS0224_OFF_APHRO_ Le bain d'Aphrodite MINUIT.jpeg",
+      "title": "Le bain d'Aphrodite MINUIT",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0225",
+      "media": "catalogue/MS0225_OFF_APHRO_1994_AST_ Aphrodite acrylique_toile   .jpeg",
+      "title": "toile",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0226",
+      "media": "catalogue/MS0226_OFF_APHRO_R.jpeg",
+      "title": "R",
+      "series": [
+        "APHRO"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0227",
+      "media": "catalogue/MS0227_OFF_ATELI_ROUGE_ABSTR_BERG_ VARIATION DE BERGUES R.jpeg",
+      "title": "VARIATION DE BERGUES R",
+      "series": [
+        "ABSTR",
+        "ATELI"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0228",
+      "media": "catalogue/MS0228_OFF_DANTE_ENCRE_ATTENTE DES ÉLUS JPEG.jpeg",
+      "title": "ATTENTE DES ÉLUS JPEG",
+      "series": [
+        "DANTE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0229",
+      "media": "catalogue/MS0229_OFF_DANTE_PURGA_ENCRE_L'attente de élus..jpeg",
+      "title": "L'attente de élus.",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0230",
+      "media": "catalogue/MS0230_OFF_ENCOU_ENCRE_ATELI.jpeg",
+      "title": "ATELI",
+      "series": [],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0231",
+      "media": "catalogue/MS0231_OFF_ENCOUR_APHRO.jpeg",
+      "title": "APHRO",
+      "series": [],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0232",
+      "media": "catalogue/MS0232_OFF_ENCOUR_ENFER_ENCRE_peintures_Sradano.JPEG.jpeg",
+      "title": "Sradano.JPEG",
+      "series": [
+        "ENFER"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0233",
+      "media": "catalogue/MS0233_OFF_ENCOUR_JUGEM_ENCRE_ATELI.jpeg",
+      "title": "ATELI",
+      "series": [
+        "JUGEM"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0234",
+      "media": "catalogue/MS0234_OFF_ENCRE_ATELI_ (1).jpeg",
+      "title": "ATELI_ (1)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0235",
+      "media": "catalogue/MS0235_OFF_ENCRE_ATELI_ (2).jpeg",
+      "title": "ATELI_ (2)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0236",
+      "media": "catalogue/MS0236_OFF_ENCRE_ATELI_ (3).jpeg",
+      "title": "ATELI_ (3)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0237",
+      "media": "catalogue/MS0237_OFF_ENCRE_ATELI_ (4).jpeg",
+      "title": "ATELI_ (4)",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0238",
+      "media": "catalogue/MS0238_OFF_ENCRE_ATELI.jpeg",
+      "title": "ATELI",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0239",
+      "media": "catalogue/MS0239_OFF_ENCRE_ENFER_DANTE_HOFO_2017_ l'Enfer.jpeg",
+      "title": "l'Enfer",
+      "series": [
+        "DANTE",
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0240",
+      "media": "catalogue/MS0240_OFF_ENCRE_peintures_Sradano.JPEG.jpeg",
+      "title": "Sradano.JPEG",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0241",
+      "media": "catalogue/MS0241_OFF_ENCRE_PURGA_HOFO_2008_l'attente des élus 45x39,5cm°.jpeg",
+      "title": "l'attente des élus 45x39,5cm°",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0242",
+      "media": "catalogue/MS0242_OFF_ENFER_ENCRE_peintures_Sradano.JPEG (1).jpeg",
+      "title": "Sradano.JPEG (1)",
+      "series": [
+        "ENFER"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0243",
+      "media": "catalogue/MS0243_OFF_ENFER_ENCRE_peintures_Sradano.JPEG.jpeg",
+      "title": "Sradano.JPEG",
+      "series": [
+        "ENFER"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0244",
+      "media": "catalogue/MS0244_OFF_JUGEM_ENCRE_ange du jugement.JPEG.jpeg",
+      "title": "ange du jugement.JPEG",
+      "series": [
+        "JUGEM"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0245",
+      "media": "catalogue/MS0245_OFF_JUGEM_ENCRE_RESUR_..jpeg",
+      "title": "RESUR_.",
+      "series": [
+        "JUGEM",
+        "RESUR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0246",
+      "media": "catalogue/MS0246_OFF_JUGEM_ENCRE_RESUR_La résurrection de la chair, peintures Sradano.jpeg",
+      "title": "La résurrection de la chair, peintures Sradano",
+      "series": [
+        "JUGEM",
+        "RESUR"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0247",
+      "media": "catalogue/MS0247_OFF_JUGEM_RESUR_ENCRE_ (1).jpeg",
+      "title": "ENCRE_ (1)",
+      "series": [
+        "ENCRE",
+        "JUGEM"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0248",
+      "media": "catalogue/MS0248_OFF_JUGEM_RESUR_ENCRE.jpeg",
+      "title": "ENCRE",
+      "series": [
+        "JUGEM"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0249",
+      "media": "catalogue/MS0249_OFF_JUGEM_RESUR_ENCRE_HOFO.jpeg",
+      "title": "HOFO",
+      "series": [
+        "ENCRE",
+        "JUGEM"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0250",
+      "media": "catalogue/MS0250_OFF_PHOTO_ABSTR.jpeg",
+      "title": "ABSTR",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0251",
+      "media": "catalogue/MS0251_OFF_PHOTO_ABSTR_0HF0_1986_AST_SANS TITRE  220x130cm.jpeg",
+      "title": "SANS TITRE  220x130cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0252",
+      "media": "catalogue/MS0252_OFF_PHOTO_AST_ABSTR_METAM_ HOFO_1988_A_ Métamorphoses acrylique et pigments sur toile,210x165cm.jpeg",
+      "title": "Métamorphoses acrylique et pigments sur toile,210x165cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0253",
+      "media": "catalogue/MS0253_OFF_PHOTO_ABSTR_PHOTO.jpeg",
+      "title": "PHOTO",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0254",
+      "media": "catalogue/MS0254_OFF_PHOTO_APHRO_ (1).jpeg",
+      "title": "APHRO_ (1)",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0255",
+      "media": "catalogue/MS0255_OFF_PHOTO_APHRO_ (2).jpeg",
+      "title": "APHRO_ (2)",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0256",
+      "media": "catalogue/MS0256_OFF_PHOTO_APHRO_ (3).jpeg",
+      "title": "APHRO_ (3)",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0257",
+      "media": "catalogue/MS0257_OFF_PHOTO_APHRO_ COMPA_060_1994.jpeg",
+      "title": "COMPA_060_1994",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0258",
+      "media": "catalogue/MS0258_OFF_PHOTO_APHRO.jpeg",
+      "title": "APHRO",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0259",
+      "media": "catalogue/MS0259_OFF_PHOTO_APHRO_0060.jpeg",
+      "title": "APHRO_0060",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0260",
+      "media": "catalogue/MS0260_OFF_PHOTO_APHRO_la course.jpeg",
+      "title": "la course",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0261",
+      "media": "catalogue/MS0261_OFF_PHOTO_APHRO_la fessée .jpeg",
+      "title": "la fessée",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0262",
+      "media": "catalogue/MS0262_OFF_PHOTO_APHRO_UNIVE.jpeg",
+      "title": "UNIVE",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0263",
+      "media": "catalogue/MS0263_OFF_PURGA_ENCRE_DANTE_L'attente de élus..jpeg",
+      "title": "L'attente de élus.",
+      "series": [
+        "DANTE",
+        "PURGA"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0264",
+      "media": "catalogue/MS0264_OFF_PUTTI ACROBATES_ENCRE_peintures_Sradano.jpeg",
+      "title": "Sradano",
+      "series": [
+        "ENCRE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0265",
+      "media": "catalogue/MS0265_OFF_UNIVE_APHRO.jpeg",
+      "title": "APHRO",
+      "series": [
+        "UNIVE"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0266",
+      "media": "catalogue/MS0266_OFFF_NUITS_ABSTR_1989_AST_petite nuit perdue.jpeg",
+      "title": "petite nuit perdue",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0267",
+      "media": "catalogue/MS0267_PHOTO _ ABSTR_O50F_1979_HST_Composition (fenêtre) 116x89cm.jpeg",
+      "title": "Composition (fenêtre) 116x89cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0268",
+      "media": "catalogue/MS0268_PHOTO_050F_1984_ABSTR_AST_ sans titre 1984_acrylique sur toile _ 89X146cm.jpeg",
+      "title": "acrylique sur toile _ 89X146cm",
+      "series": [
+        "ABSTR"
+      ],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0269",
+      "media": "catalogue/MS0269_PHOTO_ABSTR_010F_1984_HSB_petite variation bleue N°8 huile sur toile 1984.jpeg",
+      "title": "petite variation bleue N°8 huile sur toile 1984",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0270",
+      "media": "catalogue/MS0270_PHOTO_ABSTR_010F_1984_HST_petite variation bleue N°7 huile sur toile 1984.jpeg",
+      "title": "petite variation bleue N°7 huile sur toile 1984",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0271",
+      "media": "catalogue/MS0271_PHOTO_ABSTR_015F_1982_HST_petite variation blancheN°2  65X54cm, huile sur toile.jpeg",
+      "title": "petite variation blancheN°2  65X54cm, huile sur toile",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0272",
+      "media": "catalogue/MS0272_PHOTO_ABSTR_030F_1979_HST_Composition (fenêtre) 92x73cm 1979.jpeg",
+      "title": "Composition (fenêtre) 92x73cm 1979",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0273",
+      "media": "catalogue/MS0273_PHOTO_ABSTR_030F_1982_HST_ sans titre 1982_huile sur toile 73X92cm.jpeg",
+      "title": "huile sur toile 73X92cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0274",
+      "media": "catalogue/MS0274_PHOTO_ABSTR_030F_1982_HST_sans titre, 73x92cm, huile sur toile 1982.jpeg",
+      "title": "sans titre, 73x92cm, huile sur toile 1982",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0275",
+      "media": "catalogue/MS0275_PHOTO_ABSTR_040F_1979_HST_Composition (fenêtre) 100x81cm.jpeg",
+      "title": "Composition (fenêtre) 100x81cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0276",
+      "media": "catalogue/MS0276_PHOTO_ABSTR_050F_1984_AST_ sans titre _acryliquesur toile _ 89X116cm.jpeg",
+      "title": "acryliquesur toile _ 89X116cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0277",
+      "media": "catalogue/MS0277_PHOTO_ABSTR_0HF0_1986_AST_grande abstraction sans titre 300x220cm.jpeg",
+      "title": "grande abstraction sans titre 300x220cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0278",
+      "media": "catalogue/MS0278_PHOTO_ABSTR_0HF0_1986_AST_SANS TITRE  205x130cm (1).jpeg",
+      "title": "SANS TITRE  205x130cm (1)",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0279",
+      "media": "catalogue/MS0279_PHOTO_ABSTR_0HF0_1986_AST_SANS TITRE  205x130cm.jpeg",
+      "title": "SANS TITRE  205x130cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0280",
+      "media": "catalogue/MS0280_PHOTO_ABSTR_HOFO_1982_ASB_petite métamorphose 60x33cm 1982 N°10.jpeg",
+      "title": "petite métamorphose 60x33cm 1982 N°10",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0281",
+      "media": "catalogue/MS0281_PHOTO_ABSTR_HOFO_1982_HST_Petite variation bleue N°2, 80X40cm, huile sur toile 1982..jpeg",
+      "title": "Petite variation bleue N°2, 80X40cm, huile sur toile 1982.",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0282",
+      "media": "catalogue/MS0282_PHOTO_ABSTR_HOFO_1982_HST_Petite variation bleue N°2, 80X40cm, huile sur toile 1982.jpeg",
+      "title": "Petite variation bleue N°2, 80X40cm, huile sur toile 1982",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0283",
+      "media": "catalogue/MS0283_PHOTO_ABSTR_HOFO_1986_AST_Variation rouge de Bergues  N°1 , 210x 130cm acrylique sur toile libre.jpeg",
+      "title": "Variation rouge de Bergues  N°1 , 210x 130cm acrylique sur toile libre",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0284",
+      "media": "catalogue/MS0284_PHOTO_ABSTR_META_120F_1987_AST_Métamorphose n°6 acrylique sur toile 195x130cm.jpeg",
+      "title": "Métamorphose n°6 acrylique sur toile 195x130cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0285",
+      "media": "catalogue/MS0285_PHOTO_ABSTR_METAM_HOFO_1987_ASB_Petite métamorphose N°7  60X66cm acrylique sur bois.jpeg",
+      "title": "Petite métamorphose N°7  60X66cm acrylique sur bois",
+      "series": [
+        "METAM"
+      ],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0286",
+      "media": "catalogue/MS0286_PHOTO_ABSTR_NUITS_010F_1989_AST_petite nuit perdue acrylique sur toile 55x46cm.jpeg",
+      "title": "petite nuit perdue acrylique sur toile 55x46cm",
+      "series": [
+        "NUITS"
+      ],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0287",
+      "media": "catalogue/MS0287_PHOTO_APHRO_0050_1993_AST_la course d'Aphrodite 50x50cm.jpeg",
+      "title": "la course d'Aphrodite 50x50cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0288",
+      "media": "catalogue/MS0288_PHOTO_APHRO_0060_1993_TST_Le bain d'Aphrodite 1993 tempera sur toile 60X60cm.jpeg",
+      "title": "Le bain d'Aphrodite 1993 tempera sur toile 60X60cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0289",
+      "media": "catalogue/MS0289_PHOTO_APHRO_0060_1994_TST le bain.  Le bain d'Aphrodite.jpeg",
+      "title": "TST le bain.  Le bain d'Aphrodite",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0290",
+      "media": "catalogue/MS0290_PHOTO_APHRO_0060_TST_1993 _La chute d'Aphrodite.jpeg",
+      "title": "La chute d'Aphrodite",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0291",
+      "media": "catalogue/MS0291_PHOTO_APHRO_0060_TST_1994_Le bain d'Aphrodite 1994 tempera sur toile 60X60cm.jpeg",
+      "title": "Le bain d'Aphrodite 1994 tempera sur toile 60X60cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0292",
+      "media": "catalogue/MS0292_PHOTO_APHRO_0080_1993_AST_Le bain d'Aphrodite 1993 tempera sur toile 80X80cm.jpeg",
+      "title": "Le bain d'Aphrodite 1993 tempera sur toile 80X80cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0293",
+      "media": "catalogue/MS0293_PHOTO_APHRO_010P_1996_salutations tempera sur toile 55x38cm.jpeg",
+      "title": "salutations tempera sur toile 55x38cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0294",
+      "media": "catalogue/MS0294_PHOTO_APHRO_012F_1994_TST_la plongée d'Aphrodite tempera sur toile 61x50cm.jpeg",
+      "title": "la plongée d'Aphrodite tempera sur toile 61x50cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0295",
+      "media": "catalogue/MS0295_PHOTO_APHRO_012F_1994_TST_Le bain d'Aphrodite 1994 61x50cm tempera sur toile..jpeg",
+      "title": "Le bain d'Aphrodite 1994 61x50cm tempera sur toile.",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0296",
+      "media": "catalogue/MS0296_PHOTO_APHRO_0150_1995_TST_ Le bain d'Aphrodite en été à Belle île (la course) 150x150cm .jpeg",
+      "title": "Le bain d'Aphrodite en été à Belle île (la course) 150x150cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0297",
+      "media": "catalogue/MS0297_PHOTO_APHRO_120F_1994_AST_ Les heures d'Aphrodite la chute au loin 195x114cm .jpeg",
+      "title": "Les heures d'Aphrodite la chute au loin 195x114cm",
+      "series": [],
+      "photo": "Redo",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0298",
+      "media": "catalogue/MS0298_POLYP_APHRO_HOFO_1994_AST_9X70X70cm Méditerranée 1994.jpeg",
+      "title": "AST_9X70X70cm Méditerranée 1994",
+      "series": [
+        "POLYP"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0299",
+      "media": "catalogue/MS0299_POLYP_NUITS_DANAE.jpeg",
+      "title": "DANAE",
+      "series": [
+        "POLYP"
+      ],
+      "photo": "OK",
+      "publish": "VAL"
+    }
+  ]
+}
