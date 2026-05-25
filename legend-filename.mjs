@@ -135,6 +135,30 @@ export function extractSeriesCodesFromBase(baseNoExt) {
   return [...codes].sort();
 }
 
+/**
+ * Corps underscore (après MS####, segment avant la légende) : codes série = segments
+ * exactement 5 lettres A–Z (hors PHOTO et NOT_SERIES_CODES). Ne s’applique pas aux noms
+ * uniquement tirets (voir extractSeriesCodesFromBase).
+ */
+export function extractSeriesCodesFromUnderscoreBody(bodySansLegend) {
+  const body = String(bodySansLegend || '').trim();
+  const codes = [];
+  const seen = new Set();
+  const parts = body.split('_');
+  for (const raw of parts) {
+    const t = stripAccents(raw.trim())
+      .toUpperCase()
+      .replace(/[^A-Z]/g, '');
+    if (t.length !== 5) continue;
+    if (t === 'PHOTO') continue;
+    if (NOT_SERIES_CODES.has(t)) continue;
+    if (seen.has(t)) continue;
+    seen.add(t);
+    codes.push(t);
+  }
+  return codes;
+}
+
 export function photoStatusFromBase(baseNoExt) {
   const woId = stripCatalogueIdPrefix(baseNoExt);
   const compact = stripAccents(woId).toUpperCase().replace(/\s+/g, '');

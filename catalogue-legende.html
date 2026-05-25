@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
+  <meta name="catalogue-save-api" content="http://127.0.0.1:47831" />
   <title>Édition des légendes – Catalogue</title>
   <link rel="stylesheet" href="catalogue.css" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
@@ -37,30 +38,29 @@
     </header>
     <main class="catalogue-page" id="legend-editor-root">
       <div class="catalogue-standalone-inner catalogue-standalone-main">
-        <p class="catalogue-intro legend-editor-intro">
-          Légende = texte après le <strong>dernier tiret</strong> avant l’extension. Les tirets entre deux majuscules dans la légende sont normalisés en tiret cadratin dans le nom de fichier.
-          Préfixes <code>OFF-</code> / <code>VAL-</code> = non publié / à valider. <code>PHOTO-</code> = prise de vue à refaire.
-          Le navigateur ne peut pas renommer les fichiers sur le disque : enregistrez <code>renames-catalogue.sh</code> à la <strong>racine du dépôt</strong> (pas dans Téléchargements), rendez-le exécutable (<code>chmod +x renames-catalogue.sh</code>), puis lancez <code>./renames-catalogue.sh</code>. Ensuite remplacez <code>media/works.json</code> par le fichier exporté.
-        </p>
+        <p class="legend-editor-api-hint" id="legend-api-hint"></p>
         <div class="catalogue-toolbar legend-editor-toolbar">
+          <p class="legend-persist-status" id="legend-persist-status" aria-live="polite"></p>
           <button type="button" class="legend-editor-btn legend-editor-btn--primary" id="legend-export-json">
-            Télécharger <code>works.json</code> mis à jour
+            Télécharger <code>works.json</code>
+          </button>
+          <button type="button" class="legend-editor-btn" id="legend-export-state">
+            Télécharger <code>catalog-state.json</code>
           </button>
           <button type="button" class="legend-editor-btn" id="legend-export-sh">Télécharger <code>renames-catalogue.sh</code></button>
           <p class="catalogue-count" id="legend-editor-count" aria-live="polite"></p>
         </div>
         <p class="catalogue-loading" id="legend-editor-loading">Chargement…</p>
         <div class="catalogue-table-wrap legend-editor-table-wrap">
-          <table class="catalogue-table legend-editor-table">
+          <table class="catalogue-table legend-editor-table legend-editor-table--simplified">
             <thead>
               <tr>
                 <th class="col-thumb" scope="col">Vignette</th>
-                <th scope="col">Id</th>
-                <th scope="col">Codes série</th>
-                <th scope="col">Publication</th>
-                <th scope="col">PHOTO</th>
-                <th class="col-legende" scope="col">Légende</th>
-                <th scope="col">Nouveau nom de fichier</th>
+                <th class="col-legend-title" scope="col">Titre (légende)</th>
+                <th class="col-legend-series" scope="col">Séries</th>
+                <th class="col-legend-status" scope="col">Photo</th>
+                <th class="col-legend-status" scope="col">Pub.</th>
+                <th class="col-legend-status" scope="col">État</th>
               </tr>
             </thead>
             <tbody id="legend-editor-tbody"></tbody>

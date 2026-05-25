@@ -36,11 +36,54 @@ body.catalogue-standalone {
   box-sizing: border-box;
 }
 
+.catalogue-standalone-header-inner {
+  display: flex;
+  align-items: flex-start;
+  gap: 18px 22px;
+  flex-wrap: wrap;
+}
+
+.catalogue-header-adagp {
+  flex-shrink: 0;
+  display: inline-block;
+  line-height: 0;
+  margin-top: 2px;
+}
+
+.catalogue-header-adagp:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.catalogue-header-adagp-logo {
+  height: 48px;
+  width: auto;
+  max-width: min(200px, 38vw);
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.catalogue-header-text {
+  flex: 1;
+  min-width: min(100%, 260px);
+}
+
 .catalogue-standalone-header h1 {
-  font-size: 1.5rem;
+  font-size: 1.45rem;
   font-weight: 600;
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   color: var(--primary);
+  line-height: 1.25;
+}
+
+.catalogue-header-subtitle {
+  margin: 0 0 10px;
+  font-size: 0.84rem;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--secondary);
+  max-width: 52rem;
 }
 
 .catalogue-standalone-meta {
@@ -61,41 +104,6 @@ body.catalogue-standalone {
 
 .catalogue-standalone-main {
   padding-top: 8px;
-}
-
-.catalogue-sponsor {
-  margin-top: 28px;
-  padding: 20px 0 12px;
-  border-top: 1px solid var(--border);
-  text-align: center;
-}
-
-.catalogue-sponsor-label {
-  margin: 0 0 12px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.07em;
-  color: var(--secondary);
-}
-
-.catalogue-sponsor-link {
-  display: inline-block;
-  line-height: 0;
-}
-
-.catalogue-sponsor-link:focus-visible {
-  outline: 2px solid var(--accent);
-  outline-offset: 4px;
-  border-radius: 4px;
-}
-
-.catalogue-sponsor-logo {
-  height: 48px;
-  width: auto;
-  max-width: min(320px, 92vw);
-  object-fit: contain;
-  vertical-align: middle;
 }
 
 /* Écran mot de passe (protection légère côté navigateur) */
@@ -456,6 +464,134 @@ body.catalogue-standalone {
   line-height: 1.45;
 }
 
+.legend-editor-table--simplified {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.legend-editor-table--simplified .col-thumb {
+  width: 92px;
+  vertical-align: top;
+}
+
+.legend-editor-table--simplified .col-legend-title {
+  width: auto;
+  min-width: 0;
+  vertical-align: top;
+}
+
+.legend-editor-table--simplified .col-legend-series {
+  width: 112px;
+  vertical-align: top;
+}
+
+.legend-editor-table--simplified .col-legend-status {
+  width: 3.65rem;
+  min-width: 3.5rem;
+  vertical-align: top;
+}
+
+.legend-editor-table--simplified .col-legend-status .legend-select {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.legend-editor-table .legend-select--compact {
+  font-size: 0.68rem;
+  padding: 2px 3px;
+  line-height: 1.2;
+}
+
+.legend-editor-table .legend-title-textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  font: inherit;
+  line-height: 1.45;
+  padding: 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  resize: none;
+  overflow-y: auto;
+  height: calc(1.45em * 3 + 18px);
+  max-height: calc(1.45em * 3 + 18px);
+}
+
+.legend-editor-table .legend-series-textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  min-height: 5.5rem;
+  max-height: 12rem;
+  box-sizing: border-box;
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  line-height: 1.35;
+  padding: 8px 10px;
+  border: 1px solid #c49a3c;
+  border-radius: 8px;
+  background: #fff;
+  color: var(--primary, #111);
+  resize: vertical;
+}
+
+.legend-editor-api-hint {
+  margin: 0 0 12px;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: var(--secondary, #555);
+  max-width: 52rem;
+}
+
+.legend-persist-status {
+  margin: 0;
+  font-size: 0.82rem;
+  min-height: 1.25em;
+  flex: 1;
+  min-width: 140px;
+}
+
+.legend-persist-status--ok {
+  color: #1b5e20;
+}
+
+.legend-persist-status--err {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.legend-persist-status--pending {
+  color: var(--secondary, #555);
+}
+
+.legend-thumb-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 88px;
+}
+
+.legend-thumb-id {
+  font-size: 0.68rem;
+  line-height: 1.2;
+  text-align: center;
+  word-break: break-all;
+  color: var(--secondary, #555);
+}
+
+.legend-thumb-id code {
+  font-size: inherit;
+  background: #f0f0f2;
+  padding: 2px 5px;
+  border-radius: 4px;
+}
+
 .legend-editor-toolbar {
   display: flex;
   flex-wrap: wrap;
@@ -471,6 +607,11 @@ body.catalogue-standalone {
   border: 1px solid #ccc;
   background: #fff;
   cursor: pointer;
+}
+
+.legend-editor-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
 .legend-editor-btn--primary {

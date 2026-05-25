@@ -4,8 +4,8 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
-  <title>Catalogue des œuvres – Marie Sallantin</title>
-  <meta name="description" content="Tableau de synthèse des peintures : fichiers, séries, légendes et métadonnées techniques." />
+  <title>Catalogue [PARTIEL] des œuvres de Marie Sallantin</title>
+  <meta name="description" content="Catalogue partiel en cours : fichiers, séries, dimensions et poids des images, légendes et métadonnées." />
   <link rel="stylesheet" href="catalogue.css" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
@@ -29,9 +29,29 @@
   </div>
   <div id="catalogue-app" class="catalogue-app" hidden>
   <header class="catalogue-standalone-header">
-    <div class="catalogue-standalone-inner">
-      <h1>Catalogue des œuvres</h1>
-      <p class="catalogue-standalone-meta">Outil de gestion · <a href="catalogue-legende.html">Éditer les légendes</a></p>
+    <div class="catalogue-standalone-inner catalogue-standalone-header-inner">
+      <a
+        class="catalogue-header-adagp"
+        href="https://www.adagp.fr"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="ADAGP — Société des auteurs dans les arts graphiques et plastiques"
+      >
+        <img
+          class="catalogue-header-adagp-logo"
+          src="images/ADAGP_logo.png"
+          alt="ADAGP"
+          width="120"
+          height="48"
+        />
+      </a>
+      <div class="catalogue-header-text">
+        <h1>Catalogue [PARTIEL] des œuvres de Marie Sallantin</h1>
+        <p class="catalogue-header-subtitle">
+          Travail de cataloguage en cours soutenu par une dotation de l'ADAGP
+        </p>
+        <p class="catalogue-standalone-meta">Outil de gestion · <a href="catalogue-legende.html">Éditer les légendes</a></p>
+      </div>
     </div>
   </header>
   <main class="catalogue-page" id="catalogue-root">
@@ -160,23 +180,6 @@
           <tbody id="catalogue-tbody"></tbody>
         </table>
       </div>
-      <footer class="catalogue-sponsor" role="contentinfo">
-        <p class="catalogue-sponsor-label">Soutien</p>
-        <a
-          class="catalogue-sponsor-link"
-          href="https://www.adagp.fr"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="ADAGP — Société des auteurs dans les arts graphiques et plastiques"
-        >
-          <img
-            class="catalogue-sponsor-logo"
-            src="images/ADAGP_logo.png"
-            alt="ADAGP"
-            loading="lazy"
-          />
-        </a>
-      </footer>
     </div>
   </main>
   <img id="catalogue-preview-img" class="catalogue-preview" alt="" aria-hidden="true" />

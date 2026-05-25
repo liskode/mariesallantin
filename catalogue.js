@@ -6,6 +6,106 @@
   const MEDIA_BASE = 'media/';
   const stateUrl = MEDIA_BASE + 'catalog-state.json';
 
+  /** Extensions pour lesquelles on lit largeur × hauteur via decode navigateur. */
+  const RASTER_IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.avif']);
+
+  function rowExtLower(row) {
+    return String(row.ext || '').toLowerCase();
+  }
+
+  function isRasterImageRow(row) {
+    return RASTER_IMAGE_EXT.has(rowExtLower(row));
+  }
+
+  /** @returns {Promise<{ w: number, h: number } | null>} */
+  function probeImageNaturalSize(url) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+        if (w > 0 && h > 0) resolve({ w, h });
+        else resolve(null);
+      };
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  }
+
+  /** Taille fichier en octets via en-tête (même origine : Content-Length lisible). */
+  async function probeContentLengthBytes(url) {
+    try {
+      const r = await fetch(url, { method: 'HEAD', cache: 'default' });
+      if (!r.ok) return null;
+      const cl = r.headers.get('Content-Length');
+      if (!cl) return null;
+      const n = parseInt(cl, 10);
+      if (Number.isNaN(n) || n <= 0) return null;
+      return n;
+    } catch {
+      return null;
+    }
+  }
+
+  async function probeRowImageFileMeta(row) {
+    const url = row.thumbUrl;
+    const tasks = [];
+    if (isRasterImageRow(row)) {
+      tasks.push(
+        probeImageNaturalSize(url).then((dim) => {
+          if (dim) row.probedDims = dim.w + ' × ' + dim.h + ' px';
+        })
+      );
+    }
+    tasks.push(
+      probeContentLengthBytes(url).then((bytes) => {
+        if (bytes != null) row.probedTailleMo = bytes / (1024 * 1024);
+      })
+    );
+    await Promise.all(tasks);
+  }
+
+  /** @param {Array<object>} rows */
+  async function probeAllRowImages(rows) {
+    let next = 0;
+    const concurrency = 6;
+    let probeRenderRaf = null;
+    function scheduleProbeRender() {
+      if (probeRenderRaf != null) return;
+      probeRenderRaf = requestAnimationFrame(() => {
+        probeRenderRaf = null;
+        renderCatalogue();
+      });
+    }
+    async function worker() {
+      while (true) {
+        const i = next++;
+        if (i >= rows.length) break;
+        try {
+          await probeRowImageFileMeta(rows[i]);
+        } catch (e) {
+          console.warn('Sonde image catalogue', rows[i] && rows[i].thumbUrl, e);
+        }
+        scheduleProbeRender();
+      }
+    }
+    await Promise.all(Array.from({ length: concurrency }, () => worker()));
+  }
+
+  function fileMoForRow(row) {
+    if (row.probedTailleMo != null && !Number.isNaN(Number(row.probedTailleMo))) {
+      return Number(row.probedTailleMo);
+    }
+    return row.tailleMo;
+  }
+
+  function dimensionsLabelForRow(row) {
+    if (row.probedDims) return row.probedDims;
+    const d = row.dimensions;
+    if (d != null && String(d).trim() !== '' && String(d).trim() !== '—') return String(d).trim();
+    return '—';
+  }
+
   const container = document.getElementById('catalogue-root');
   const previewImg = document.getElementById('catalogue-preview-img');
   if (!container) return;
@@ -46,7 +146,7 @@
   function effectivePhoto(row) {
     const j = (row.photo || 'OK').trim();
     if (j === 'Redo' || fileNameImpliesPhotoRedo(row.fileName)) return 'Redo';
-    const mo = row.tailleMo;
+    const mo = fileMoForRow(row);
     if (mo != null && !Number.isNaN(Number(mo))) {
       const n = Number(mo);
       if (n >= 10) return 'HQ';
@@ -199,9 +299,9 @@
         return rank[e] != null ? rank[e] : 2;
       }
       case 'dimensions':
-        return row.dimensions || '';
+        return dimensionsLabelForRow(row);
       case 'tailleMo':
-        return row.tailleMo;
+        return fileMoForRow(row);
       case 'title':
         return row.title;
       case 'publish':
@@ -316,8 +416,10 @@
   }
 
   function fmtMo(v) {
-    if (v == null || Number.isNaN(v)) return '—';
-    return v + ' Mo';
+    if (v == null || Number.isNaN(Number(v))) return '—';
+    const n = Number(v);
+    const t = n.toFixed(3).replace(/\.?0+$/, '');
+    return t + ' Mo';
   }
 
   function buildRowHtml(r) {
@@ -349,10 +451,10 @@
       escapeHtml(photoCellLabel(r)) +
       '</td>' +
       '<td>' +
-      escapeHtml(r.dimensions || '—') +
+      escapeHtml(dimensionsLabelForRow(r)) +
       '</td>' +
       '<td>' +
-      escapeHtml(fmtMo(r.tailleMo)) +
+      escapeHtml(fmtMo(fileMoForRow(r))) +
       '</td>' +
       '<td class="col-legende">' +
       escapeHtml(r.title) +
@@ -521,6 +623,7 @@
 
         renderCatalogue();
         container.querySelector('.catalogue-loading')?.remove();
+        void probeAllRowImages(allRows);
       })
       .catch((err) => {
         console.error(err);
