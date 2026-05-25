@@ -3,6 +3,15 @@
  * filtres, tri, compteur affiché / total.
  */
 (function () {
+  if (typeof location !== 'undefined' && location.hostname === 'catalogue.mariesallantin.art') {
+    var p = location.pathname;
+    var idx = p.lastIndexOf('catalogue.html');
+    if (idx !== -1) {
+      var prefix = p.slice(0, idx).replace(/\/?$/, '');
+      history.replaceState(null, '', (prefix ? prefix + '/' : '/') + location.search + location.hash);
+    }
+  }
+
   const MEDIA_BASE = 'media/';
   const titlesUrl = MEDIA_BASE + 'titles.txt';
   const stateUrl = MEDIA_BASE + 'catalog-state.json';

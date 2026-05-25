@@ -1,6 +1,16 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <script>
+    (function () {
+      var h = location.hostname;
+      if (h === 'mariesallantin.art' || h === 'www.mariesallantin.art') {
+        location.replace(
+          'https://catalogue.mariesallantin.art/' + location.search + location.hash
+        );
+      }
+    })();
+  </script>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
@@ -31,9 +41,7 @@
   <header class="catalogue-standalone-header">
     <div class="catalogue-standalone-inner">
       <h1>Catalogue des œuvres</h1>
-      <p class="catalogue-standalone-meta">
-        Outil de gestion — <a href="index.html">Retour au site public</a>
-      </p>
+      <p class="catalogue-standalone-meta">Outil de gestion</p>
     </div>
   </header>
   <main class="catalogue-page" id="catalogue-root">
