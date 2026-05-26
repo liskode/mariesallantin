@@ -262,6 +262,51 @@ body.catalogue-standalone {
   border: 1px solid var(--border);
 }
 
+/* Défilement virtuel : seul ce bloc défile (en-tête de tableau sticky à l’intérieur). */
+.catalogue-table-wrap--virtual {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  max-height: min(calc(100vh - 200px), 1200px);
+}
+
+.catalogue-vrow-spacer,
+.catalogue-vrow-spacer .catalogue-vrow-spacer-cell {
+  pointer-events: none;
+}
+
+.catalogue-vrow-spacer .catalogue-vrow-spacer-cell {
+  padding: 0 !important;
+  border: none !important;
+  line-height: 0;
+  font-size: 0;
+  vertical-align: top;
+  background: transparent;
+}
+
+/* Hauteur fixe pour aligner le scroll virtuel (~64px vignette + marges). */
+.catalogue-table-wrap--virtual .catalogue-table tbody tr.catalogue-vdata-row {
+  height: 90px;
+}
+
+.catalogue-table-wrap--virtual .catalogue-table tbody tr.catalogue-vdata-row td {
+  box-sizing: border-box;
+  max-height: 90px;
+  overflow: hidden;
+}
+
+.catalogue-table-wrap--virtual .catalogue-table tbody tr.catalogue-vdata-row td:not(.col-thumb):not(.col-legende) {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.catalogue-table-wrap--virtual .catalogue-table tbody tr.catalogue-vdata-row td.col-legende {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  white-space: normal;
+}
+
 .catalogue-table {
   width: 100%;
   border-collapse: collapse;

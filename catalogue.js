@@ -87,7 +87,7 @@
       if (probeRenderRaf != null) return;
       probeRenderRaf = requestAnimationFrame(() => {
         probeRenderRaf = null;
-        renderCatalogue();
+        updateVirtualSlice();
       });
     }
     async function worker() {
@@ -125,6 +125,16 @@
 
   /** @type {Array<object>} */
   let allRows = [];
+
+  /** Filtré + trié ; référence partagée pour le scroll virtuel. */
+  let catalogueViewSorted = [];
+
+  let virtualScrollListenersBound = false;
+  let virtualScrollRaf = null;
+
+  /** Hauteur d’une ligne (px), alignée sur le CSS `.catalogue-vdata-row`. */
+  const VIRTUAL_ROW_HEIGHT = 90;
+  const VIRTUAL_BUFFER = 12;
 
   let sortColumn = 'order';
   let sortDir = 'asc';
@@ -463,6 +473,16 @@
     });
   }
 
+  function buildSpacerRow(pixelHeight) {
+    const h = Math.round(Number(pixelHeight) || 0);
+    if (h <= 0) return '';
+    return (
+      '<tr class="catalogue-vrow-spacer" aria-hidden="true"><td colspan="11" class="catalogue-vrow-spacer-cell" style="height:' +
+      h +
+      'px"></td></tr>'
+    );
+  }
+
   function fmtMo(v) {
     if (v == null || Number.isNaN(Number(v))) return '—';
     const n = Number(v);
@@ -473,7 +493,9 @@
   function buildRowHtml(r) {
     const etatDisplay = r.etatDisplay;
     return (
-      '<tr data-id="' +
+      '<tr class="catalogue-vdata-row" title="' +
+      escapeHtml(String(r.fileName || '') + (r.title ? ' — ' + r.title : '')) +
+      '" data-id="' +
       escapeHtml(r.id) +
       '" data-path="' +
       escapeHtml(r.filePath) +
@@ -483,7 +505,7 @@
       escapeHtml(r.displayThumbSrc) +
       '" data-catalogue-full="' +
       escapeHtml(r.fullImageSrc) +
-      '" alt="" loading="lazy" decoding="async" fetchpriority="low" onerror="if(this.dataset.catalogueFull){this.onerror=null;this.src=this.dataset.catalogueFull}" />' +
+      '" alt="" loading="lazy" decoding="async" onerror="if(this.dataset.catalogueFull){this.onerror=null;this.src=this.dataset.catalogueFull}" />' +
       '</td>' +
       '<td><code>' +
       escapeHtml(r.id) +
@@ -612,24 +634,77 @@
     });
   }
 
+  function ensureVirtualScrollListeners() {
+    if (virtualScrollListenersBound) return;
+    const wrap = document.getElementById('catalogue-table-wrap');
+    if (!wrap) return;
+    virtualScrollListenersBound = true;
+    function onScrollOrResize() {
+      if (virtualScrollRaf != null) cancelAnimationFrame(virtualScrollRaf);
+      virtualScrollRaf = requestAnimationFrame(() => {
+        virtualScrollRaf = null;
+        updateVirtualSlice();
+      });
+    }
+    wrap.addEventListener('scroll', onScrollOrResize, { passive: true });
+    window.addEventListener('resize', onScrollOrResize);
+  }
+
+  function updateVirtualSlice() {
+    const tbody = document.getElementById('catalogue-tbody');
+    const wrap = document.getElementById('catalogue-table-wrap');
+    if (!tbody) return;
+
+    const sorted = catalogueViewSorted;
+    const n = sorted.length;
+    updateCount(n, allRows.length);
+
+    if (n === 0) {
+      tbody.innerHTML = '';
+      return;
+    }
+
+    const rowH = VIRTUAL_ROW_HEIGHT;
+    const buf = VIRTUAL_BUFFER;
+    const st = wrap ? wrap.scrollTop : 0;
+    const vh = wrap && wrap.clientHeight > 0 ? wrap.clientHeight : 600;
+
+    let start = Math.floor(st / rowH) - buf;
+    if (start < 0) start = 0;
+    let end = Math.ceil((st + vh) / rowH) + buf;
+    if (end > n) end = n;
+
+    const topH = start * rowH;
+    const bottomH = (n - end) * rowH;
+
+    const parts = [];
+    parts.push(buildSpacerRow(topH));
+    for (let i = start; i < end; i++) {
+      parts.push(buildRowHtml(sorted[i]));
+    }
+    parts.push(buildSpacerRow(bottomH));
+    tbody.innerHTML = parts.join('');
+
+    const dataRows = tbody.querySelectorAll('tr.catalogue-vdata-row');
+    for (let k = 0; k < dataRows.length; k++) {
+      const r = sorted[start + k];
+      if (!r) continue;
+      const thumb = dataRows[k].querySelector('.catalogue-thumb');
+      if (thumb) attachPreview(thumb, r.fullImageSrc);
+    }
+  }
+
   function renderCatalogue() {
     const tbody = document.getElementById('catalogue-tbody');
     if (!tbody) return;
 
-    const filtered = filterRows(allRows);
-    const sorted = sortRows(filtered);
+    catalogueViewSorted = sortRows(filterRows(allRows));
 
-    tbody.innerHTML = sorted.map(buildRowHtml).join('');
+    const wrap = document.getElementById('catalogue-table-wrap');
+    if (wrap) wrap.scrollTop = 0;
 
-    const trs = tbody.querySelectorAll('tr');
-    sorted.forEach((r, i) => {
-      const rowEl = trs[i];
-      if (!rowEl) return;
-      const thumb = rowEl.querySelector('.catalogue-thumb');
-      if (thumb) attachPreview(thumb, r.fullImageSrc);
-    });
-
-    updateCount(sorted.length, allRows.length);
+    ensureVirtualScrollListeners();
+    updateVirtualSlice();
   }
 
   const CATALOGUE_AUTH_KEY = 'catalogue_ms75_ok';
