@@ -1,0 +1,10 @@
+{
+  "name": "mariesallantin",
+  "private": true,
+  "scripts": {
+    "catalogue:thumbs": "node scripts/generate-catalogue-thumbnails.mjs"
+  },
+  "devDependencies": {
+    "sharp": "^0.33.5"
+  }
+}

@@ -44,3 +44,4 @@ data.works = data.works.map((w) => {
 fs.writeFileSync(worksPath, JSON.stringify(data, null, 2) + '\n', 'utf8');
 console.log('Œuvres catalogue enrichies :', updated, '| fichiers absents :', missing);
 console.log('Écrit :', worksPath);
+console.log('Astuce : npm run catalogue:thumbs pour régénérer les miniatures WebP si des fichiers ont changé.');

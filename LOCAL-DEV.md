@@ -29,6 +29,17 @@ node scripts/prefix-ms-catalogue-files.mjs              # renommer + mettre à j
 node scripts/build-works-from-list.mjs                  # régénérer media/works.json
 ```
 
+### Miniatures WebP (catalogue plus rapide)
+
+Les vignettes du tableau utilisent `media/catalogue/_thumbs/*.webp` (générées à partir des fichiers HD). Après **nouvelles images** ou mise à jour de `works.json` :
+
+```bash
+npm install
+npm run catalogue:thumbs
+```
+
+Le script ne recrée que les miniatures **manquantes** ou **plus anciennes** que la source (`--force` pour tout refaire). Voir `media/catalogue/_thumbs/README.md`.
+
 ## Option 2 — `npx serve`
 
 ```bash
@@ -38,8 +49,6 @@ npx --yes serve . -p 8765
 
 Même URL : `http://localhost:8765/catalogue.html`.
 
-## Sous-domaine `catalogue.mariesallantin.art`
+## Sous-domaine `catalogue.mariesallantin.art` (optionnel)
 
-Une redirection est définie dans **`index.html`** : sur ce sous-domaine uniquement, la racine **`/`** envoie vers **`/catalogue.html`**. Le fichier **`catalogue.html`** sur le domaine principal (`mariesallantin.art/catalogue.html`) n’est pas modifié par ce mécanisme.
-
-Côté hébergement : même dépôt GitHub Pages, DNS **CNAME** `catalogue` → cible GitHub, et ajouter le domaine personnalisé dans les réglages Pages si besoin (certificat HTTPS).
+Si un sous-domaine pointe vers le même dépôt GitHub Pages, les mêmes fichiers sont servis ; il n’y a plus de redirection JavaScript obligatoire dans ce dépôt. DNS **CNAME** et domaine personnalisé se configurent dans les réglages GitHub Pages et chez le registrar.

@@ -20,6 +20,47 @@ const SAVE_API_BASE = (() => {
   return String(u || '').trim() || 'http://127.0.0.1:47831';
 })();
 
+const RASTER_EXT_LEGEND = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tif', '.tiff', '.avif']);
+
+function pathExtLowerFromFilePart(filePart) {
+  const i = filePart.lastIndexOf('.');
+  return i >= 0 ? filePart.slice(i).toLowerCase() : '';
+}
+
+/** @returns {string | null} ex. catalogue/_thumbs/foo.webp */
+function webThumbRelFromMediaFp(mediaFp) {
+  const fp = String(mediaFp || '')
+    .trim()
+    .replace(/\\/g, '/');
+  if (!fp.toLowerCase().startsWith('catalogue/')) return null;
+  const rest = fp.slice('catalogue/'.length);
+  const lastSlash = rest.lastIndexOf('/');
+  const filePart = lastSlash >= 0 ? rest.slice(lastSlash + 1) : rest;
+  if (!RASTER_EXT_LEGEND.has(pathExtLowerFromFilePart(filePart))) return null;
+  const stem = filePart.replace(/\.[^.]+$/i, '');
+  const dirPart = lastSlash >= 0 ? rest.slice(0, lastSlash) : '';
+  return dirPart
+    ? `catalogue/_thumbs/${dirPart}/${stem}.webp`
+    : `catalogue/_thumbs/${stem}.webp`;
+}
+
+function encodeMediaPath(url) {
+  return String(url)
+    .split('/')
+    .map((seg, i) => (i === 0 ? seg : encodeURIComponent(seg)))
+    .join('/');
+}
+
+function displayThumbSrcForMedia(media) {
+  const rel = webThumbRelFromMediaFp(media);
+  if (!rel) return encodeMediaPath(MEDIA_BASE + media);
+  return encodeMediaPath(MEDIA_BASE + rel);
+}
+
+function fullImageSrcForMedia(media) {
+  return encodeMediaPath(MEDIA_BASE + media);
+}
+
 function stripAccents(s) {
   return String(s)
     .normalize('NFD')
@@ -333,7 +374,7 @@ function renderTable() {
         `<td class="col-thumb catalogue-thumb-cell">` +
         `<div class="legend-thumb-stack">` +
         `<button type="button" class="legend-thumb-btn" data-index="${idx}" aria-label="Agrandir la vignette">` +
-        `<img class="catalogue-thumb" src="${escapeHtml(st.thumbUrl)}" alt="" loading="lazy" width="72" height="72" />` +
+        `<img class="catalogue-thumb" src="${escapeHtml(displayThumbSrcForMedia(st.media))}" data-catalogue-full="${escapeHtml(fullImageSrcForMedia(st.media))}" alt="" loading="lazy" decoding="async" fetchpriority="low" width="72" height="72" onerror="if(this.dataset.catalogueFull){this.onerror=null;this.src=this.dataset.catalogueFull}" />` +
         `</button>` +
         `<div class="legend-thumb-id"><code>${escapeHtml(st.id)}</code></div>` +
         `</div></td>` +
@@ -443,7 +484,7 @@ function openZoom(index) {
   const dialog = document.getElementById('legend-zoom-dialog');
   const img = document.getElementById('legend-zoom-img');
   if (!backdrop || !dialog || !img) return;
-  img.src = st.thumbUrl;
+  img.src = fullImageSrcForMedia(st.media);
   backdrop.hidden = false;
   dialog.hidden = false;
   backdrop.setAttribute('aria-hidden', 'false');

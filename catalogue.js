@@ -202,6 +202,8 @@
           ? Number(w.tailleMo)
           : null;
       const thumbUrl = MEDIA_BASE + fp;
+      const thumbRelWebp = webThumbRelFromMediaFp(fp);
+      const displayThumbUrl = thumbRelWebp ? MEDIA_BASE + thumbRelWebp : thumbUrl;
       return {
         id,
         filePath: fp,
@@ -211,6 +213,9 @@
         seriesCodes: codes,
         title: w.title || '',
         thumbUrl,
+        displayThumbUrl,
+        displayThumbSrc: encodeMediaPath(displayThumbUrl),
+        fullImageSrc: encodeMediaPath(thumbUrl),
         orderIndex: i,
         photo,
         publish,
@@ -250,6 +255,36 @@
     const div = document.createElement('div');
     div.textContent = s;
     return div.innerHTML;
+  }
+
+  /** Encode chaque segment de chemin (espaces, accents) pour les attributs src/href. */
+  function encodeMediaPath(url) {
+    return String(url)
+      .split('/')
+      .map((seg, i) => (i === 0 ? seg : encodeURIComponent(seg)))
+      .join('/');
+  }
+
+  /**
+   * Chemin logique miniature WebP (généré par scripts/generate-catalogue-thumbnails.mjs),
+   * ou null si pas de miniature dédiée (hors catalogue/ ou non raster).
+   */
+  function webThumbRelFromMediaFp(mediaFp) {
+    const fp = String(mediaFp || '')
+      .trim()
+      .replace(/\\/g, '/');
+    if (!fp.toLowerCase().startsWith('catalogue/')) return null;
+    const rest = fp.slice('catalogue/'.length);
+    const lastSlash = rest.lastIndexOf('/');
+    const filePart = lastSlash >= 0 ? rest.slice(lastSlash + 1) : rest;
+    const lastDot = filePart.lastIndexOf('.');
+    const ext = lastDot >= 0 ? filePart.slice(lastDot).toLowerCase() : '';
+    if (!RASTER_IMAGE_EXT.has(ext)) return null;
+    const stem = filePart.replace(/\.[^.]+$/i, '');
+    const dirPart = lastSlash >= 0 ? rest.slice(0, lastSlash) : '';
+    return dirPart
+      ? 'catalogue/_thumbs/' + dirPart + '/' + stem + '.webp'
+      : 'catalogue/_thumbs/' + stem + '.webp';
   }
 
   function attachPreview(thumb, fullSrc) {
@@ -445,8 +480,10 @@
       '">' +
       '<td class="col-thumb catalogue-thumb-cell">' +
       '<img class="catalogue-thumb" src="' +
-      escapeHtml(r.thumbUrl) +
-      '" alt="" loading="lazy" decoding="async" fetchpriority="low" />' +
+      escapeHtml(r.displayThumbSrc) +
+      '" data-catalogue-full="' +
+      escapeHtml(r.fullImageSrc) +
+      '" alt="" loading="lazy" decoding="async" fetchpriority="low" onerror="if(this.dataset.catalogueFull){this.onerror=null;this.src=this.dataset.catalogueFull}" />' +
       '</td>' +
       '<td><code>' +
       escapeHtml(r.id) +
@@ -588,9 +625,8 @@
     sorted.forEach((r, i) => {
       const rowEl = trs[i];
       if (!rowEl) return;
-      const mediaUrl = r.thumbUrl;
       const thumb = rowEl.querySelector('.catalogue-thumb');
-      if (thumb) attachPreview(thumb, mediaUrl);
+      if (thumb) attachPreview(thumb, r.fullImageSrc);
     });
 
     updateCount(sorted.length, allRows.length);
