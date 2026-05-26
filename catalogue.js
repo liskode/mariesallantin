@@ -65,8 +65,21 @@
     await Promise.all(tasks);
   }
 
+  /** Quand works.json est enrichi (dimensions + tailleMo), inutile de re-télécharger chaque fichier (HEAD + decode) : c’était le principal goulot d’étranglement. */
+  function rowNeedsImageProbe(row) {
+    const d = row.dimensions;
+    const hasDims =
+      d != null && String(d).trim() !== '' && String(d).trim() !== '—';
+    const t = row.tailleMo;
+    const hasMo = t != null && t !== '' && !Number.isNaN(Number(t));
+    return !hasDims || !hasMo;
+  }
+
   /** @param {Array<object>} rows */
   async function probeAllRowImages(rows) {
+    const toProbe = rows.filter(rowNeedsImageProbe);
+    if (toProbe.length === 0) return;
+
     let next = 0;
     const concurrency = 6;
     let probeRenderRaf = null;
@@ -80,11 +93,11 @@
     async function worker() {
       while (true) {
         const i = next++;
-        if (i >= rows.length) break;
+        if (i >= toProbe.length) break;
         try {
-          await probeRowImageFileMeta(rows[i]);
+          await probeRowImageFileMeta(toProbe[i]);
         } catch (e) {
-          console.warn('Sonde image catalogue', rows[i] && rows[i].thumbUrl, e);
+          console.warn('Sonde image catalogue', toProbe[i] && toProbe[i].thumbUrl, e);
         }
         scheduleProbeRender();
       }
@@ -433,7 +446,7 @@
       '<td class="col-thumb catalogue-thumb-cell">' +
       '<img class="catalogue-thumb" src="' +
       escapeHtml(r.thumbUrl) +
-      '" alt="" loading="lazy" />' +
+      '" alt="" loading="lazy" decoding="async" fetchpriority="low" />' +
       '</td>' +
       '<td><code>' +
       escapeHtml(r.id) +
