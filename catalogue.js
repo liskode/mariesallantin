@@ -269,7 +269,9 @@
   function encodeMediaPath(url) {
     return String(url)
       .split('/')
-      .map((seg, i) => (i === 0 ? seg : encodeURIComponent(seg)))
+      .map((seg, i) =>
+        i === 0 ? seg : encodeURIComponent(String(seg).normalize('NFC'))
+      )
       .join('/');
   }
 

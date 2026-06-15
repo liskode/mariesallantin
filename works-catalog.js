@@ -179,11 +179,30 @@
     cache = null;
   }
 
+  /**
+   * URL pour attribut src (img) : préfixe media/ + chemin type catalogue/fichier.jpeg.
+   * NFC sur chaque segment encodé pour correspondre aux chemins sur l’hébergeur (GitHub Pages, etc.).
+   */
+  function buildMediaUrl(mediaRelativePath) {
+    const p = String(mediaRelativePath || '')
+      .trim()
+      .replace(/\\/g, '/');
+    if (!p) return '';
+    const full = p.startsWith('media/') ? p : 'media/' + p;
+    return full
+      .split('/')
+      .map((seg, i) =>
+        i === 0 ? seg : encodeURIComponent(String(seg).normalize('NFC'))
+      )
+      .join('/');
+  }
+
   global.WorksCatalog = {
     load,
     clearCache,
     parseTitlesTxt,
     parseWorksJson,
     getSeriesCounts,
+    buildMediaUrl,
   };
 })(typeof window !== 'undefined' ? window : this);

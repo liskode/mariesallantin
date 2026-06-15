@@ -12,6 +12,13 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSeriesCode = '';
   let currentIndex = 0;
 
+  function mediaSrc(filePath) {
+    if (typeof WorksCatalog !== 'undefined' && typeof WorksCatalog.buildMediaUrl === 'function') {
+      return WorksCatalog.buildMediaUrl(filePath);
+    }
+    return `media/${filePath}`;
+  }
+
   // Lightbox elements
   let lightbox, lightboxImg, lightboxTitle, lightboxClose, lightboxPrev, lightboxNext;
 
@@ -53,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (index >= currentSeries.length) index = 0;
     currentIndex = index;
     const { filePath, title } = currentSeries[index];
-    lightboxImg.src = `media/${filePath}`;
+    lightboxImg.src = mediaSrc(filePath);
     lightboxImg.alt = title;
     lightboxTitle.textContent = title;
     lightbox.style.display = 'flex';
@@ -118,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
     paintingsContainer.className = 'paintings-container';
     currentSeries.forEach((painting, idx) => {
       const img = document.createElement('img');
-      img.src = `media/${painting.filePath}`;
+      img.src = mediaSrc(painting.filePath);
       img.alt = painting.title;
       img.className = 'painting-thumb';
       img.tabIndex = 0;
@@ -147,7 +154,7 @@ document.addEventListener('DOMContentLoaded', () => {
       title.className = 'series-overview-title';
       title.textContent = seriesNames[code];
       const img = document.createElement('img');
-      img.src = `media/${allSeries[code][0].filePath}`;
+      img.src = mediaSrc(allSeries[code][0].filePath);
       img.alt = seriesNames[code];
       img.className = 'series-overview-img';
       img.style.cursor = 'pointer';

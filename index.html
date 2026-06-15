@@ -220,7 +220,10 @@
           var img = document.getElementById('random-image');
           var titleElement = document.getElementById('image-title');
           var seriesNameElement = document.getElementById('series-name');
-          img.src = 'media/' + w.media;
+          img.src =
+            typeof WorksCatalog !== 'undefined' && typeof WorksCatalog.buildMediaUrl === 'function'
+              ? WorksCatalog.buildMediaUrl(w.media)
+              : 'media/' + w.media;
           titleElement.textContent = w.title;
           seriesNameElement.textContent = seriesName || '—';
           seriesNameElement.dataset.seriesCode = seriesCode;
