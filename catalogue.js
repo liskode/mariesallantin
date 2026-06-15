@@ -87,7 +87,7 @@
       if (probeRenderRaf != null) return;
       probeRenderRaf = requestAnimationFrame(() => {
         probeRenderRaf = null;
-        updateVirtualSlice();
+        renderCatalogue({ resetPage: false });
       });
     }
     async function worker() {
@@ -126,15 +126,13 @@
   /** @type {Array<object>} */
   let allRows = [];
 
-  /** Filtré + trié ; référence partagée pour le scroll virtuel. */
+  /** Filtré + trié (résultat filtres + tri). */
   let catalogueViewSorted = [];
 
-  let virtualScrollListenersBound = false;
-  let virtualScrollRaf = null;
+  /** Page courante (1-based), pour la pagination. */
+  let cataloguePage = 1;
 
-  /** Hauteur d’une ligne (px), alignée sur le CSS `.catalogue-vdata-row`. */
-  const VIRTUAL_ROW_HEIGHT = 90;
-  const VIRTUAL_BUFFER = 12;
+  let paginationControlsBound = false;
 
   let sortColumn = 'order';
   let sortDir = 'asc';
@@ -468,19 +466,106 @@
           sortDir = 'asc';
         }
         updateSortHeaderUI();
-        renderCatalogue();
+        renderCatalogue({ resetPage: true });
       });
     });
   }
 
-  function buildSpacerRow(pixelHeight) {
-    const h = Math.round(Number(pixelHeight) || 0);
-    if (h <= 0) return '';
-    return (
-      '<tr class="catalogue-vrow-spacer" aria-hidden="true"><td colspan="11" class="catalogue-vrow-spacer-cell" style="height:' +
-      h +
-      'px"></td></tr>'
-    );
+  function getPageSizeFromSelect() {
+    const sel = document.getElementById('catalogue-page-size');
+    if (!sel) return 50;
+    const v = String(sel.value || '50');
+    if (v === 'all') return Infinity;
+    const n = parseInt(v, 10);
+    return Number.isNaN(n) || n < 1 ? 50 : n;
+  }
+
+  function updatePaginationBar(filteredTotal, totalPages, pageSize) {
+    const bar = document.getElementById('catalogue-pagination');
+    const prev = document.getElementById('catalogue-page-prev');
+    const next = document.getElementById('catalogue-page-next');
+    const label = document.getElementById('catalogue-page-label');
+    if (!bar || !prev || !next || !label) return;
+
+    const paginated =
+      Number.isFinite(pageSize) && pageSize > 0 && filteredTotal > pageSize;
+    bar.hidden = !paginated;
+    prev.disabled = cataloguePage <= 1;
+    next.disabled = cataloguePage >= totalPages;
+    label.textContent = 'Page ' + cataloguePage + ' / ' + totalPages;
+  }
+
+  function bindPaginationControls() {
+    if (paginationControlsBound) return;
+    paginationControlsBound = true;
+
+    document.getElementById('catalogue-page-prev')?.addEventListener('click', () => {
+      if (cataloguePage > 1) {
+        cataloguePage--;
+        renderCatalogue({ resetPage: false });
+        document.getElementById('catalogue-table-wrap')?.scrollIntoView({ block: 'nearest' });
+      }
+    });
+    document.getElementById('catalogue-page-next')?.addEventListener('click', () => {
+      const n = catalogueViewSorted.length;
+      const ps = getPageSizeFromSelect();
+      const totalPages =
+        !Number.isFinite(ps) || ps <= 0 || n <= ps ? 1 : Math.max(1, Math.ceil(n / ps));
+      if (cataloguePage < totalPages) {
+        cataloguePage++;
+        renderCatalogue({ resetPage: false });
+        document.getElementById('catalogue-table-wrap')?.scrollIntoView({ block: 'nearest' });
+      }
+    });
+    document.getElementById('catalogue-page-size')?.addEventListener('change', () => {
+      renderCatalogue({ resetPage: true });
+    });
+  }
+
+  function renderCatalogue(opts) {
+    const o = opts || {};
+    const resetPage = o.resetPage !== false;
+
+    const tbody = document.getElementById('catalogue-tbody');
+    if (!tbody) return;
+
+    catalogueViewSorted = sortRows(filterRows(allRows));
+    const sorted = catalogueViewSorted;
+    const n = sorted.length;
+
+    const pageSize = getPageSizeFromSelect();
+
+    if (resetPage) cataloguePage = 1;
+
+    const totalPages =
+      !Number.isFinite(pageSize) || pageSize <= 0 || n <= pageSize
+        ? 1
+        : Math.max(1, Math.ceil(n / pageSize));
+
+    if (cataloguePage > totalPages) cataloguePage = totalPages;
+    if (cataloguePage < 1) cataloguePage = 1;
+
+    const start =
+      !Number.isFinite(pageSize) || pageSize <= 0 || n <= pageSize
+        ? 0
+        : (cataloguePage - 1) * pageSize;
+    const slice =
+      !Number.isFinite(pageSize) || pageSize <= 0 || n <= pageSize
+        ? sorted
+        : sorted.slice(start, Math.min(start + pageSize, n));
+
+    tbody.innerHTML = slice.map(buildRowHtml).join('');
+
+    const trs = tbody.querySelectorAll('tr');
+    slice.forEach((r, i) => {
+      const rowEl = trs[i];
+      if (!rowEl) return;
+      const thumb = rowEl.querySelector('.catalogue-thumb');
+      if (thumb) attachPreview(thumb, r.fullImageSrc);
+    });
+
+    updateCount(slice.length, n);
+    updatePaginationBar(n, totalPages, pageSize);
   }
 
   function fmtMo(v) {
@@ -493,7 +578,7 @@
   function buildRowHtml(r) {
     const etatDisplay = r.etatDisplay;
     return (
-      '<tr class="catalogue-vdata-row" title="' +
+      '<tr title="' +
       escapeHtml(String(r.fileName || '') + (r.title ? ' — ' + r.title : '')) +
       '" data-id="' +
       escapeHtml(r.id) +
@@ -630,81 +715,8 @@
       'catalogue-filter-etat',
     ].forEach((id) => {
       const el = document.getElementById(id);
-      if (el) el.addEventListener('change', renderCatalogue);
+      if (el) el.addEventListener('change', () => renderCatalogue({ resetPage: true }));
     });
-  }
-
-  function ensureVirtualScrollListeners() {
-    if (virtualScrollListenersBound) return;
-    const wrap = document.getElementById('catalogue-table-wrap');
-    if (!wrap) return;
-    virtualScrollListenersBound = true;
-    function onScrollOrResize() {
-      if (virtualScrollRaf != null) cancelAnimationFrame(virtualScrollRaf);
-      virtualScrollRaf = requestAnimationFrame(() => {
-        virtualScrollRaf = null;
-        updateVirtualSlice();
-      });
-    }
-    wrap.addEventListener('scroll', onScrollOrResize, { passive: true });
-    window.addEventListener('resize', onScrollOrResize);
-  }
-
-  function updateVirtualSlice() {
-    const tbody = document.getElementById('catalogue-tbody');
-    const wrap = document.getElementById('catalogue-table-wrap');
-    if (!tbody) return;
-
-    const sorted = catalogueViewSorted;
-    const n = sorted.length;
-    updateCount(n, allRows.length);
-
-    if (n === 0) {
-      tbody.innerHTML = '';
-      return;
-    }
-
-    const rowH = VIRTUAL_ROW_HEIGHT;
-    const buf = VIRTUAL_BUFFER;
-    const st = wrap ? wrap.scrollTop : 0;
-    const vh = wrap && wrap.clientHeight > 0 ? wrap.clientHeight : 600;
-
-    let start = Math.floor(st / rowH) - buf;
-    if (start < 0) start = 0;
-    let end = Math.ceil((st + vh) / rowH) + buf;
-    if (end > n) end = n;
-
-    const topH = start * rowH;
-    const bottomH = (n - end) * rowH;
-
-    const parts = [];
-    parts.push(buildSpacerRow(topH));
-    for (let i = start; i < end; i++) {
-      parts.push(buildRowHtml(sorted[i]));
-    }
-    parts.push(buildSpacerRow(bottomH));
-    tbody.innerHTML = parts.join('');
-
-    const dataRows = tbody.querySelectorAll('tr.catalogue-vdata-row');
-    for (let k = 0; k < dataRows.length; k++) {
-      const r = sorted[start + k];
-      if (!r) continue;
-      const thumb = dataRows[k].querySelector('.catalogue-thumb');
-      if (thumb) attachPreview(thumb, r.fullImageSrc);
-    }
-  }
-
-  function renderCatalogue() {
-    const tbody = document.getElementById('catalogue-tbody');
-    if (!tbody) return;
-
-    catalogueViewSorted = sortRows(filterRows(allRows));
-
-    const wrap = document.getElementById('catalogue-table-wrap');
-    if (wrap) wrap.scrollTop = 0;
-
-    ensureVirtualScrollListeners();
-    updateVirtualSlice();
   }
 
   const CATALOGUE_AUTH_KEY = 'catalogue_ms75_ok';
@@ -745,6 +757,7 @@
         bindSortHeaders();
         updateSortHeaderUI();
 
+        bindPaginationControls();
         renderCatalogue();
         container.querySelector('.catalogue-loading')?.remove();
         void probeAllRowImages(allRows);

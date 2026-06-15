@@ -17,7 +17,7 @@ Puis dans le navigateur :
 
 Les images du catalogue v2 doivent être sous **`media/catalogue/`** (chemins du type `media/catalogue/nom-fichier.jpeg`).
 
-Le **tableau du catalogue** défile dans un cadre à hauteur limitée (**scroll virtuel** : seules les lignes proches de la fenêtre de défilement sont rendues dans le DOM), ce qui reste fluide avec des centaines d’œuvres.
+Le **tableau du catalogue** est **paginé** (50 / 100 / 200 lignes par page ou « Tout ») pour limiter le nombre de vignettes chargées à la fois ; tri et filtres s’appliquent à tout le jeu de données.
 
 Si **`media/works_numero.txt`** est présent, le script de build l’utilise par défaut (sinon `data/catalogue-filenames.txt`) : les **id** `MS0001` … sont lus dans chaque nom de fichier, et les légendes suivent la convention « underscore » de ce fichier.
 

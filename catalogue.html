@@ -57,13 +57,27 @@
   <main class="catalogue-page" id="catalogue-root">
     <div class="catalogue-standalone-inner catalogue-standalone-main">
       <p class="catalogue-intro">
-        Cliquer pour trier une colonne, passer le pointeur au-dessus du tableau pour agrandir, filtrer avec les menus déroulants.
+        Tri et filtres sur tout le catalogue ; pagination (50 / 100 / 200 / tout) pour limiter les vignettes chargées. Survol du tableau pour agrandir une image.
       </p>
       <div class="catalogue-toolbar">
         <p class="catalogue-count" id="catalogue-count" aria-live="polite">0 affiché sur 0</p>
+        <div class="catalogue-pagination" id="catalogue-pagination" hidden>
+          <button type="button" class="catalogue-page-btn" id="catalogue-page-prev" aria-label="Page précédente">←</button>
+          <span class="catalogue-page-label" id="catalogue-page-label">Page 1 / 1</span>
+          <button type="button" class="catalogue-page-btn" id="catalogue-page-next" aria-label="Page suivante">→</button>
+          <label class="catalogue-page-size-label">
+            <span class="catalogue-page-size-text">Lignes par page</span>
+            <select id="catalogue-page-size" class="catalogue-select catalogue-select--inline" aria-label="Nombre de lignes par page">
+              <option value="50" selected>50</option>
+              <option value="100">100</option>
+              <option value="200">200</option>
+              <option value="all">Tout</option>
+            </select>
+          </label>
+        </div>
       </div>
       <p class="catalogue-loading">Chargement du catalogue…</p>
-      <div class="catalogue-table-wrap catalogue-table-wrap--virtual" id="catalogue-table-wrap">
+      <div class="catalogue-table-wrap" id="catalogue-table-wrap">
         <table class="catalogue-table">
           <thead id="catalogue-thead">
             <tr>

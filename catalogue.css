@@ -202,6 +202,66 @@ body.catalogue-standalone {
 
 .catalogue-toolbar {
   margin-bottom: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+
+.catalogue-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px 14px;
+}
+
+.catalogue-page-btn {
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  min-width: 2.5rem;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--primary);
+  cursor: pointer;
+}
+
+.catalogue-page-btn:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.catalogue-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.catalogue-page-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--secondary);
+  min-width: 6.5rem;
+  text-align: center;
+}
+
+.catalogue-page-size-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  color: var(--secondary);
+}
+
+.catalogue-page-size-text {
+  white-space: nowrap;
+}
+
+.catalogue-select--inline {
+  margin: 0;
+  min-width: 5.5rem;
 }
 
 .catalogue-select {
@@ -260,51 +320,6 @@ body.catalogue-standalone {
   border-radius: var(--radius);
   box-shadow: var(--shadow);
   border: 1px solid var(--border);
-}
-
-/* Défilement virtuel : seul ce bloc défile (en-tête de tableau sticky à l’intérieur). */
-.catalogue-table-wrap--virtual {
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  max-height: min(calc(100vh - 200px), 1200px);
-}
-
-.catalogue-vrow-spacer,
-.catalogue-vrow-spacer .catalogue-vrow-spacer-cell {
-  pointer-events: none;
-}
-
-.catalogue-vrow-spacer .catalogue-vrow-spacer-cell {
-  padding: 0 !important;
-  border: none !important;
-  line-height: 0;
-  font-size: 0;
-  vertical-align: top;
-  background: transparent;
-}
-
-/* Hauteur fixe pour aligner le scroll virtuel (~64px vignette + marges). */
-.catalogue-table-wrap--virtual .catalogue-table tbody tr.catalogue-vdata-row {
-  height: 90px;
-}
-
-.catalogue-table-wrap--virtual .catalogue-table tbody tr.catalogue-vdata-row td {
-  box-sizing: border-box;
-  max-height: 90px;
-  overflow: hidden;
-}
-
-.catalogue-table-wrap--virtual .catalogue-table tbody tr.catalogue-vdata-row td:not(.col-thumb):not(.col-legende) {
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-.catalogue-table-wrap--virtual .catalogue-table tbody tr.catalogue-vdata-row td.col-legende {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  white-space: normal;
 }
 
 .catalogue-table {
