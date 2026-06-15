@@ -719,9 +719,6 @@
     });
   }
 
-  const CATALOGUE_AUTH_KEY = 'catalogue_ms75_ok';
-  const CATALOGUE_PASSWORD = 'MS75';
-
   function startCatalogue() {
     if (typeof WorksCatalog === 'undefined') {
       console.error('works-catalog.js doit être chargé avant catalogue.js');
@@ -773,45 +770,5 @@
       });
   }
 
-  function setupCatalogueAuth() {
-    const loginEl = document.getElementById('catalogue-login');
-    const appEl = document.getElementById('catalogue-app');
-    const form = document.getElementById('catalogue-login-form');
-    const input = document.getElementById('catalogue-login-input');
-    const errEl = document.getElementById('catalogue-login-error');
-
-    if (!loginEl || !appEl || !form || !input) {
-      startCatalogue();
-      return;
-    }
-
-    function unlock() {
-      sessionStorage.setItem(CATALOGUE_AUTH_KEY, '1');
-      loginEl.remove();
-      appEl.hidden = false;
-      startCatalogue();
-    }
-
-    if (sessionStorage.getItem(CATALOGUE_AUTH_KEY) === '1') {
-      unlock();
-      return;
-    }
-
-    appEl.hidden = true;
-    input.focus();
-
-    form.addEventListener('submit', (e) => {
-      e.preventDefault();
-      if (errEl) errEl.hidden = true;
-      if (input.value === CATALOGUE_PASSWORD) {
-        unlock();
-      } else {
-        if (errEl) errEl.hidden = false;
-        input.value = '';
-        input.focus();
-      }
-    });
-  }
-
-  setupCatalogueAuth();
+  startCatalogue();
 })();

@@ -4,76 +4,19 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
-  <meta name="catalogue-save-api" content="http://127.0.0.1:47831" />
-  <title>Édition des légendes – Catalogue</title>
+  <title>Édition des légendes — désactivée</title>
   <link rel="stylesheet" href="catalogue.css" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
-<body class="catalogue-standalone catalogue-legend-page">
-  <div id="catalogue-login" class="catalogue-login-screen" role="dialog" aria-labelledby="catalogue-login-title">
-    <form id="catalogue-login-form" class="catalogue-login-box" autocomplete="on">
-      <h2 id="catalogue-login-title" class="catalogue-login-title">Édition légendes — accès restreint</h2>
-      <label class="catalogue-login-label" for="catalogue-login-input">Mot de passe</label>
-      <input
-        id="catalogue-login-input"
-        class="catalogue-login-input"
-        type="password"
-        name="password"
-        autocomplete="current-password"
-        required
-      />
-      <button type="submit" class="catalogue-login-submit">Accéder</button>
-      <p id="catalogue-login-error" class="catalogue-login-error" hidden>Mot de passe incorrect.</p>
-    </form>
-  </div>
-  <div id="catalogue-app" class="catalogue-app" hidden>
-    <header class="catalogue-standalone-header">
-      <div class="catalogue-standalone-inner">
-        <h1>Édition des légendes</h1>
-        <p class="catalogue-standalone-meta">
-          <a href="catalogue.html">← Retour au catalogue</a>
-        </p>
-      </div>
-    </header>
-    <main class="catalogue-page" id="legend-editor-root">
-      <div class="catalogue-standalone-inner catalogue-standalone-main">
-        <p class="legend-editor-api-hint" id="legend-api-hint"></p>
-        <div class="catalogue-toolbar legend-editor-toolbar">
-          <p class="legend-persist-status" id="legend-persist-status" aria-live="polite"></p>
-          <button type="button" class="legend-editor-btn legend-editor-btn--primary" id="legend-export-json">
-            Télécharger <code>works.json</code>
-          </button>
-          <button type="button" class="legend-editor-btn" id="legend-export-state">
-            Télécharger <code>catalog-state.json</code>
-          </button>
-          <button type="button" class="legend-editor-btn" id="legend-export-sh">Télécharger <code>renames-catalogue.sh</code></button>
-          <p class="catalogue-count" id="legend-editor-count" aria-live="polite"></p>
-        </div>
-        <p class="catalogue-loading" id="legend-editor-loading">Chargement…</p>
-        <div class="catalogue-table-wrap legend-editor-table-wrap">
-          <table class="catalogue-table legend-editor-table legend-editor-table--simplified">
-            <thead>
-              <tr>
-                <th class="col-thumb" scope="col">Vignette</th>
-                <th class="col-legend-title" scope="col">Titre (légende)</th>
-                <th class="col-legend-series" scope="col">Séries</th>
-                <th class="col-legend-status" scope="col">Photo</th>
-                <th class="col-legend-status" scope="col">Pub.</th>
-                <th class="col-legend-status" scope="col">État</th>
-              </tr>
-            </thead>
-            <tbody id="legend-editor-tbody"></tbody>
-          </table>
-        </div>
-      </div>
-    </main>
-  </div>
-  <div id="legend-zoom-backdrop" class="legend-zoom-backdrop" hidden aria-hidden="true"></div>
-  <div id="legend-zoom-dialog" class="legend-zoom-dialog" role="dialog" aria-modal="true" aria-label="Agrandissement" hidden>
-    <button type="button" class="legend-zoom-close" id="legend-zoom-close" aria-label="Fermer">×</button>
-    <img id="legend-zoom-img" class="legend-zoom-img" alt="" />
-  </div>
-  <script type="module" src="catalogue-legende-app.mjs"></script>
+<body class="catalogue-standalone">
+  <main class="catalogue-page catalogue-standalone-inner" style="max-width: 40rem; margin: 3rem auto; padding: 0 16px">
+    <h1 style="font-size: 1.35rem; margin-top: 0">Édition des légendes</h1>
+    <p style="line-height: 1.55; color: var(--secondary, #6a6a6a)">
+      Cette page n’est plus proposée en l’état. Les métadonnées et légendes se gèrent via le dépôt
+      (<code>media/works.json</code>, scripts, etc.) et le <a href="catalogue.html">catalogue</a> reste disponible en consultation.
+    </p>
+    <p><a href="catalogue.html">← Retour au catalogue</a></p>
+  </main>
 </body>
 </html>

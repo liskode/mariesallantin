@@ -11,9 +11,10 @@ python3 -m http.server 8765
 
 Puis dans le navigateur :
 
-- **Catalogue (gestion)** : [http://localhost:8765/catalogue.html](http://localhost:8765/catalogue.html)  
-- **Édition des légendes** : [http://localhost:8765/catalogue-legende.html](http://localhost:8765/catalogue-legende.html)  
+- **Catalogue (consultation)** : [http://localhost:8765/catalogue.html](http://localhost:8765/catalogue.html) (accès public, sans mot de passe)  
 - **Accueil du site** : [http://localhost:8765/](http://localhost:8765/)
+
+L’ancienne page d’édition des légendes (`catalogue-legende.html`) affiche un message : l’édition se fait via le dépôt, pas depuis le navigateur.
 
 Les images du catalogue v2 doivent être sous **`media/catalogue/`** (chemins du type `media/catalogue/nom-fichier.jpeg`).
 
