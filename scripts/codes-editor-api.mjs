@@ -72,7 +72,7 @@ function sendJson(res, status, obj) {
     'Content-Type': 'application/json; charset=utf-8',
     'Content-Length': Buffer.byteLength(body),
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   });
   res.end(body);
@@ -144,6 +144,31 @@ async function fetchTechniques(supabase) {
   return data || [];
 }
 
+async function fetchCodesWithCounts(supabase) {
+  const [formats, techniques] = await Promise.all([
+    fetchFormats(supabase),
+    fetchTechniques(supabase),
+  ]);
+  const { data: works, error } = await supabase
+    .from('works')
+    .select('format_code, technique_code');
+  if (error) throw error;
+
+  const formatCounts = new Map();
+  const techniqueCounts = new Map();
+  for (const w of works || []) {
+    if (w.format_code) formatCounts.set(w.format_code, (formatCounts.get(w.format_code) || 0) + 1);
+    if (w.technique_code) {
+      techniqueCounts.set(w.technique_code, (techniqueCounts.get(w.technique_code) || 0) + 1);
+    }
+  }
+
+  return {
+    formats: formats.map((f) => ({ ...f, work_count: formatCounts.get(f.code) || 0 })),
+    techniques: techniques.map((t) => ({ ...t, work_count: techniqueCounts.get(t.code) || 0 })),
+  };
+}
+
 async function nextSortOrder(supabase, table) {
   const { data } = await supabase
     .from(table)
@@ -158,7 +183,7 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     });
     res.end();
@@ -196,10 +221,7 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       const supabase = createSupabase();
-      const [formats, techniques] = await Promise.all([
-        fetchFormats(supabase),
-        fetchTechniques(supabase),
-      ]);
+      const { formats, techniques } = await fetchCodesWithCounts(supabase);
       sendJson(res, 200, { ok: true, formats, techniques });
       return;
     }
@@ -233,9 +255,8 @@ const server = http.createServer(async (req, res) => {
         sort_order: await nextSortOrder(supabase, 'formats'),
       });
       if (error) throw error;
-      const formats = await fetchFormats(supabase);
-      const techniques = await fetchTechniques(supabase);
-      sendJson(res, 200, { ok: true, formats, techniques, createdCode: code });
+      const lists = await fetchCodesWithCounts(supabase);
+      sendJson(res, 200, { ok: true, ...lists, createdCode: code });
       return;
     }
 
@@ -266,9 +287,8 @@ const server = http.createServer(async (req, res) => {
         sort_order: await nextSortOrder(supabase, 'techniques'),
       });
       if (error) throw error;
-      const formats = await fetchFormats(supabase);
-      const techniques = await fetchTechniques(supabase);
-      sendJson(res, 200, { ok: true, formats, techniques, createdCode: code });
+      const lists = await fetchCodesWithCounts(supabase);
+      sendJson(res, 200, { ok: true, ...lists, createdCode: code });
       return;
     }
 
@@ -295,9 +315,68 @@ const server = http.createServer(async (req, res) => {
         const { error } = await supabase.from('techniques').upsert(payload, { onConflict: 'code' });
         if (error) throw error;
       }
-      const formats = await fetchFormats(supabase);
-      const techniques = await fetchTechniques(supabase);
-      sendJson(res, 200, { ok: true, formats, techniques });
+      const lists = await fetchCodesWithCounts(supabase);
+      sendJson(res, 200, { ok: true, ...lists });
+      return;
+    }
+
+    if (req.method === 'DELETE' && url.pathname.startsWith('/api/formats/')) {
+      const code = decodeURIComponent(url.pathname.slice('/api/formats/'.length)).trim().toUpperCase();
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      if (!code) {
+        sendJson(res, 400, { ok: false, error: 'code manquant' });
+        return;
+      }
+      const supabase = createSupabase();
+      const { count, error: cErr } = await supabase
+        .from('works')
+        .select('id', { count: 'exact', head: true })
+        .eq('format_code', code);
+      if (cErr) throw cErr;
+      if ((count || 0) > 0) {
+        sendJson(res, 400, {
+          ok: false,
+          error: `impossible de supprimer ${code} : ${count} tableau(x) lié(s)`,
+        });
+        return;
+      }
+      const { error } = await supabase.from('formats').delete().eq('code', code);
+      if (error) throw error;
+      const lists = await fetchCodesWithCounts(supabase);
+      sendJson(res, 200, { ok: true, ...lists });
+      return;
+    }
+
+    if (req.method === 'DELETE' && url.pathname.startsWith('/api/techniques/')) {
+      const code = decodeURIComponent(url.pathname.slice('/api/techniques/'.length)).trim().toUpperCase();
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      if (!code) {
+        sendJson(res, 400, { ok: false, error: 'code manquant' });
+        return;
+      }
+      const supabase = createSupabase();
+      const { count, error: cErr } = await supabase
+        .from('works')
+        .select('id', { count: 'exact', head: true })
+        .eq('technique_code', code);
+      if (cErr) throw cErr;
+      if ((count || 0) > 0) {
+        sendJson(res, 400, {
+          ok: false,
+          error: `impossible de supprimer ${code} : ${count} tableau(x) lié(s)`,
+        });
+        return;
+      }
+      const { error } = await supabase.from('techniques').delete().eq('code', code);
+      if (error) throw error;
+      const lists = await fetchCodesWithCounts(supabase);
+      sendJson(res, 200, { ok: true, ...lists });
       return;
     }
 

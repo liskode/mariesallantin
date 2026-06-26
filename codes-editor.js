@@ -7,6 +7,9 @@
   const PRODUCTION_API =
     'https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/codes-api';
 
+  const TRASH_ICON =
+    '<svg class="codes-delete-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 7h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-4h6l1 2H8l1-2zm-1 6v9h2V9H8zm4 0v9h2V9h-2z"/></svg>';
+
   let siteConfig = null;
   let resolvedApiBase = '';
   /** @type {Array<object>} */
@@ -186,6 +189,31 @@
     window.setTimeout(() => tr.classList.remove('codes-editor-row--focus'), 2500);
   }
 
+  function appendCountAndDelete(tr, row, kind) {
+    const count = row.work_count ?? 0;
+    const tdCount = document.createElement('td');
+    tdCount.textContent = String(count);
+    tdCount.className = 'codes-work-count-cell';
+
+    const tdAct = document.createElement('td');
+    tdAct.className = 'codes-action-cell';
+    if (count === 0) {
+      const delBtn = document.createElement('button');
+      delBtn.type = 'button';
+      delBtn.className = 'codes-delete-btn';
+      delBtn.title = 'Supprimer ce code';
+      delBtn.setAttribute('aria-label', 'Supprimer ' + row.code);
+      delBtn.innerHTML = TRASH_ICON;
+      delBtn.addEventListener('click', () => {
+        if (kind === 'format') deleteFormat(row);
+        else deleteTechnique(row);
+      });
+      tdAct.appendChild(delBtn);
+    }
+    tr.appendChild(tdCount);
+    tr.appendChild(tdAct);
+  }
+
   function renderFormats() {
     if (!formatsTbody) return;
     formatsTbody.innerHTML = '';
@@ -228,6 +256,7 @@
       tr.appendChild(tdLabel);
       tr.appendChild(tdW);
       tr.appendChild(tdH);
+      appendCountAndDelete(tr, f, 'format');
       formatsTbody.appendChild(tr);
     }
   }
@@ -254,6 +283,7 @@
 
       tr.appendChild(tdCode);
       tr.appendChild(tdLabel);
+      appendCountAndDelete(tr, t, 'technique');
       techniquesTbody.appendChild(tr);
     }
   }
@@ -356,6 +386,42 @@
     focusAfterRender = { kind: 'technique', code: j.createdCode || normalized };
     renderAll();
     setStatus('Technique ' + normalized + ' créée — complétez le libellé.');
+  }
+
+  async function deleteFormat(row) {
+    if (!row.code) return;
+    if (!window.confirm('Supprimer le format ' + row.code + ' ?')) return;
+    setStatus('Suppression…');
+    const r = await apiFetch(
+      '/api/formats/' + encodeURIComponent(row.code) + '?token=' + encodeURIComponent(token),
+      { method: 'DELETE' }
+    );
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || 'suppression impossible');
+    formatsList = j.formats || formatsList;
+    techniquesList = j.techniques || techniquesList;
+    dirtyFormats.delete(row.code);
+    updateSaveBtn();
+    renderAll();
+    setStatus('Format ' + row.code + ' supprimé.');
+  }
+
+  async function deleteTechnique(row) {
+    if (!row.code) return;
+    if (!window.confirm('Supprimer la technique ' + row.code + ' ?')) return;
+    setStatus('Suppression…');
+    const r = await apiFetch(
+      '/api/techniques/' + encodeURIComponent(row.code) + '?token=' + encodeURIComponent(token),
+      { method: 'DELETE' }
+    );
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || 'suppression impossible');
+    formatsList = j.formats || formatsList;
+    techniquesList = j.techniques || techniquesList;
+    dirtyTechniques.delete(row.code);
+    updateSaveBtn();
+    renderAll();
+    setStatus('Technique ' + row.code + ' supprimée.');
   }
 
   async function checkApiHealth() {

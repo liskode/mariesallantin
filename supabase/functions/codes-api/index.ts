@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supa
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
 };
 
 function jsonResponse(status: number, body: Record<string, unknown>) {
@@ -89,6 +89,37 @@ async function fetchTechniques(supabase: SupabaseClient) {
   return data || [];
 }
 
+async function fetchCodesWithCounts(supabase: SupabaseClient) {
+  const [formats, techniques] = await Promise.all([
+    fetchFormats(supabase),
+    fetchTechniques(supabase),
+  ]);
+  const { data: works, error } = await supabase
+    .from('works')
+    .select('format_code, technique_code');
+  if (error) throw error;
+
+  const formatCounts = new Map<string, number>();
+  const techniqueCounts = new Map<string, number>();
+  for (const w of works || []) {
+    const fc = w.format_code as string | null;
+    const tc = w.technique_code as string | null;
+    if (fc) formatCounts.set(fc, (formatCounts.get(fc) || 0) + 1);
+    if (tc) techniqueCounts.set(tc, (techniqueCounts.get(tc) || 0) + 1);
+  }
+
+  return {
+    formats: formats.map((f) => ({
+      ...f,
+      work_count: formatCounts.get(f.code as string) || 0,
+    })),
+    techniques: techniques.map((t) => ({
+      ...t,
+      work_count: techniqueCounts.get(t.code as string) || 0,
+    })),
+  };
+}
+
 async function nextSortOrder(
   supabase: SupabaseClient,
   table: 'formats' | 'techniques'
@@ -121,10 +152,7 @@ Deno.serve(async (req) => {
         return jsonResponse(403, { ok: false, error: 'token incorrect' });
       }
       const supabase = createSupabase();
-      const [formats, techniques] = await Promise.all([
-        fetchFormats(supabase),
-        fetchTechniques(supabase),
-      ]);
+      const { formats, techniques } = await fetchCodesWithCounts(supabase);
       return jsonResponse(200, { ok: true, formats, techniques });
     }
 
@@ -155,8 +183,7 @@ Deno.serve(async (req) => {
       };
       const { error } = await supabase.from('formats').insert(row);
       if (error) throw error;
-      const formats = await fetchFormats(supabase);
-      const techniques = await fetchTechniques(supabase);
+      const { formats, techniques } = await fetchCodesWithCounts(supabase);
       return jsonResponse(200, { ok: true, formats, techniques, createdCode: code });
     }
 
@@ -185,8 +212,7 @@ Deno.serve(async (req) => {
       };
       const { error } = await supabase.from('techniques').insert(row);
       if (error) throw error;
-      const formats = await fetchFormats(supabase);
-      const techniques = await fetchTechniques(supabase);
+      const { formats, techniques } = await fetchCodesWithCounts(supabase);
       return jsonResponse(200, { ok: true, formats, techniques, createdCode: code });
     }
 
@@ -215,11 +241,62 @@ Deno.serve(async (req) => {
         if (error) throw error;
       }
 
-      const [formats, techniques] = await Promise.all([
-        fetchFormats(supabase),
-        fetchTechniques(supabase),
-      ]);
+      const { formats, techniques } = await fetchCodesWithCounts(supabase);
       return jsonResponse(200, { ok: true, formats, techniques });
+    }
+
+    if (req.method === 'DELETE' && path.startsWith('/api/formats/')) {
+      const code = decodeURIComponent(path.slice('/api/formats/'.length)).trim().toUpperCase();
+      const token = url.searchParams.get('token') || '';
+      if (!checkToken(token)) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      if (!code) {
+        return jsonResponse(400, { ok: false, error: 'code manquant' });
+      }
+      const supabase = createSupabase();
+      const { count, error: cErr } = await supabase
+        .from('works')
+        .select('id', { count: 'exact', head: true })
+        .eq('format_code', code);
+      if (cErr) throw cErr;
+      if ((count || 0) > 0) {
+        return jsonResponse(400, {
+          ok: false,
+          error: `impossible de supprimer ${code} : ${count} tableau(x) lié(s)`,
+        });
+      }
+      const { error } = await supabase.from('formats').delete().eq('code', code);
+      if (error) throw error;
+      const lists = await fetchCodesWithCounts(supabase);
+      return jsonResponse(200, { ok: true, ...lists });
+    }
+
+    if (req.method === 'DELETE' && path.startsWith('/api/techniques/')) {
+      const code = decodeURIComponent(path.slice('/api/techniques/'.length)).trim().toUpperCase();
+      const token = url.searchParams.get('token') || '';
+      if (!checkToken(token)) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      if (!code) {
+        return jsonResponse(400, { ok: false, error: 'code manquant' });
+      }
+      const supabase = createSupabase();
+      const { count, error: cErr } = await supabase
+        .from('works')
+        .select('id', { count: 'exact', head: true })
+        .eq('technique_code', code);
+      if (cErr) throw cErr;
+      if ((count || 0) > 0) {
+        return jsonResponse(400, {
+          ok: false,
+          error: `impossible de supprimer ${code} : ${count} tableau(x) lié(s)`,
+        });
+      }
+      const { error } = await supabase.from('techniques').delete().eq('code', code);
+      if (error) throw error;
+      const lists = await fetchCodesWithCounts(supabase);
+      return jsonResponse(200, { ok: true, ...lists });
     }
 
     return jsonResponse(404, { ok: false, error: 'not found' });
