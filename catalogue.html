@@ -45,6 +45,14 @@
       </p>
       <div class="catalogue-toolbar">
         <p class="catalogue-count" id="catalogue-count" aria-live="polite">0 affiché sur 0</p>
+        <div class="catalogue-edit-tools">
+          <button type="button" class="catalogue-edit-toggle" id="catalogue-edit-toggle" aria-pressed="false">
+            Mode edition: OFF
+          </button>
+          <button type="button" class="catalogue-edit-export" id="catalogue-edit-export" disabled>
+            Telecharger works.json modifie
+          </button>
+        </div>
         <div class="catalogue-pagination" id="catalogue-pagination" hidden>
           <button type="button" class="catalogue-page-btn" id="catalogue-page-prev" aria-label="Page précédente">←</button>
           <span class="catalogue-page-label" id="catalogue-page-label">Page 1 / 1</span>
@@ -181,6 +189,44 @@
     </div>
   </main>
   <img id="catalogue-preview-img" class="catalogue-preview" alt="" aria-hidden="true" />
+  <div id="catalogue-edit-backdrop" class="catalogue-edit-backdrop" hidden></div>
+  <dialog id="catalogue-edit-dialog" class="catalogue-edit-dialog" aria-labelledby="catalogue-edit-title">
+    <button type="button" class="catalogue-edit-close" id="catalogue-edit-close" aria-label="Fermer">×</button>
+    <div class="catalogue-edit-layout">
+      <div class="catalogue-edit-left">
+        <img id="catalogue-edit-image" class="catalogue-edit-image" alt="" />
+        <p class="catalogue-edit-id" id="catalogue-edit-id"></p>
+      </div>
+      <form class="catalogue-edit-form" id="catalogue-edit-form">
+        <h2 id="catalogue-edit-title">Edition oeuvre</h2>
+        <label class="catalogue-edit-label">
+          <span>Titre / legende</span>
+          <textarea id="catalogue-edit-title-input" rows="4"></textarea>
+        </label>
+        <label class="catalogue-edit-label">
+          <span>Series (selection multiple)</span>
+          <button type="button" class="catalogue-multiselect-toggle" id="catalogue-edit-series-toggle">Choisir...</button>
+          <div class="catalogue-multiselect-panel" id="catalogue-edit-series-panel" hidden></div>
+        </label>
+        <label class="catalogue-edit-label">
+          <span>Format (code 4 caracteres)</span>
+          <select id="catalogue-edit-format"></select>
+        </label>
+        <label class="catalogue-edit-label">
+          <span>Annee (4 chiffres)</span>
+          <input id="catalogue-edit-year" type="text" inputmode="numeric" maxlength="4" />
+        </label>
+        <label class="catalogue-edit-label">
+          <span>Technique (code 3 caracteres)</span>
+          <select id="catalogue-edit-technique"></select>
+        </label>
+        <p class="catalogue-edit-error" id="catalogue-edit-error" hidden></p>
+        <div class="catalogue-edit-actions">
+          <button type="submit" class="catalogue-edit-save">Enregistrer cette oeuvre</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
   </div>
   <script src="works-catalog.js"></script>
   <script src="catalogue.js"></script>

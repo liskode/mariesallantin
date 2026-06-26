@@ -1,0 +1,26 @@
+{
+  "formats": [
+    { "code": "HF23", "label": "200x300" },
+    { "code": "HF21", "label": "210x" },
+    { "code": "HF03", "label": "" },
+    { "code": "HF04", "label": "" },
+    { "code": "HF05", "label": "" },
+    { "code": "HF06", "label": "" },
+    { "code": "HF07", "label": "" },
+    { "code": "HF08", "label": "" },
+    { "code": "HF09", "label": "" }
+  ],
+  "techniques": [
+    { "code": "TST", "label": "Tempera sur toile" },
+    { "code": "TSB", "label": "Tempera sur bois" },
+    { "code": "INK", "label": "Encre sur papier" },
+    { "code": "HUI", "label": "Huile sur toile" },
+    { "code": "AST", "label": "Acrylique sur toile" },
+    { "code": "ASB", "label": "Acrylique sur bois" }
+  ],
+  "series": [
+    { "code": "COMPA", "label": "Compagnie de Venus" },
+    { "code": "LICOR", "label": "Licorne" },
+    { "code": "HIVER", "label": "Quatre saisons - Hiver" }
+  ]
+}

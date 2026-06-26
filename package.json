@@ -2,9 +2,15 @@
   "name": "mariesallantin",
   "private": true,
   "scripts": {
-    "catalogue:thumbs": "node scripts/generate-catalogue-thumbnails.mjs"
+    "catalogue:thumbs": "node scripts/generate-catalogue-thumbnails.mjs",
+    "supabase:import-works": "node scripts/import-works-to-supabase.mjs",
+    "supabase:update-dimensions": "node scripts/update-works-dimensions-cm.mjs",
+    "supabase:strip-title-dimensions": "node scripts/strip-works-title-dimensions.mjs",
+    "supabase:update-collectors": "node scripts/update-works-collectors.mjs",
+    "collectors:api": "node scripts/collectors-editor-api.mjs"
   },
   "devDependencies": {
+    "@supabase/supabase-js": "^2.49.8",
     "sharp": "^0.33.5"
   }
 }

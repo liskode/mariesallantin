@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="collectors-api" content="http://127.0.0.1:47832" />
+  <title>Collectionneurs — édition</title>
+  <link rel="stylesheet" href="catalogue.css" />
+  <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body class="catalogue-standalone">
+  <header class="catalogue-standalone-header">
+    <div class="catalogue-standalone-inner catalogue-standalone-header-inner catalogue-standalone-header-inner--logos">
+      <a class="catalogue-header-ms" href="index.html" title="Marie Sallantin — accueil">
+        <img
+          class="catalogue-header-ms-logo"
+          src="images/logoMS.png"
+          alt="Marie Sallantin"
+          width="240"
+          height="96"
+        />
+      </a>
+      <div class="catalogue-header-text catalogue-header-text--center">
+        <h1>Collectionneurs</h1>
+        <p class="catalogue-header-subtitle">Provenance des œuvres — édition privée</p>
+      </div>
+      <a
+        class="catalogue-header-adagp"
+        href="https://www.adagp.fr"
+        target="_blank"
+        rel="noopener noreferrer"
+        title="ADAGP — Société des auteurs dans les arts graphiques et plastiques"
+      >
+        <img
+          class="catalogue-header-adagp-logo"
+          src="images/ADAGP_logo.png"
+          alt="ADAGP"
+          width="120"
+          height="48"
+        />
+      </a>
+    </div>
+  </header>
+
+  <div id="collectors-login" class="catalogue-login">
+    <div class="catalogue-login-box">
+      <h1 class="catalogue-login-title">Collectionneurs</h1>
+      <p class="catalogue-intro" style="margin-bottom: 16px;">
+        Édition des fiches collectionneurs (Supabase). Le <strong>code</strong> (COL####) est stable ; le <strong>nom</strong> est modifiable.
+      </p>
+      <label class="catalogue-login-label" for="collectors-pass">Mot de passe</label>
+      <input type="password" id="collectors-pass" class="catalogue-login-input" autocomplete="current-password" />
+      <button type="button" id="collectors-login-btn" class="catalogue-login-submit">Ouvrir l’éditeur</button>
+      <p id="collectors-login-error" class="catalogue-login-error" hidden></p>
+      <p class="legend-editor-api-hint" id="collectors-api-hint"></p>
+    </div>
+  </div>
+
+  <div id="collectors-app" class="catalogue-app" hidden>
+    <main class="catalogue-page">
+      <div class="catalogue-standalone-inner catalogue-standalone-main">
+        <p class="catalogue-intro">
+          Modifiez le nom, le type, les coordonnées et les notes. Enregistrez avant de quitter la page.
+          L’API locale doit tourner : <code>npm run collectors:api</code> puis ouvrir
+          <a href="http://127.0.0.1:47832/">http://127.0.0.1:47832/</a>
+        </p>
+
+        <div class="legend-editor-toolbar">
+          <p class="catalogue-count" id="collectors-count" aria-live="polite">0 collectionneur(s)</p>
+          <div class="catalogue-edit-tools">
+            <button type="button" class="legend-editor-btn" id="collectors-add-btn">+ Nouveau</button>
+            <button type="button" class="legend-editor-btn legend-editor-btn--primary" id="collectors-save-btn" disabled>
+              Enregistrer les modifications
+            </button>
+            <button type="button" class="legend-editor-btn" id="collectors-reload-btn">Recharger</button>
+          </div>
+        </div>
+
+        <p id="collectors-status" class="legend-editor-api-hint" aria-live="polite"></p>
+
+        <div class="legend-editor-table-wrap">
+          <table class="catalogue-table legend-editor-table collectors-editor-table">
+            <thead>
+              <tr>
+                <th scope="col">Code</th>
+                <th scope="col">Nom</th>
+                <th scope="col">Type</th>
+                <th scope="col">Prénom</th>
+                <th scope="col">Téléphone</th>
+                <th scope="col">E-mail</th>
+                <th scope="col">Notes</th>
+                <th scope="col">Œuvres</th>
+                <th scope="col"></th>
+              </tr>
+            </thead>
+            <tbody id="collectors-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="collectors.js"></script>
+</body>
+</html>

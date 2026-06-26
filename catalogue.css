@@ -43,6 +43,65 @@ body.catalogue-standalone {
   flex-wrap: wrap;
 }
 
+.catalogue-standalone-header-inner--logos {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px 22px;
+}
+
+.catalogue-header-ms {
+  flex-shrink: 0;
+  display: inline-block;
+  line-height: 0;
+}
+
+.catalogue-header-ms:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+.catalogue-header-ms-logo {
+  height: 96px;
+  width: auto;
+  max-width: min(320px, 64vw);
+  object-fit: contain;
+  vertical-align: middle;
+}
+
+.catalogue-header-text--center {
+  text-align: center;
+  min-width: 0;
+}
+
+.catalogue-header-text--center h1 {
+  margin-bottom: 4px;
+}
+
+@media (max-width: 640px) {
+  .catalogue-standalone-header-inner--logos {
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      'ms adagp'
+      'title title';
+  }
+
+  .catalogue-header-ms {
+    grid-area: ms;
+  }
+
+  .catalogue-header-adagp {
+    grid-area: adagp;
+    justify-self: end;
+  }
+
+  .catalogue-header-text--center {
+    grid-area: title;
+    text-align: left;
+  }
+}
+
 .catalogue-header-adagp {
   flex-shrink: 0;
   display: inline-block;
@@ -207,6 +266,41 @@ body.catalogue-standalone {
   align-items: center;
   justify-content: space-between;
   gap: 12px 20px;
+}
+
+.catalogue-edit-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catalogue-edit-toggle,
+.catalogue-edit-export,
+.catalogue-row-edit-btn,
+.catalogue-multiselect-toggle,
+.catalogue-edit-save {
+  font: inherit;
+  border: 1px solid var(--border);
+  background: #fff;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.catalogue-edit-toggle,
+.catalogue-edit-export {
+  padding: 8px 12px;
+  font-size: 0.86rem;
+}
+
+.catalogue-edit-toggle[aria-pressed='true'] {
+  border-color: #1b5e20;
+  color: #1b5e20;
+  background: #e8f4ea;
+}
+
+.catalogue-edit-export:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .catalogue-pagination {
@@ -479,6 +573,16 @@ body.catalogue-standalone {
 .catalogue-table td.col-legende {
   line-height: 1.4;
   color: var(--primary);
+}
+
+.catalogue-row-edit-btn {
+  padding: 5px 10px;
+  font-size: 0.8rem;
+}
+
+.catalogue-edit-col {
+  width: 82px;
+  text-align: center;
 }
 
 .catalogue-table .col-publish {
@@ -785,6 +889,131 @@ body.catalogue-standalone {
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
+.catalogue-edit-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10020;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.catalogue-edit-dialog {
+  border: none;
+  border-radius: 12px;
+  padding: 0;
+  width: min(1080px, 94vw);
+  max-width: 94vw;
+  max-height: 90vh;
+  z-index: 10021;
+}
+
+.catalogue-edit-dialog::backdrop {
+  background: transparent;
+}
+
+.catalogue-edit-close {
+  position: absolute;
+  right: 12px;
+  top: 8px;
+  border: none;
+  background: transparent;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+.catalogue-edit-layout {
+  display: grid;
+  grid-template-columns: minmax(320px, 46%) minmax(320px, 54%);
+  gap: 18px;
+  padding: 18px;
+}
+
+.catalogue-edit-left {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.catalogue-edit-image {
+  width: 100%;
+  max-height: 72vh;
+  object-fit: contain;
+  border-radius: 8px;
+  background: #f2f3f7;
+}
+
+.catalogue-edit-id {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--secondary);
+}
+
+.catalogue-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.catalogue-edit-form h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.catalogue-edit-label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 0.85rem;
+}
+
+.catalogue-edit-label textarea,
+.catalogue-edit-label input,
+.catalogue-edit-label select {
+  font: inherit;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.catalogue-multiselect-toggle {
+  text-align: left;
+  padding: 9px 10px;
+}
+
+.catalogue-multiselect-panel {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px;
+  max-height: 180px;
+  overflow: auto;
+  background: #fff;
+}
+
+.catalogue-series-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.82rem;
+  margin: 3px 0;
+}
+
+.catalogue-edit-error {
+  margin: 2px 0 0;
+  color: #b00020;
+  font-size: 0.84rem;
+}
+
+.catalogue-edit-actions {
+  margin-top: 6px;
+}
+
+.catalogue-edit-save {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  padding: 10px 12px;
+  font-weight: 600;
+}
+
 @media (max-width: 900px) {
   .catalogue-page {
     padding: 0 12px 32px;
@@ -795,4 +1024,127 @@ body.catalogue-standalone {
     padding: 8px;
     font-size: 0.8rem;
   }
+
+  .catalogue-edit-layout {
+    grid-template-columns: 1fr;
+    max-height: 86vh;
+    overflow: auto;
+  }
+}
+
+/* Éditeur collectionneurs */
+.collectors-editor-table .collectors-code-cell {
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  color: var(--secondary);
+}
+
+.collectors-editor-table .collectors-count-cell {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+
+.collectors-count-cell--has-works {
+  cursor: help;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.collectors-count-cell--has-works:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.collectors-works-popover {
+  position: fixed;
+  z-index: 10000;
+  max-width: min(480px, 94vw);
+  max-height: min(400px, 65vh);
+  overflow: auto;
+  padding: 10px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.14);
+  pointer-events: none;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.collectors-works-popover-heading {
+  margin: 0 0 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--secondary);
+}
+
+.collectors-works-popover ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.collectors-works-popover li {
+  padding: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.collectors-works-popover-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 0;
+}
+
+.collectors-works-popover-thumb {
+  flex-shrink: 0;
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--background);
+}
+
+.collectors-works-popover-thumb--empty {
+  display: inline-block;
+  background: var(--border);
+}
+
+.collectors-works-popover-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.collectors-works-popover li:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.collectors-works-popover-id {
+  display: inline-block;
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  margin-right: 6px;
+  white-space: nowrap;
+}
+
+.collectors-works-popover-title {
+  color: var(--secondary);
+}
+
+.collectors-editor-table .legend-input {
+  min-width: 7rem;
+}
+
+.collectors-editor-table td:nth-child(7) .legend-input {
+  min-width: 10rem;
 }

@@ -99,12 +99,15 @@
       const photo = w.photo != null ? String(w.photo).trim() : 'OK';
       const dimensions = w.dimensions != null ? String(w.dimensions).trim() : '';
       const tailleMo = w.tailleMo != null && w.tailleMo !== '' ? Number(w.tailleMo) : null;
+      const format = w.format != null ? String(w.format).trim().toUpperCase() : '';
+      const year = w.year != null ? String(w.year).trim() : '';
+      const technique = w.technique != null ? String(w.technique).trim().toUpperCase() : '';
       const fileName = media.includes('/') ? media.slice(media.indexOf('/') + 1) : media;
       let publish = w.publish != null ? String(w.publish).trim().toUpperCase() : '';
       if (publish !== 'ON' && publish !== 'OFF' && publish !== 'VAL') {
         publish = inferPublishFromBasename(fileName);
       }
-      return { id, media, title, series, photo, publish, dimensions, tailleMo };
+      return { id, media, title, series, photo, publish, dimensions, tailleMo, format, year, technique };
     });
 
     return buildStructures(seriesOrder, seriesNames, works);
@@ -126,6 +129,9 @@
         publish: w.publish,
         dimensions: w.dimensions,
         tailleMo: w.tailleMo,
+        format: w.format,
+        year: w.year,
+        technique: w.technique,
       };
       w.series.forEach((code) => {
         if (!allSeries[code]) {

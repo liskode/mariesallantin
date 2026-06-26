@@ -5,6 +5,33 @@
 (function () {
   const MEDIA_BASE = 'media/';
   const stateUrl = MEDIA_BASE + 'catalog-state.json';
+  const WORKS_URL = MEDIA_BASE + 'works.json';
+  const EDIT_CODES_URL = MEDIA_BASE + 'editor-codes.json';
+  const EDIT_PASS = 'MS75';
+  const EDIT_AUTH_KEY = 'catalogue_edit_mode_ok';
+
+  const DEFAULT_EDIT_CODES = {
+    formats: [
+      { code: 'HF23', label: '200x300' },
+      { code: 'HF21', label: '210x' },
+      { code: 'HF03', label: '' },
+      { code: 'HF04', label: '' },
+      { code: 'HF05', label: '' },
+      { code: 'HF06', label: '' },
+      { code: 'HF07', label: '' },
+      { code: 'HF08', label: '' },
+      { code: 'HF09', label: '' },
+    ],
+    techniques: [
+      { code: 'TST', label: 'Tempera sur toile' },
+      { code: 'TSB', label: 'Tempera sur bois' },
+      { code: 'INK', label: 'Encre sur papier' },
+      { code: 'HUI', label: 'Huile sur toile' },
+      { code: 'AST', label: 'Acrylique sur toile' },
+      { code: 'ASB', label: 'Acrylique sur bois' },
+    ],
+    series: [],
+  };
 
   /** Extensions pour lesquelles on lit largeur × hauteur via decode navigateur. */
   const RASTER_IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.avif']);
@@ -136,6 +163,11 @@
 
   let sortColumn = 'order';
   let sortDir = 'asc';
+  let editMode = false;
+  let editCodes = DEFAULT_EDIT_CODES;
+  let worksRawPayload = null;
+  let activeEditRowIndex = -1;
+  const dirtyWorksIds = new Set();
 
   /** @type {string[]} */
   let catalogSeriesOrder = [];
@@ -209,6 +241,10 @@
         w.tailleMo != null && w.tailleMo !== '' && !Number.isNaN(Number(w.tailleMo))
           ? Number(w.tailleMo)
           : null;
+      const formatCode = w.format != null ? String(w.format).trim().toUpperCase() : '';
+      const year = w.year != null && String(w.year).trim() !== '' ? String(w.year).trim() : '';
+      const techniqueCode =
+        w.technique != null ? String(w.technique).trim().toUpperCase() : '';
       const thumbUrl = MEDIA_BASE + fp;
       const thumbRelWebp = webThumbRelFromMediaFp(fp);
       const displayThumbUrl = thumbRelWebp ? MEDIA_BASE + thumbRelWebp : thumbUrl;
@@ -229,6 +265,9 @@
         publish,
         dimensions,
         tailleMo,
+        format: formatCode,
+        year,
+        technique: techniqueCode,
       };
     });
   }
@@ -263,6 +302,35 @@
     const div = document.createElement('div');
     div.textContent = s;
     return div.innerHTML;
+  }
+
+  function normalizeCodeEntries(entries) {
+    if (!Array.isArray(entries)) return [];
+    return entries
+      .map((x) => {
+        if (!x) return null;
+        if (typeof x === 'string') return { code: x.trim().toUpperCase(), label: '' };
+        const code = String(x.code || '').trim().toUpperCase();
+        const label = String(x.label || '').trim();
+        if (!code) return null;
+        return { code, label };
+      })
+      .filter(Boolean);
+  }
+
+  async function loadEditCodes() {
+    try {
+      const r = await fetch(EDIT_CODES_URL, { cache: 'no-store' });
+      if (!r.ok) return DEFAULT_EDIT_CODES;
+      const j = await r.json();
+      return {
+        formats: normalizeCodeEntries(j.formats || DEFAULT_EDIT_CODES.formats),
+        techniques: normalizeCodeEntries(j.techniques || DEFAULT_EDIT_CODES.techniques),
+        series: normalizeCodeEntries(j.series || []),
+      };
+    } catch {
+      return DEFAULT_EDIT_CODES;
+    }
   }
 
   /** Encode chaque segment de chemin (espaces, accents) pour les attributs src/href. */
@@ -564,6 +632,13 @@
       if (!rowEl) return;
       const thumb = rowEl.querySelector('.catalogue-thumb');
       if (thumb) attachPreview(thumb, r.fullImageSrc);
+      const editBtn = rowEl.querySelector('.catalogue-row-edit-btn');
+      if (editBtn) {
+        editBtn.addEventListener('click', () => {
+          const targetIndex = allRows.findIndex((x) => x.id === r.id);
+          if (targetIndex >= 0) openEditDialog(targetIndex);
+        });
+      }
     });
 
     updateCount(slice.length, n);
@@ -624,6 +699,9 @@
       '<td>' +
       renderEtat(etatDisplay) +
       '</td>' +
+      (editMode
+        ? '<td class="catalogue-edit-col"><button type="button" class="catalogue-row-edit-btn">Edit</button></td>'
+        : '') +
       '</tr>'
     );
   }
@@ -721,6 +799,280 @@
     });
   }
 
+  function ensureEditHeader() {
+    const headRow = document.querySelector('#catalogue-thead tr');
+    if (!headRow) return;
+    const existing = headRow.querySelector('.catalogue-edit-col-head');
+    if (editMode && !existing) {
+      const th = document.createElement('th');
+      th.className = 'catalogue-th catalogue-edit-col catalogue-edit-col-head';
+      th.scope = 'col';
+      th.textContent = 'Edition';
+      headRow.appendChild(th);
+      return;
+    }
+    if (!editMode && existing) existing.remove();
+  }
+
+  function updateEditExportButton() {
+    const btn = document.getElementById('catalogue-edit-export');
+    if (!btn) return;
+    const n = dirtyWorksIds.size;
+    btn.disabled = n === 0 || !worksRawPayload;
+    btn.textContent = n > 0 ? `Telecharger works.json modifie (${n})` : 'Telecharger works.json modifie';
+  }
+
+  function getSeriesOptions() {
+    const opts = new Map();
+    (editCodes.series || []).forEach((x) => {
+      opts.set(x.code, x.label || catalogSeriesNames[x.code] || x.code);
+    });
+    Object.keys(catalogSeriesNames).forEach((code) => {
+      if (!opts.has(code)) opts.set(code, catalogSeriesNames[code] || code);
+    });
+    allRows.forEach((r) => {
+      (r.seriesCodes || []).forEach((code) => {
+        if (!opts.has(code)) opts.set(code, catalogSeriesNames[code] || code);
+      });
+    });
+    return [...opts.entries()]
+      .map(([code, label]) => ({ code, label }))
+      .sort((a, b) => a.code.localeCompare(b.code, 'fr'));
+  }
+
+  function fillCodeSelect(selectEl, options, placeholder) {
+    if (!selectEl) return;
+    selectEl.innerHTML = '';
+    const optEmpty = document.createElement('option');
+    optEmpty.value = '';
+    optEmpty.textContent = placeholder;
+    selectEl.appendChild(optEmpty);
+    options.forEach((x) => {
+      const o = document.createElement('option');
+      o.value = x.code;
+      o.textContent = x.label ? `${x.code} — ${x.label}` : x.code;
+      selectEl.appendChild(o);
+    });
+  }
+
+  function renderSeriesPanel(selectedCodes) {
+    const panel = document.getElementById('catalogue-edit-series-panel');
+    if (!panel) return;
+    const opts = getSeriesOptions();
+    panel.innerHTML = '';
+    opts.forEach((x) => {
+      const label = document.createElement('label');
+      label.className = 'catalogue-series-option';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = x.code;
+      cb.checked = selectedCodes.includes(x.code);
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(x.label ? `${x.code} — ${x.label}` : x.code));
+      panel.appendChild(label);
+    });
+  }
+
+  function readSelectedSeriesCodes() {
+    const panel = document.getElementById('catalogue-edit-series-panel');
+    if (!panel) return [];
+    return [...panel.querySelectorAll('input[type="checkbox"]:checked')]
+      .map((el) => String(el.value || '').trim().toUpperCase())
+      .filter(Boolean);
+  }
+
+  function updateSeriesToggleText() {
+    const btn = document.getElementById('catalogue-edit-series-toggle');
+    if (!btn) return;
+    const selected = readSelectedSeriesCodes();
+    btn.textContent = selected.length
+      ? selected.join(', ')
+      : 'Choisir...';
+  }
+
+  function closeEditDialog() {
+    const dlg = document.getElementById('catalogue-edit-dialog');
+    const backdrop = document.getElementById('catalogue-edit-backdrop');
+    if (backdrop) backdrop.hidden = true;
+    if (dlg && typeof dlg.close === 'function') dlg.close();
+    activeEditRowIndex = -1;
+    const err = document.getElementById('catalogue-edit-error');
+    if (err) {
+      err.hidden = true;
+      err.textContent = '';
+    }
+  }
+
+  function openEditDialog(rowIndex) {
+    if (!editMode) return;
+    const row = allRows[rowIndex];
+    if (!row) return;
+    activeEditRowIndex = rowIndex;
+    const dlg = document.getElementById('catalogue-edit-dialog');
+    const backdrop = document.getElementById('catalogue-edit-backdrop');
+    const img = document.getElementById('catalogue-edit-image');
+    const id = document.getElementById('catalogue-edit-id');
+    const titleInput = document.getElementById('catalogue-edit-title-input');
+    const yearInput = document.getElementById('catalogue-edit-year');
+    const formatSel = document.getElementById('catalogue-edit-format');
+    const techniqueSel = document.getElementById('catalogue-edit-technique');
+
+    if (!dlg || !img || !id || !titleInput || !yearInput || !formatSel || !techniqueSel) return;
+
+    img.src = row.fullImageSrc;
+    id.textContent = `${row.id} — ${row.fileName}`;
+    titleInput.value = row.title || '';
+    yearInput.value = row.year || '';
+    fillCodeSelect(formatSel, editCodes.formats || [], 'Aucun format');
+    fillCodeSelect(techniqueSel, editCodes.techniques || [], 'Aucune technique');
+    formatSel.value = row.format || '';
+    techniqueSel.value = row.technique || '';
+
+    renderSeriesPanel(row.seriesCodes || []);
+    const panel = document.getElementById('catalogue-edit-series-panel');
+    if (panel) panel.hidden = true;
+    updateSeriesToggleText();
+    if (backdrop) backdrop.hidden = false;
+    if (typeof dlg.showModal === 'function') dlg.showModal();
+  }
+
+  function validateYear(v) {
+    const t = String(v || '').trim();
+    if (!t) return '';
+    if (!/^\d{4}$/.test(t)) return null;
+    return t;
+  }
+
+  function saveCurrentEdit() {
+    if (activeEditRowIndex < 0) return;
+    const row = allRows[activeEditRowIndex];
+    if (!row) return;
+    const err = document.getElementById('catalogue-edit-error');
+    const titleInput = document.getElementById('catalogue-edit-title-input');
+    const yearInput = document.getElementById('catalogue-edit-year');
+    const formatSel = document.getElementById('catalogue-edit-format');
+    const techniqueSel = document.getElementById('catalogue-edit-technique');
+    if (!titleInput || !yearInput || !formatSel || !techniqueSel) return;
+
+    const parsedYear = validateYear(yearInput.value);
+    if (parsedYear == null) {
+      if (err) {
+        err.hidden = false;
+        err.textContent = 'Annee invalide : saisir 4 chiffres (ex: 1987).';
+      }
+      return;
+    }
+    if (err) {
+      err.hidden = true;
+      err.textContent = '';
+    }
+
+    row.title = titleInput.value.trim();
+    row.seriesCodes = readSelectedSeriesCodes();
+    row.seriesName = row.seriesCodes.length
+      ? row.seriesCodes.map((c) => catalogSeriesNames[c] || c).join(' · ')
+      : 'non renseigné';
+    row.format = String(formatSel.value || '').trim().toUpperCase();
+    row.technique = String(techniqueSel.value || '').trim().toUpperCase();
+    row.year = parsedYear;
+    dirtyWorksIds.add(row.id);
+    updateEditExportButton();
+    closeEditDialog();
+    renderCatalogue({ resetPage: false });
+  }
+
+  function buildUpdatedWorksPayload() {
+    if (!worksRawPayload || !Array.isArray(worksRawPayload.works)) return null;
+    const byId = new Map(allRows.map((r) => [r.id, r]));
+    const nextWorks = worksRawPayload.works.map((w) => {
+      const r = byId.get(w.id);
+      if (!r) return w;
+      const next = {
+        ...w,
+        title: r.title,
+        series: r.seriesCodes || [],
+      };
+      if (r.format) next.format = r.format;
+      else delete next.format;
+      if (r.technique) next.technique = r.technique;
+      else delete next.technique;
+      if (r.year) next.year = r.year;
+      else delete next.year;
+      return next;
+    });
+    return { ...worksRawPayload, works: nextWorks };
+  }
+
+  function downloadUpdatedWorksJson() {
+    const p = buildUpdatedWorksPayload();
+    if (!p) return;
+    const blob = new Blob([JSON.stringify(p, null, 2) + '\n'], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'works.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function setEditMode(nextMode) {
+    editMode = !!nextMode;
+    const toggle = document.getElementById('catalogue-edit-toggle');
+    if (toggle) {
+      toggle.setAttribute('aria-pressed', editMode ? 'true' : 'false');
+      toggle.textContent = editMode ? 'Mode edition: ON' : 'Mode edition: OFF';
+    }
+    ensureEditHeader();
+    renderCatalogue({ resetPage: false });
+  }
+
+  function bindEditControls() {
+    const toggle = document.getElementById('catalogue-edit-toggle');
+    const exportBtn = document.getElementById('catalogue-edit-export');
+    const closeBtn = document.getElementById('catalogue-edit-close');
+    const backdrop = document.getElementById('catalogue-edit-backdrop');
+    const form = document.getElementById('catalogue-edit-form');
+    const seriesToggle = document.getElementById('catalogue-edit-series-toggle');
+    const seriesPanel = document.getElementById('catalogue-edit-series-panel');
+    if (!toggle || !exportBtn || !form || !seriesToggle || !seriesPanel) return;
+
+    toggle.addEventListener('click', () => {
+      if (editMode) {
+        setEditMode(false);
+        sessionStorage.removeItem(EDIT_AUTH_KEY);
+        closeEditDialog();
+        return;
+      }
+      const pass = window.prompt('Mot de passe mode edition :');
+      if (pass !== EDIT_PASS) {
+        window.alert('Mot de passe invalide.');
+        return;
+      }
+      sessionStorage.setItem(EDIT_AUTH_KEY, '1');
+      setEditMode(true);
+    });
+
+    exportBtn.addEventListener('click', () => {
+      downloadUpdatedWorksJson();
+    });
+
+    closeBtn?.addEventListener('click', closeEditDialog);
+    backdrop?.addEventListener('click', closeEditDialog);
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeEditDialog();
+    });
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      saveCurrentEdit();
+    });
+    seriesToggle.addEventListener('click', () => {
+      seriesPanel.hidden = !seriesPanel.hidden;
+    });
+    seriesPanel.addEventListener('change', () => updateSeriesToggleText());
+
+    if (sessionStorage.getItem(EDIT_AUTH_KEY) === '1') setEditMode(true);
+    updateEditExportButton();
+  }
+
   function startCatalogue() {
     if (typeof WorksCatalog === 'undefined') {
       console.error('works-catalog.js doit être chargé avant catalogue.js');
@@ -737,8 +1089,14 @@
       fetch(stateUrl)
         .then((r) => (r.ok ? r.json() : {}))
         .catch(() => ({})),
+      fetch(WORKS_URL)
+        .then((r) => (r.ok ? r.json() : null))
+        .catch(() => null),
+      loadEditCodes(),
     ])
-      .then(([data, state]) => {
+      .then(([data, state, rawWorks, loadedCodes]) => {
+        worksRawPayload = rawWorks;
+        editCodes = loadedCodes || DEFAULT_EDIT_CODES;
         const baseRows = buildRowsFromWorksData(data);
         allRows = baseRows.map((r) => {
           const etatRaw = state[r.id] != null ? state[r.id] : state[r.filePath];
@@ -757,6 +1115,7 @@
         updateSortHeaderUI();
 
         bindPaginationControls();
+        bindEditControls();
         renderCatalogue();
         container.querySelector('.catalogue-loading')?.remove();
         void probeAllRowImages(allRows);
