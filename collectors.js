@@ -1,18 +1,156 @@
 /**
- * Éditeur collectionneurs (Supabase via API locale collectors-editor-api).
+ * Éditeur collectionneurs — API locale (dev) ou Edge Function Supabase (en ligne).
  */
 (function () {
   const EDIT_PASS = 'MS75';
   const AUTH_KEY = 'collectors_edit_ok';
   const COLLECTOR_TYPES = ['Galerie', 'Institutions', 'Particulier'];
+  const MEDIA_BASE = 'media/';
+  const RASTER_EXT = new Set([
+    '.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tif', '.tiff', '.avif',
+  ]);
 
-  function apiBase() {
-    if (typeof window !== 'undefined' && window.location.port === '47832') {
-      return window.location.origin;
+  /** @type {{ collectorsApiUrl?: string, anonKey?: string } | null} */
+  let siteConfig = null;
+  /** @type {string} */
+  let resolvedApiBase = '';
+  /** @type {Map<string, string> | null} */
+  let workMediaById = null;
+
+  async function loadSiteConfig() {
+    if (siteConfig) return siteConfig;
+    siteConfig = {};
+    try {
+      const r = await fetch(MEDIA_BASE + 'collectors-config.json', { cache: 'no-store' });
+      if (r.ok) siteConfig = await r.json();
+    } catch {
+      /* config optionnelle */
     }
-    const el = document.querySelector('meta[name="collectors-api"]');
-    const u = el && el.getAttribute('content');
-    return String(u || '').trim() || 'http://127.0.0.1:47832';
+    return siteConfig;
+  }
+
+  function isLocalDevServer() {
+    return typeof window !== 'undefined' && window.location.port === '47832';
+  }
+
+  async function apiBase() {
+    if (resolvedApiBase) return resolvedApiBase;
+    if (isLocalDevServer()) {
+      resolvedApiBase = window.location.origin;
+      return resolvedApiBase;
+    }
+    const cfg = await loadSiteConfig();
+    const fromMeta = document.querySelector('meta[name="collectors-api"]');
+    const metaUrl = fromMeta && fromMeta.getAttribute('content');
+    if (metaUrl && !metaUrl.includes('127.0.0.1')) {
+      resolvedApiBase = String(metaUrl).trim().replace(/\/$/, '');
+      return resolvedApiBase;
+    }
+    if (cfg.collectorsApiUrl) {
+      resolvedApiBase = String(cfg.collectorsApiUrl).trim().replace(/\/$/, '');
+      return resolvedApiBase;
+    }
+    resolvedApiBase = 'http://127.0.0.1:47832';
+    return resolvedApiBase;
+  }
+
+  function isOnlineApi(base) {
+    return base.includes('supabase.co');
+  }
+
+  async function supabaseAnonKey() {
+    const cfg = await loadSiteConfig();
+    if (cfg.anonKey) return String(cfg.anonKey).trim();
+    const meta = document.querySelector('meta[name="supabase-anon-key"]');
+    return meta ? String(meta.getAttribute('content') || '').trim() : '';
+  }
+
+  async function apiFetch(pathAndQuery, init) {
+    const base = await apiBase();
+    const headers = new Headers((init && init.headers) || {});
+    if (init && init.body && !headers.has('Content-Type')) {
+      headers.set('Content-Type', 'application/json');
+    }
+    if (isOnlineApi(base)) {
+      const anon = await supabaseAnonKey();
+      if (!anon) {
+        throw new Error(
+          'Clé anon Supabase manquante : renseignez anonKey dans media/collectors-config.json'
+        );
+      }
+      headers.set('apikey', anon);
+      headers.set('Authorization', 'Bearer ' + anon);
+    }
+    return fetch(base + pathAndQuery, { ...init, headers });
+  }
+
+  function pathExtLower(filePart) {
+    const i = filePart.lastIndexOf('.');
+    return i >= 0 ? filePart.slice(i).toLowerCase() : '';
+  }
+
+  function webThumbRelFromMediaFp(mediaFp) {
+    const fp = String(mediaFp || '').trim().replace(/\\/g, '/');
+    if (!fp.toLowerCase().startsWith('catalogue/')) return null;
+    const rest = fp.slice('catalogue/'.length);
+    const lastSlash = rest.lastIndexOf('/');
+    const filePart = lastSlash >= 0 ? rest.slice(lastSlash + 1) : rest;
+    if (!RASTER_EXT.has(pathExtLower(filePart))) return null;
+    const stem = filePart.replace(/\.[^.]+$/i, '');
+    const dirPart = lastSlash >= 0 ? rest.slice(0, lastSlash) : '';
+    return dirPart
+      ? 'catalogue/_thumbs/' + dirPart + '/' + stem + '.webp'
+      : 'catalogue/_thumbs/' + stem + '.webp';
+  }
+
+  function encodeMediaPath(url) {
+    return String(url)
+      .split('/')
+      .map((seg, i) =>
+        i === 0 ? seg : encodeURIComponent(String(seg).normalize('NFC'))
+      )
+      .join('/');
+  }
+
+  function workImageUrlsFromMedia(mediaFp) {
+    const rel = String(mediaFp || '').trim().replace(/\\/g, '/');
+    if (!rel) return { thumb_url: null, full_url: null };
+    const thumbRel = webThumbRelFromMediaFp(rel);
+    const full_url = MEDIA_BASE + encodeMediaPath(rel);
+    const thumb_url = thumbRel ? MEDIA_BASE + encodeMediaPath(thumbRel) : full_url;
+    return { thumb_url, full_url };
+  }
+
+  async function loadWorkMediaMap() {
+    if (workMediaById) return workMediaById;
+    workMediaById = new Map();
+    try {
+      const r = await fetch(MEDIA_BASE + 'works.json', { cache: 'default' });
+      if (r.ok) {
+        const j = await r.json();
+        for (const w of j.works || []) {
+          if (w.id && w.media) workMediaById.set(w.id, String(w.media));
+        }
+      }
+    } catch {
+      /* vignettes optionnelles */
+    }
+    return workMediaById;
+  }
+
+  async function enrichCollectorsWithThumbs(list) {
+    const base = await apiBase();
+    if (isLocalDevServer() || !isOnlineApi(base)) return list;
+    const mediaMap = await loadWorkMediaMap();
+    for (const c of list) {
+      for (const w of c.works || []) {
+        if (w.thumb_url) continue;
+        const urls = workImageUrlsFromMedia(mediaMap.get(w.id));
+        w.thumb_url = urls.thumb_url;
+        w.full_url = urls.full_url;
+      }
+    }
+    return list;
   }
 
   const loginEl = document.getElementById('collectors-login');
@@ -41,18 +179,25 @@
 
   async function checkApiHealth() {
     try {
-      const r = await fetch(apiBase() + '/api/health');
+      const base = await apiBase();
+      const r = await apiFetch('/api/health');
       const j = await r.json();
       if (apiHint) {
-        apiHint.textContent = j.ok
-          ? 'API locale détectée (' + apiBase() + ').'
-          : 'API locale : réponse inattendue.';
+        if (j.ok) {
+          apiHint.textContent = isOnlineApi(base)
+            ? 'API en ligne (Supabase Edge Function).'
+            : 'API locale détectée (' + base + ').';
+        } else {
+          apiHint.textContent = 'API : réponse inattendue.';
+        }
       }
       return !!j.ok;
-    } catch {
+    } catch (e) {
       if (apiHint) {
-        apiHint.textContent =
-          'API non joignable. Lancez : npm run collectors:api (' + apiBase() + ')';
+        const base = await apiBase();
+        apiHint.textContent = isOnlineApi(base)
+          ? 'API en ligne indisponible. Vérifiez le déploiement Edge Function et anonKey.'
+          : 'API locale non joignable. Lancez : npm run collectors:api';
       }
       return false;
     }
@@ -283,12 +428,10 @@
 
   async function loadCollectors() {
     setStatus('Chargement…');
-    const r = await fetch(
-      apiBase() + '/api/collectors?token=' + encodeURIComponent(token)
-    );
+    const r = await apiFetch('/api/collectors?token=' + encodeURIComponent(token));
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || 'chargement impossible');
-    collectors = j.collectors || [];
+    collectors = await enrichCollectorsWithThumbs(j.collectors || []);
     dirtyCodes.clear();
     if (saveBtn) saveBtn.disabled = true;
     renderTable();
@@ -305,15 +448,14 @@
     saveBtn.disabled = true;
     setStatus('Enregistrement…');
 
-    const r = await fetch(apiBase() + '/api/collectors/save', {
+    const r = await apiFetch('/api/collectors/save', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, collectors: toSave }),
     });
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || 'échec enregistrement');
 
-    collectors = j.collectors || collectors;
+    collectors = await enrichCollectorsWithThumbs(j.collectors || collectors);
     dirtyCodes.clear();
     renderTable();
     setStatus('Enregistré (' + toSave.length + ' fiche(s)).');
@@ -324,9 +466,8 @@
     if (!name || !name.trim()) return;
 
     setStatus('Création…');
-    const r = await fetch(apiBase() + '/api/collectors/create', {
+    const r = await apiFetch('/api/collectors/create', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         token,
         collector: {
@@ -342,7 +483,7 @@
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || 'création impossible');
 
-    collectors = j.collectors || collectors;
+    collectors = await enrichCollectorsWithThumbs(j.collectors || collectors);
     renderTable();
     setStatus('Collectionneur créé : ' + (j.collector && j.collector.code));
   }
@@ -352,9 +493,8 @@
     if (!window.confirm('Supprimer ' + c.code + ' — ' + c.name + ' ?')) return;
 
     setStatus('Suppression…');
-    const r = await fetch(
-      apiBase() +
-        '/api/collectors/' +
+    const r = await apiFetch(
+      '/api/collectors/' +
         encodeURIComponent(c.code) +
         '?token=' +
         encodeURIComponent(token),
@@ -389,7 +529,10 @@
     const apiOk = await checkApiHealth();
     if (!apiOk) {
       if (loginErr) {
-        loginErr.textContent = 'API locale indisponible. Lancez npm run collectors:api';
+        const base = await apiBase();
+        loginErr.textContent = isOnlineApi(base)
+          ? 'API en ligne indisponible (Edge Function ou anonKey).'
+          : 'API locale indisponible. Lancez npm run collectors:api';
         loginErr.hidden = false;
       }
       return;
@@ -426,6 +569,23 @@
     });
   }
 
+  async function updateIntroText() {
+    const el = document.getElementById('collectors-intro');
+    if (!el) return;
+    const base = await apiBase();
+    if (isOnlineApi(base)) {
+      el.textContent =
+        'Éditeur en ligne — données Supabase. Enregistrez avant de quitter. Les vignettes sont servies depuis ce site.';
+    } else if (isLocalDevServer()) {
+      el.textContent =
+        'Mode développement local : API et fichiers media sur cette machine.';
+    } else {
+      el.textContent =
+        'Développement local : npm run collectors:api puis http://127.0.0.1:47832/';
+    }
+  }
+
+  updateIntroText();
   checkApiHealth();
   if (sessionStorage.getItem(AUTH_KEY) === '1' && passEl) {
     passEl.value = EDIT_PASS;

@@ -1,0 +1,5 @@
+# Supabase local / Edge Functions
+# https://supabase.com/docs/guides/functions
+
+[functions.collectors-api]
+verify_jwt = false

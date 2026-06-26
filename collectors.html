@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex,nofollow" />
-  <meta name="collectors-api" content="http://127.0.0.1:47832" />
   <title>Collectionneurs — édition</title>
   <link rel="stylesheet" href="catalogue.css" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
@@ -61,10 +60,8 @@
   <div id="collectors-app" class="catalogue-app" hidden>
     <main class="catalogue-page">
       <div class="catalogue-standalone-inner catalogue-standalone-main">
-        <p class="catalogue-intro">
+        <p class="catalogue-intro" id="collectors-intro">
           Modifiez le nom, le type, les coordonnées et les notes. Enregistrez avant de quitter la page.
-          L’API locale doit tourner : <code>npm run collectors:api</code> puis ouvrir
-          <a href="http://127.0.0.1:47832/">http://127.0.0.1:47832/</a>
         </p>
 
         <div class="legend-editor-toolbar">
