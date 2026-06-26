@@ -21,7 +21,7 @@
   let seriesList = [];
   const dirtyCodes = new Set();
   let token = '';
-  /** @type {{ series: object, iconImg: HTMLImageElement, workInput: HTMLInputElement, tr: HTMLTableRowElement } | null} */
+  /** @type {{ series: object, iconImg: HTMLImageElement, tr: HTMLTableRowElement } | null} */
   let vignettePickerCtx = null;
 
   const loginEl = document.getElementById('series-login');
@@ -210,6 +210,11 @@
     updateSaveBtn();
   }
 
+  function thumbPlaceholderFromImg(imgEl) {
+    const btn = imgEl && imgEl.parentElement;
+    return btn ? btn.querySelector('.series-icon-placeholder') : null;
+  }
+
   function updateIconPreview(imgEl, workId) {
     if (!imgEl) return;
     const url = thumbUrlForWorkId(workId);
@@ -259,9 +264,9 @@
     if (vignetteDialog && vignetteDialog.open) vignetteDialog.close();
   }
 
-  function openVignettePicker(seriesObj, iconImg, workInput, tr) {
+  function openVignettePicker(seriesObj, iconImg, tr) {
     if (!vignetteDialog || !vignetteMosaic) return;
-    vignettePickerCtx = { series: seriesObj, iconImg, workInput, tr };
+    vignettePickerCtx = { series: seriesObj, iconImg, tr };
     const works = worksBySeries.get(seriesObj.code) || [];
     const label = seriesObj.label || seriesObj.code;
 
@@ -314,8 +319,9 @@
         btn.appendChild(idEl);
         btn.addEventListener('click', () => {
           seriesObj.icon_work_id = w.id;
-          if (workInput) workInput.value = w.id;
           updateIconPreview(iconImg, w.id);
+          const ph = thumbPlaceholderFromImg(iconImg);
+          if (ph) ph.hidden = true;
           markDirty(seriesObj.code);
           tr.classList.add('legend-editor-row--dirty');
           closeVignetteDialog();
@@ -378,26 +384,11 @@
       thumbBtn.appendChild(iconImg);
       thumbBtn.appendChild(placeholder);
 
-      const workInput = document.createElement('input');
-      workInput.type = 'text';
-      workInput.className = 'legend-input series-work-id-input';
-      workInput.placeholder = 'MS####';
-      workInput.maxLength = 6;
-      workInput.value = s.icon_work_id || '';
-      workInput.addEventListener('input', () => {
-        s.icon_work_id = workInput.value.trim().toUpperCase();
-        placeholder.hidden = !!s.icon_work_id;
-        updateIconPreview(iconImg, s.icon_work_id);
-        markDirty(s.code);
-        tr.classList.add('legend-editor-row--dirty');
-      });
-
       thumbBtn.addEventListener('click', () => {
-        openVignettePicker(s, iconImg, workInput, tr);
+        openVignettePicker(s, iconImg, tr);
       });
 
       tdVignette.appendChild(thumbBtn);
-      tdVignette.appendChild(workInput);
 
       const tdYears = document.createElement('td');
       tdYears.className = 'series-years-cell';

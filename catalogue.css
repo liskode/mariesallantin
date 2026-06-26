@@ -1200,7 +1200,8 @@ body.catalogue-standalone {
 }
 
 .series-editor-table .series-vignette-cell {
-  white-space: nowrap;
+  width: 48px;
+  text-align: center;
 }
 
 .series-vignette-btn {
@@ -1210,7 +1211,6 @@ body.catalogue-standalone {
   width: 40px;
   height: 40px;
   padding: 0;
-  margin-right: 4px;
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--background);
@@ -1243,13 +1243,6 @@ body.catalogue-standalone {
 
 .series-vignette-btn .series-icon-thumb:not([hidden]) + .series-icon-placeholder {
   display: none;
-}
-
-.series-editor-table .series-work-id-input {
-  width: 4.75rem;
-  font-family: ui-monospace, monospace;
-  font-size: 0.75rem;
-  vertical-align: middle;
 }
 
 .series-years-th::after {
