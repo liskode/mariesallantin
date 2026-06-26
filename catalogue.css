@@ -29,6 +29,69 @@ body.catalogue-standalone {
   padding: 20px 24px 18px;
 }
 
+.editor-tabs-nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.editor-tabs-inner {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.editor-tabs-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.editor-tab {
+  display: inline-flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin-bottom: -1px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 8px 8px 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+.editor-tab:hover {
+  color: var(--accent);
+  background: rgba(26, 54, 93, 0.05);
+}
+
+.editor-tab:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.editor-tab--active {
+  color: var(--accent);
+  background: var(--background);
+  border-color: var(--border);
+  box-shadow: inset 0 -2px 0 var(--background);
+}
+
+@media (max-width: 700px) {
+  .editor-tabs-nav {
+    padding: 0 12px;
+  }
+
+  .editor-tab {
+    padding: 10px 12px;
+    font-size: 0.82rem;
+  }
+}
+
 .catalogue-standalone-inner {
   max-width: 1400px;
   margin: 0 auto;
@@ -1580,4 +1643,127 @@ body.catalogue-standalone {
   .codes-editor-panel + .codes-editor-panel {
     margin-top: 16px;
   }
+}
+
+/* Éditeur tableaux (œuvres) */
+.works-editor-toolbar {
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.works-editor-toolbar-left {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  flex: 1 1 auto;
+}
+
+.works-editor-filter-input {
+  min-width: min(280px, 100%);
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.works-editor-pagination {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 8px 0 12px;
+}
+
+.works-editor-page-info {
+  font-size: 0.85rem;
+  color: var(--secondary);
+}
+
+.works-editor-table {
+  font-size: 0.8rem;
+}
+
+.works-editor-table th,
+.works-editor-table td {
+  padding: 5px 7px;
+  vertical-align: middle;
+}
+
+.works-thumb-th,
+.works-thumb-cell {
+  width: 52px;
+  padding-right: 4px;
+}
+
+.works-thumb-img {
+  display: block;
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: #f2f3f7;
+}
+
+.works-thumb-img--empty {
+  background: #eceff3;
+}
+
+.works-code-cell {
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.works-title-cell {
+  max-width: 14rem;
+}
+
+.works-year-cell,
+.works-status-cell {
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.works-code-ref-cell,
+.works-series-cell {
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.works-series-cell {
+  max-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.works-edit-row-btn {
+  padding: 4px 8px;
+  font-size: 0.78rem;
+}
+
+.works-editor-empty {
+  text-align: center;
+  color: var(--secondary);
+  padding: 24px 12px !important;
+}
+
+.works-edit-dimensions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.works-edit-series-add-select {
+  margin-top: 6px;
+  font: inherit;
+  padding: 9px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.catalogue-edit-label select option.works-select-new-option {
+  font-weight: 600;
+  color: var(--accent);
 }

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
+  <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
+  <title>Tableaux — édition</title>
+  <link rel="stylesheet" href="catalogue.css" />
+  <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body class="catalogue-standalone" data-editor-tab="works">
+  <header class="catalogue-standalone-header">
+    <div class="catalogue-standalone-inner catalogue-standalone-header-inner catalogue-standalone-header-inner--logos">
+      <a class="catalogue-header-ms" href="index.html" title="Marie Sallantin — accueil">
+        <img class="catalogue-header-ms-logo" src="images/logoMS.png" alt="Marie Sallantin" width="240" height="96" />
+      </a>
+      <div class="catalogue-header-text catalogue-header-text--center">
+        <h1>Tableaux</h1>
+        <p class="catalogue-header-subtitle">Œuvres catalogue — édition privée</p>
+      </div>
+      <a class="catalogue-header-adagp" href="https://www.adagp.fr" target="_blank" rel="noopener noreferrer" title="ADAGP">
+        <img class="catalogue-header-adagp-logo" src="images/ADAGP_logo.png" alt="ADAGP" width="120" height="48" />
+      </a>
+    </div>
+  </header>
+
+  <div id="editor-tabs-mount"></div>
+
+  <div id="works-login" class="catalogue-login">
+    <div class="catalogue-login-box">
+      <h1 class="catalogue-login-title">Tableaux</h1>
+      <p class="catalogue-intro" style="margin-bottom: 16px;">
+        Édition des fiches œuvres : titres, codes format et technique, séries, collectionneur, statuts.
+      </p>
+      <label class="catalogue-login-label" for="works-pass">Mot de passe</label>
+      <input type="password" id="works-pass" class="catalogue-login-input" autocomplete="current-password" />
+      <button type="button" id="works-login-btn" class="catalogue-login-submit">Ouvrir l’éditeur</button>
+      <p id="works-login-error" class="catalogue-login-error" hidden></p>
+      <p class="legend-editor-api-hint" id="works-api-hint"></p>
+    </div>
+  </div>
+
+  <div id="works-app" class="catalogue-app" hidden>
+    <main class="catalogue-page">
+      <div class="catalogue-standalone-inner catalogue-standalone-main">
+        <div class="legend-editor-toolbar works-editor-toolbar">
+          <div class="works-editor-toolbar-left">
+            <p class="catalogue-count" id="works-count" aria-live="polite">0 tableau(x)</p>
+            <label class="works-editor-filter">
+              <span class="visually-hidden">Filtrer</span>
+              <input type="search" id="works-filter" class="works-editor-filter-input" placeholder="Filtrer par code ou titre…" autocomplete="off" />
+            </label>
+          </div>
+          <div class="catalogue-edit-tools">
+            <button type="button" class="legend-editor-btn legend-editor-btn--save legend-editor-btn--save-clean" id="works-save-btn" disabled>
+              Enregistrer les modifications
+            </button>
+            <button type="button" class="legend-editor-btn" id="works-reload-btn">Recharger</button>
+          </div>
+        </div>
+
+        <div class="works-editor-pagination" id="works-pagination" hidden>
+          <button type="button" class="legend-editor-btn" id="works-page-prev" disabled>← Précédent</button>
+          <span id="works-page-info" class="works-editor-page-info"></span>
+          <button type="button" class="legend-editor-btn" id="works-page-next">Suivant →</button>
+        </div>
+
+        <p id="works-status" class="legend-editor-api-hint" aria-live="polite"></p>
+
+        <div class="legend-editor-table-wrap">
+          <table class="catalogue-table legend-editor-table works-editor-table">
+            <thead>
+              <tr>
+                <th scope="col" class="works-thumb-th">Vignette</th>
+                <th scope="col">Code</th>
+                <th scope="col">Titre</th>
+                <th scope="col">Année</th>
+                <th scope="col">Format</th>
+                <th scope="col">Technique</th>
+                <th scope="col">Séries</th>
+                <th scope="col">Collectionneur</th>
+                <th scope="col">Pub.</th>
+                <th scope="col">Photo</th>
+                <th scope="col" class="editor-action-th"><span class="visually-hidden">Éditer</span></th>
+              </tr>
+            </thead>
+            <tbody id="works-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="works-edit-backdrop" class="catalogue-edit-backdrop" hidden></div>
+  <dialog id="works-edit-dialog" class="catalogue-edit-dialog" aria-labelledby="works-edit-title">
+    <button type="button" class="catalogue-edit-close" id="works-edit-close" aria-label="Fermer">×</button>
+    <div class="catalogue-edit-layout">
+      <div class="catalogue-edit-left">
+        <img id="works-edit-image" class="catalogue-edit-image" alt="" />
+        <p class="catalogue-edit-id" id="works-edit-id"></p>
+      </div>
+      <form class="catalogue-edit-form" id="works-edit-form">
+        <h2 id="works-edit-title">Édition tableau</h2>
+        <label class="catalogue-edit-label">
+          <span>Titre / légende</span>
+          <textarea id="works-edit-title-input" rows="4"></textarea>
+        </label>
+        <label class="catalogue-edit-label">
+          <span>Année (4 chiffres)</span>
+          <input id="works-edit-year" type="text" inputmode="numeric" maxlength="4" />
+        </label>
+        <label class="catalogue-edit-label">
+          <span>Format</span>
+          <select id="works-edit-format"></select>
+        </label>
+        <div class="works-edit-dimensions">
+          <label class="catalogue-edit-label">
+            <span>Largeur (cm)</span>
+            <input id="works-edit-width" type="text" inputmode="decimal" />
+          </label>
+          <label class="catalogue-edit-label">
+            <span>Hauteur (cm)</span>
+            <input id="works-edit-height" type="text" inputmode="decimal" />
+          </label>
+        </div>
+        <label class="catalogue-edit-label">
+          <span>Technique</span>
+          <select id="works-edit-technique"></select>
+        </label>
+        <label class="catalogue-edit-label">
+          <span>Séries (sélection multiple)</span>
+          <button type="button" class="catalogue-multiselect-toggle" id="works-edit-series-toggle">Choisir…</button>
+          <div class="catalogue-multiselect-panel" id="works-edit-series-panel" hidden></div>
+          <select id="works-edit-series-add" class="works-edit-series-add-select">
+            <option value="">Ajouter une série…</option>
+          </select>
+        </label>
+        <label class="catalogue-edit-label">
+          <span>Collectionneur</span>
+          <select id="works-edit-collector"></select>
+        </label>
+        <label class="catalogue-edit-label">
+          <span>Statut publication</span>
+          <select id="works-edit-publication"></select>
+        </label>
+        <label class="catalogue-edit-label">
+          <span>Statut photo</span>
+          <select id="works-edit-photo"></select>
+        </label>
+        <p class="catalogue-edit-error" id="works-edit-error" hidden></p>
+        <div class="catalogue-edit-actions">
+          <button type="submit" class="catalogue-edit-save">Appliquer à cette œuvre</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <script src="editor-common.js"></script>
+  <script src="works-editor.js"></script>
+</body>
+</html>

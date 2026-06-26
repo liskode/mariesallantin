@@ -1,9 +1,19 @@
 /**
- * Composants partagés des éditeurs (corbeille codes orphelins).
+ * Composants partagés des éditeurs (corbeille, navigation par onglets).
  */
 (function (global) {
   const TRASH_ICON =
     '<svg class="editor-delete-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 7h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-4h6l1 2H8l1-2zm-1 6v9h2V9H8zm4 0v9h2V9h-2z"/></svg>';
+
+  /** @type {Array<{ id: string, label: string, href: string, port: number }>} */
+  const EDITOR_TABS = [
+    { id: 'works', label: 'Œuvres', href: 'works-editor.html', port: 47835 },
+    { id: 'series', label: 'Séries', href: 'series.html', port: 47833 },
+    { id: 'codes', label: 'Formats & techniques', href: 'codes-editor.html', port: 47834 },
+    { id: 'collectors', label: 'Collectionneurs', href: 'collectors.html', port: 47832 },
+  ];
+
+  const LOCAL_EDITOR_PORTS = new Set(['47832', '47833', '47834', '47835']);
 
   /**
    * @param {number} count
@@ -30,8 +40,80 @@
     return td;
   }
 
+  function tabHref(tab) {
+    const host = window.location.hostname || '';
+    const port = window.location.port || '';
+    if (
+      (host === '127.0.0.1' || host === 'localhost') &&
+      LOCAL_EDITOR_PORTS.has(port)
+    ) {
+      return 'http://127.0.0.1:' + tab.port + '/' + tab.href;
+    }
+    return tab.href;
+  }
+
+  /**
+   * @param {string} activeId
+   * @returns {HTMLElement}
+   */
+  function renderEditorTabs(activeId) {
+    const nav = document.createElement('nav');
+    nav.className = 'editor-tabs-nav';
+    nav.setAttribute('aria-label', 'Édition catalogue');
+
+    const inner = document.createElement('div');
+    inner.className = 'catalogue-standalone-inner editor-tabs-inner';
+
+    const list = document.createElement('div');
+    list.className = 'editor-tabs-list';
+    list.setAttribute('role', 'tablist');
+
+    EDITOR_TABS.forEach((tab) => {
+      const isActive = tab.id === activeId;
+      const link = document.createElement('a');
+      link.className = 'editor-tab' + (isActive ? ' editor-tab--active' : '');
+      link.href = tabHref(tab);
+      link.textContent = tab.label;
+      link.setAttribute('role', 'tab');
+      if (isActive) {
+        link.setAttribute('aria-current', 'page');
+      }
+      list.appendChild(link);
+    });
+
+    inner.appendChild(list);
+    nav.appendChild(inner);
+    return nav;
+  }
+
+  function mountEditorTabs() {
+    const activeId = document.body.getAttribute('data-editor-tab');
+    if (!activeId) return;
+
+    const tabs = renderEditorTabs(activeId);
+    const mount = document.getElementById('editor-tabs-mount');
+    if (mount) {
+      mount.replaceWith(tabs);
+      return;
+    }
+
+    const header = document.querySelector('.catalogue-standalone-header');
+    if (header && header.parentNode) {
+      header.insertAdjacentElement('afterend', tabs);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', mountEditorTabs);
+  } else {
+    mountEditorTabs();
+  }
+
   global.EditorCommon = {
     TRASH_ICON,
+    EDITOR_TABS,
     appendDeleteCell,
+    renderEditorTabs,
+    mountEditorTabs,
   };
 })(window);

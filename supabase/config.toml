@@ -9,3 +9,6 @@ verify_jwt = false
 
 [functions.codes-api]
 verify_jwt = false
+
+[functions.works-api]
+verify_jwt = false
