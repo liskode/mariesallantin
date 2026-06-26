@@ -7,7 +7,8 @@
     "supabase:update-dimensions": "node scripts/update-works-dimensions-cm.mjs",
     "supabase:strip-title-dimensions": "node scripts/strip-works-title-dimensions.mjs",
     "supabase:update-collectors": "node scripts/update-works-collectors.mjs",
-    "collectors:api": "node scripts/collectors-editor-api.mjs"
+    "collectors:api": "node scripts/collectors-editor-api.mjs",
+    "series:api": "node scripts/series-editor-api.mjs"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.49.8",

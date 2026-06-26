@@ -1,5 +1,6 @@
 {
   "supabaseUrl": "https://leezsypadtvypdgqgvtk.supabase.co",
   "collectorsApiUrl": "https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/collectors-api",
+  "seriesApiUrl": "https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/series-api",
   "anonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo"
 }

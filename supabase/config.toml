@@ -3,3 +3,6 @@
 
 [functions.collectors-api]
 verify_jwt = false
+
+[functions.series-api]
+verify_jwt = false

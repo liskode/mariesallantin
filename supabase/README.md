@@ -115,6 +115,22 @@ supabase functions deploy collectors-api --no-verify-jwt
 
 Les vignettes au survol utilisent `media/works.json` et `media/catalogue/_thumbs/` déjà hébergés sur le site.
 
+### Éditeur séries (en ligne)
+
+1. Exécuter `migrations/20250617170000_series_metadata.sql` dans le SQL Editor
+2. Déployer l’Edge Function :
+
+```bash
+supabase secrets set CATALOGUE_EDITOR_TOKEN=MS75
+supabase functions deploy series-api --no-verify-jwt
+```
+
+3. Ouvrir **https://mariesallantin.art/series.html** (mot de passe `MS75`)
+
+Champs éditables : libellé, icône (`icon_work_id` = MS####), `year_start`, `year_end`, `description` (texte libre, paragraphes conservés).
+
+Développement local : `npm run series:api` → http://127.0.0.1:47833/
+
 ## Prochaines étapes
 
 1. Brancher l’éditeur catalogue (mode MS75) vers Supabase

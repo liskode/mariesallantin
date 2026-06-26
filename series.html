@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="series-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/series-api" />
+  <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
+  <title>Séries — édition</title>
+  <link rel="stylesheet" href="catalogue.css" />
+  <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body class="catalogue-standalone">
+  <header class="catalogue-standalone-header">
+    <div class="catalogue-standalone-inner catalogue-standalone-header-inner catalogue-standalone-header-inner--logos">
+      <a class="catalogue-header-ms" href="index.html" title="Marie Sallantin — accueil">
+        <img class="catalogue-header-ms-logo" src="images/logoMS.png" alt="Marie Sallantin" width="240" height="96" />
+      </a>
+      <div class="catalogue-header-text catalogue-header-text--center">
+        <h1>Séries</h1>
+        <p class="catalogue-header-subtitle">Fiches séries — édition privée</p>
+      </div>
+      <a class="catalogue-header-adagp" href="https://www.adagp.fr" target="_blank" rel="noopener noreferrer" title="ADAGP">
+        <img class="catalogue-header-adagp-logo" src="images/ADAGP_logo.png" alt="ADAGP" width="120" height="48" />
+      </a>
+    </div>
+  </header>
+
+  <div id="series-login" class="catalogue-login">
+    <div class="catalogue-login-box">
+      <h1 class="catalogue-login-title">Séries</h1>
+      <p class="catalogue-intro" style="margin-bottom: 16px;">
+        Édition des fiches séries : libellé, icône (<strong>MS####</strong>), années et description.
+      </p>
+      <label class="catalogue-login-label" for="series-pass">Mot de passe</label>
+      <input type="password" id="series-pass" class="catalogue-login-input" autocomplete="current-password" />
+      <button type="button" id="series-login-btn" class="catalogue-login-submit">Ouvrir l’éditeur</button>
+      <p id="series-login-error" class="catalogue-login-error" hidden></p>
+      <p class="legend-editor-api-hint" id="series-api-hint"></p>
+    </div>
+  </div>
+
+  <div id="series-app" class="catalogue-app" hidden>
+    <main class="catalogue-page">
+      <div class="catalogue-standalone-inner catalogue-standalone-main">
+        <p class="catalogue-intro" id="series-intro">
+          Modifiez les champs puis enregistrez. L’icône est une œuvre du catalogue (ex. MS0024).
+        </p>
+
+        <div class="legend-editor-toolbar">
+          <p class="catalogue-count" id="series-count" aria-live="polite">0 série(s)</p>
+          <div class="catalogue-edit-tools">
+            <button type="button" class="legend-editor-btn legend-editor-btn--primary" id="series-save-btn" disabled>
+              Enregistrer les modifications
+            </button>
+            <button type="button" class="legend-editor-btn" id="series-reload-btn">Recharger</button>
+          </div>
+        </div>
+
+        <p id="series-status" class="legend-editor-api-hint" aria-live="polite"></p>
+
+        <div class="legend-editor-table-wrap">
+          <table class="catalogue-table legend-editor-table series-editor-table">
+            <thead>
+              <tr>
+                <th scope="col">Code</th>
+                <th scope="col">Libellé</th>
+                <th scope="col">Icône</th>
+                <th scope="col">MS####</th>
+                <th scope="col">Début</th>
+                <th scope="col">Fin</th>
+                <th scope="col">Description</th>
+                <th scope="col">Œuvres</th>
+              </tr>
+            </thead>
+            <tbody id="series-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="series.js"></script>
+</body>
+</html>
