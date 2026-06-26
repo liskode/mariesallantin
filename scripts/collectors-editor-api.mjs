@@ -43,6 +43,7 @@ const STATIC_ROUTES = {
   '/': 'collectors.html',
   '/collectors.html': 'collectors.html',
   '/collectors.js': 'collectors.js',
+  '/editor-common.js': 'editor-common.js',
   '/catalogue.css': 'catalogue.css',
 };
 

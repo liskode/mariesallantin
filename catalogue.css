@@ -1495,6 +1495,7 @@ body.catalogue-standalone {
   font-size: 0.78rem;
 }
 
+.editor-action-th,
 .codes-action-th {
   width: 2rem;
   padding-left: 4px;
@@ -1508,6 +1509,15 @@ body.catalogue-standalone {
   padding-right: 4px;
 }
 
+.editor-action-cell,
+.codes-action-cell {
+  text-align: center;
+  width: 2rem;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+.editor-delete-btn,
 .codes-delete-btn {
   display: inline-flex;
   align-items: center;
@@ -1522,11 +1532,13 @@ body.catalogue-standalone {
   cursor: pointer;
 }
 
+.editor-delete-btn:hover,
 .codes-delete-btn:hover {
   background: #ffebee;
   border-color: #c62828;
 }
 
+.editor-delete-icon,
 .codes-delete-icon {
   display: block;
 }

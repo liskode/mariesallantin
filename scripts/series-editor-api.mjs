@@ -30,6 +30,7 @@ const STATIC_ROUTES = {
   '/': 'series.html',
   '/series.html': 'series.html',
   '/series.js': 'series.js',
+  '/editor-common.js': 'editor-common.js',
   '/catalogue.css': 'catalogue.css',
 };
 
@@ -72,7 +73,7 @@ function sendJson(res, status, obj) {
     'Content-Type': 'application/json; charset=utf-8',
     'Content-Length': Buffer.byteLength(body),
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type',
   });
   res.end(body);
@@ -142,7 +143,7 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     });
     res.end();
@@ -258,6 +259,42 @@ const server = http.createServer(async (req, res) => {
         return s;
       });
       const { error } = await supabase.from('series').upsert(payload, { onConflict: 'code' });
+      if (error) throw error;
+      const series = await fetchSeriesWithCounts(supabase);
+      sendJson(res, 200, { ok: true, series });
+      return;
+    }
+
+    if (req.method === 'DELETE' && url.pathname.startsWith('/api/series/')) {
+      const code = decodeURIComponent(url.pathname.slice('/api/series/'.length)).trim().toUpperCase();
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      if (!code) {
+        sendJson(res, 400, { ok: false, error: 'code manquant' });
+        return;
+      }
+      const supabase = createSupabase();
+      const { count: workCount, error: wErr } = await supabase
+        .from('work_series')
+        .select('work_id', { count: 'exact', head: true })
+        .eq('series_code', code);
+      if (wErr) throw wErr;
+      const { count: mediaCount, error: mErr } = await supabase
+        .from('related_media_series')
+        .select('media_id', { count: 'exact', head: true })
+        .eq('series_code', code);
+      if (mErr) throw mErr;
+      const total = (workCount || 0) + (mediaCount || 0);
+      if (total > 0) {
+        sendJson(res, 400, {
+          ok: false,
+          error: `impossible de supprimer ${code} : ${total} lien(s) actif(s)`,
+        });
+        return;
+      }
+      const { error } = await supabase.from('series').delete().eq('code', code);
       if (error) throw error;
       const series = await fetchSeriesWithCounts(supabase);
       sendJson(res, 200, { ok: true, series });

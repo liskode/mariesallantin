@@ -427,6 +427,18 @@
       tr.appendChild(tdYears);
       tr.appendChild(tdDesc);
       tr.appendChild(tdCount);
+
+      if (window.EditorCommon) {
+        window.EditorCommon.appendDeleteCell(tr, s.work_count ?? 0, {
+          code: s.code,
+          onDelete: () => deleteSeries(s),
+        });
+      } else {
+        const tdAct = document.createElement('td');
+        tdAct.className = 'editor-action-cell';
+        tr.appendChild(tdAct);
+      }
+
       tbody.appendChild(tr);
     }
 
@@ -493,6 +505,24 @@
     updateSaveBtn();
     renderTable();
     setStatus('Série ' + normalized + ' créée.');
+  }
+
+  async function deleteSeries(s) {
+    if (!s.code) return;
+    if ((s.work_count || 0) > 0) return;
+    if (!window.confirm('Supprimer la série ' + s.code + ' ?')) return;
+    setStatus('Suppression…');
+    const r = await apiFetch(
+      '/api/series/' + encodeURIComponent(s.code) + '?token=' + encodeURIComponent(token),
+      { method: 'DELETE' }
+    );
+    const j = await r.json();
+    if (!j.ok) throw new Error(j.error || 'suppression impossible');
+    seriesList = j.series || seriesList.filter((x) => x.code !== s.code);
+    dirtyCodes.delete(s.code);
+    updateSaveBtn();
+    renderTable();
+    setStatus('Série ' + s.code + ' supprimée.');
   }
 
   async function checkApiHealth() {

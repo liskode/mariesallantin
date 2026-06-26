@@ -7,8 +7,28 @@
   const PRODUCTION_API =
     'https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/codes-api';
 
-  const TRASH_ICON =
-    '<svg class="codes-delete-icon" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M6 7h12v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V7zm3-4h6l1 2H8l1-2zm-1 6v9h2V9H8zm4 0v9h2V9h-2z"/></svg>';
+  function appendCountAndDelete(tr, row, kind) {
+    const count = row.work_count ?? 0;
+    const tdCount = document.createElement('td');
+    tdCount.textContent = String(count);
+    tdCount.className = 'codes-work-count-cell';
+    tr.appendChild(tdCount);
+
+    const EC = window.EditorCommon;
+    if (EC) {
+      EC.appendDeleteCell(tr, count, {
+        code: row.code,
+        onDelete: () => {
+          if (kind === 'format') deleteFormat(row);
+          else deleteTechnique(row);
+        },
+      });
+      return;
+    }
+    const tdAct = document.createElement('td');
+    tdAct.className = 'editor-action-cell';
+    tr.appendChild(tdAct);
+  }
 
   let siteConfig = null;
   let resolvedApiBase = '';
@@ -187,31 +207,6 @@
     }
     tr.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
     window.setTimeout(() => tr.classList.remove('codes-editor-row--focus'), 2500);
-  }
-
-  function appendCountAndDelete(tr, row, kind) {
-    const count = row.work_count ?? 0;
-    const tdCount = document.createElement('td');
-    tdCount.textContent = String(count);
-    tdCount.className = 'codes-work-count-cell';
-
-    const tdAct = document.createElement('td');
-    tdAct.className = 'codes-action-cell';
-    if (count === 0) {
-      const delBtn = document.createElement('button');
-      delBtn.type = 'button';
-      delBtn.className = 'codes-delete-btn';
-      delBtn.title = 'Supprimer ce code';
-      delBtn.setAttribute('aria-label', 'Supprimer ' + row.code);
-      delBtn.innerHTML = TRASH_ICON;
-      delBtn.addEventListener('click', () => {
-        if (kind === 'format') deleteFormat(row);
-        else deleteTechnique(row);
-      });
-      tdAct.appendChild(delBtn);
-    }
-    tr.appendChild(tdCount);
-    tr.appendChild(tdAct);
   }
 
   function renderFormats() {

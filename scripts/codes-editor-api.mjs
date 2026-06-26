@@ -27,6 +27,7 @@ const STATIC_ROUTES = {
   '/': 'codes-editor.html',
   '/codes-editor.html': 'codes-editor.html',
   '/codes-editor.js': 'codes-editor.js',
+  '/editor-common.js': 'editor-common.js',
   '/catalogue.css': 'catalogue.css',
 };
 

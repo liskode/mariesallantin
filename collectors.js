@@ -421,19 +421,6 @@
       tdCount.className = 'collectors-count-cell';
       attachWorksCountHover(tdCount, c);
 
-      const tdActions = document.createElement('td');
-      const delBtn = document.createElement('button');
-      delBtn.type = 'button';
-      delBtn.className = 'catalogue-row-edit-btn';
-      delBtn.textContent = 'Suppr.';
-      delBtn.disabled = (c.work_count || 0) > 0 || !c.code;
-      delBtn.title =
-        (c.work_count || 0) > 0
-          ? 'Des œuvres sont liées à ce collectionneur'
-          : 'Supprimer ce collectionneur';
-      delBtn.addEventListener('click', () => deleteCollector(c));
-      tdActions.appendChild(delBtn);
-
       tr.appendChild(tdCode);
       tr.appendChild(tdName);
       tr.appendChild(tdType);
@@ -442,7 +429,18 @@
       tr.appendChild(textCell('email'));
       tr.appendChild(tdNotes);
       tr.appendChild(tdCount);
-      tr.appendChild(tdActions);
+
+      if (window.EditorCommon) {
+        window.EditorCommon.appendDeleteCell(tr, c.work_count || 0, {
+          code: c.code,
+          onDelete: () => deleteCollector(c),
+        });
+      } else {
+        const tdActions = document.createElement('td');
+        tdActions.className = 'editor-action-cell';
+        tr.appendChild(tdActions);
+      }
+
       tbody.appendChild(tr);
     }
 
@@ -519,6 +517,7 @@
 
   async function deleteCollector(c) {
     if (!c.code) return;
+    if ((c.work_count || 0) > 0) return;
     if (!window.confirm('Supprimer ' + c.code + ' — ' + c.name + ' ?')) return;
 
     setStatus('Suppression…');

@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supa
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+  'Access-Control-Allow-Methods': 'GET, POST, DELETE, OPTIONS',
 };
 
 function jsonResponse(status: number, body: Record<string, unknown>) {
@@ -176,6 +176,39 @@ Deno.serve(async (req) => {
       const { error } = await supabase.from('series').upsert(payload, { onConflict: 'code' });
       if (error) throw error;
 
+      const series = await fetchSeriesWithCounts(supabase);
+      return jsonResponse(200, { ok: true, series });
+    }
+
+    if (req.method === 'DELETE' && path.startsWith('/api/series/')) {
+      const code = decodeURIComponent(path.slice('/api/series/'.length)).trim().toUpperCase();
+      const token = url.searchParams.get('token') || '';
+      if (!checkToken(token)) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      if (!code) {
+        return jsonResponse(400, { ok: false, error: 'code manquant' });
+      }
+      const supabase = createSupabase();
+      const { count: workCount, error: wErr } = await supabase
+        .from('work_series')
+        .select('work_id', { count: 'exact', head: true })
+        .eq('series_code', code);
+      if (wErr) throw wErr;
+      const { count: mediaCount, error: mErr } = await supabase
+        .from('related_media_series')
+        .select('media_id', { count: 'exact', head: true })
+        .eq('series_code', code);
+      if (mErr) throw mErr;
+      const total = (workCount || 0) + (mediaCount || 0);
+      if (total > 0) {
+        return jsonResponse(400, {
+          ok: false,
+          error: `impossible de supprimer ${code} : ${total} lien(s) actif(s)`,
+        });
+      }
+      const { error } = await supabase.from('series').delete().eq('code', code);
+      if (error) throw error;
       const series = await fetchSeriesWithCounts(supabase);
       return jsonResponse(200, { ok: true, series });
     }
