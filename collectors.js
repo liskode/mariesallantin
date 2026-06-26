@@ -6,6 +6,8 @@
   const AUTH_KEY = 'collectors_edit_ok';
   const COLLECTOR_TYPES = ['Galerie', 'Institutions', 'Particulier'];
   const MEDIA_BASE = 'media/';
+  const PRODUCTION_API =
+    'https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/collectors-api';
   const RASTER_EXT = new Set([
     '.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tif', '.tiff', '.avif',
   ]);
@@ -33,21 +35,34 @@
     return typeof window !== 'undefined' && window.location.port === '47832';
   }
 
+  function isProductionHost() {
+    const h = String(window.location.hostname || '');
+    return (
+      h === 'mariesallantin.art' ||
+      h === 'www.mariesallantin.art' ||
+      h.endsWith('.github.io')
+    );
+  }
+
   async function apiBase() {
     if (resolvedApiBase) return resolvedApiBase;
     if (isLocalDevServer()) {
       resolvedApiBase = window.location.origin;
       return resolvedApiBase;
     }
-    const cfg = await loadSiteConfig();
     const fromMeta = document.querySelector('meta[name="collectors-api"]');
     const metaUrl = fromMeta && fromMeta.getAttribute('content');
     if (metaUrl && !metaUrl.includes('127.0.0.1')) {
       resolvedApiBase = String(metaUrl).trim().replace(/\/$/, '');
       return resolvedApiBase;
     }
+    const cfg = await loadSiteConfig();
     if (cfg.collectorsApiUrl) {
       resolvedApiBase = String(cfg.collectorsApiUrl).trim().replace(/\/$/, '');
+      return resolvedApiBase;
+    }
+    if (isProductionHost()) {
+      resolvedApiBase = PRODUCTION_API;
       return resolvedApiBase;
     }
     resolvedApiBase = 'http://127.0.0.1:47832';
@@ -59,10 +74,12 @@
   }
 
   async function supabaseAnonKey() {
+    const meta = document.querySelector('meta[name="supabase-anon-key"]');
+    const fromMeta = meta ? String(meta.getAttribute('content') || '').trim() : '';
+    if (fromMeta) return fromMeta;
     const cfg = await loadSiteConfig();
     if (cfg.anonKey) return String(cfg.anonKey).trim();
-    const meta = document.querySelector('meta[name="supabase-anon-key"]');
-    return meta ? String(meta.getAttribute('content') || '').trim() : '';
+    return '';
   }
 
   async function apiFetch(pathAndQuery, init) {
