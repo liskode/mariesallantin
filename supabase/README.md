@@ -131,6 +131,21 @@ Champs éditables : libellé, icône (`icon_work_id` = MS####), `year_start`, `y
 
 Développement local : `npm run series:api` → http://127.0.0.1:47833/
 
+### Éditeur formats & techniques (en ligne)
+
+1. Exécuter `migrations/20250617180000_formats_dimensions.sql` dans le SQL Editor
+2. Déployer l’Edge Function :
+
+```bash
+supabase functions deploy codes-api --no-verify-jwt --project-ref leezsypadtvypdgqgvtk
+```
+
+3. Ouvrir **https://mariesallantin.art/codes-editor.html** (mot de passe `MS75`)
+
+Deux panneaux côte à côte : formats (code, libellé, largeur/hauteur cm) et techniques (code, libellé). Boutons **+ Nouveau** pour ajouter un code vide puis compléter la ligne.
+
+Développement local : `npm run codes:api` → http://127.0.0.1:47834/
+
 ## Prochaines étapes
 
 1. Brancher l’éditeur catalogue (mode MS75) vers Supabase

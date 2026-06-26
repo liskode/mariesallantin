@@ -1404,3 +1404,113 @@ body.catalogue-standalone {
   font-weight: 600;
   color: var(--secondary);
 }
+
+/* Éditeur formats & techniques */
+.codes-editor-split {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  gap: 0;
+  align-items: start;
+  margin-top: 8px;
+}
+
+.codes-editor-divider {
+  background: var(--border);
+  min-height: 120px;
+  align-self: stretch;
+}
+
+.codes-editor-panel {
+  min-width: 0;
+  padding: 0 12px;
+}
+
+.codes-editor-panel:first-child {
+  padding-left: 0;
+}
+
+.codes-editor-panel:last-child {
+  padding-right: 0;
+}
+
+.codes-editor-panel-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.codes-editor-panel-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.codes-editor-table {
+  font-size: 0.8rem;
+}
+
+.codes-editor-table th,
+.codes-editor-table td {
+  padding: 4px 6px;
+  vertical-align: middle;
+}
+
+.codes-editor-table .legend-input {
+  min-width: 0;
+  max-width: none;
+  padding: 3px 5px;
+  border-radius: 4px;
+}
+
+.codes-editor-table .codes-code-cell {
+  font-family: ui-monospace, monospace;
+  font-weight: 600;
+  white-space: nowrap;
+  font-size: 0.78rem;
+  width: 3.5rem;
+}
+
+.codes-formats-table .codes-label-input {
+  width: 10rem;
+}
+
+.codes-techniques-table .codes-label-input {
+  width: 14rem;
+}
+
+.codes-editor-table .codes-cm-input {
+  width: 4rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.78rem;
+  text-align: right;
+}
+
+.codes-editor-row--focus {
+  outline: 2px solid var(--accent);
+  outline-offset: -2px;
+  background: rgba(26, 54, 93, 0.04);
+}
+
+@media (max-width: 900px) {
+  .codes-editor-split {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1px auto;
+  }
+
+  .codes-editor-divider {
+    width: 100%;
+    height: 1px;
+    min-height: 0;
+  }
+
+  .codes-editor-panel {
+    padding: 0;
+  }
+
+  .codes-editor-panel + .codes-editor-panel {
+    margin-top: 16px;
+  }
+}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="codes-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/codes-api" />
+  <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
+  <title>Formats &amp; techniques — édition</title>
+  <link rel="stylesheet" href="catalogue.css" />
+  <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body class="catalogue-standalone">
+  <header class="catalogue-standalone-header">
+    <div class="catalogue-standalone-inner catalogue-standalone-header-inner catalogue-standalone-header-inner--logos">
+      <a class="catalogue-header-ms" href="index.html" title="Marie Sallantin — accueil">
+        <img class="catalogue-header-ms-logo" src="images/logoMS.png" alt="Marie Sallantin" width="240" height="96" />
+      </a>
+      <div class="catalogue-header-text catalogue-header-text--center">
+        <h1>Formats &amp; techniques</h1>
+        <p class="catalogue-header-subtitle">Codes catalogue — édition privée</p>
+      </div>
+      <a class="catalogue-header-adagp" href="https://www.adagp.fr" target="_blank" rel="noopener noreferrer" title="ADAGP">
+        <img class="catalogue-header-adagp-logo" src="images/ADAGP_logo.png" alt="ADAGP" width="120" height="48" />
+      </a>
+    </div>
+  </header>
+
+  <div id="codes-login" class="catalogue-login">
+    <div class="catalogue-login-box">
+      <h1 class="catalogue-login-title">Formats &amp; techniques</h1>
+      <p class="catalogue-intro" style="margin-bottom: 16px;">
+        Édition des codes format de tableau et des techniques.
+      </p>
+      <label class="catalogue-login-label" for="codes-pass">Mot de passe</label>
+      <input type="password" id="codes-pass" class="catalogue-login-input" autocomplete="current-password" />
+      <button type="button" id="codes-login-btn" class="catalogue-login-submit">Ouvrir l’éditeur</button>
+      <p id="codes-login-error" class="catalogue-login-error" hidden></p>
+      <p class="legend-editor-api-hint" id="codes-api-hint"></p>
+    </div>
+  </div>
+
+  <div id="codes-app" class="catalogue-app" hidden>
+    <main class="catalogue-page">
+      <div class="catalogue-standalone-inner catalogue-standalone-main">
+        <div class="legend-editor-toolbar">
+          <p class="catalogue-count" id="codes-count" aria-live="polite">0 format(s) · 0 technique(s)</p>
+          <div class="catalogue-edit-tools">
+            <button type="button" class="legend-editor-btn legend-editor-btn--save legend-editor-btn--save-clean" id="codes-save-btn" disabled>
+              Enregistrer les modifications
+            </button>
+            <button type="button" class="legend-editor-btn" id="codes-reload-btn">Recharger</button>
+          </div>
+        </div>
+
+        <p id="codes-status" class="legend-editor-api-hint" aria-live="polite"></p>
+
+        <div class="codes-editor-split">
+          <section class="codes-editor-panel" aria-labelledby="formats-panel-title">
+            <header class="codes-editor-panel-header">
+              <h2 id="formats-panel-title" class="codes-editor-panel-title">Formats de tableau</h2>
+              <button type="button" class="legend-editor-btn" id="formats-add-btn">+ Nouveau format</button>
+            </header>
+            <div class="legend-editor-table-wrap">
+              <table class="catalogue-table legend-editor-table codes-editor-table codes-formats-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Code</th>
+                    <th scope="col">Libellé</th>
+                    <th scope="col">L (cm)</th>
+                    <th scope="col">H (cm)</th>
+                  </tr>
+                </thead>
+                <tbody id="formats-tbody"></tbody>
+              </table>
+            </div>
+          </section>
+
+          <div class="codes-editor-divider" role="separator" aria-orientation="vertical"></div>
+
+          <section class="codes-editor-panel" aria-labelledby="techniques-panel-title">
+            <header class="codes-editor-panel-header">
+              <h2 id="techniques-panel-title" class="codes-editor-panel-title">Techniques</h2>
+              <button type="button" class="legend-editor-btn" id="techniques-add-btn">+ Nouvelle technique</button>
+            </header>
+            <div class="legend-editor-table-wrap">
+              <table class="catalogue-table legend-editor-table codes-editor-table codes-techniques-table">
+                <thead>
+                  <tr>
+                    <th scope="col">Code</th>
+                    <th scope="col">Libellé</th>
+                  </tr>
+                </thead>
+                <tbody id="techniques-tbody"></tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="codes-editor.js"></script>
+</body>
+</html>

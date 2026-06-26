@@ -6,3 +6,6 @@ verify_jwt = false
 
 [functions.series-api]
 verify_jwt = false
+
+[functions.codes-api]
+verify_jwt = false
