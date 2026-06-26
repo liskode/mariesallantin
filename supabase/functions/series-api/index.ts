@@ -112,6 +112,50 @@ Deno.serve(async (req) => {
       return jsonResponse(200, { ok: true, series });
     }
 
+    if (req.method === 'POST' && path === '/api/series/create') {
+      const body = await req.json();
+      if (!checkToken(String(body.token || ''))) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      const code = String(body.code || '').trim().toUpperCase();
+      if (!/^[A-Z0-9]{2,12}$/.test(code)) {
+        return jsonResponse(400, {
+          ok: false,
+          error: 'code invalide (2–12 caractères A-Z, 0-9)',
+        });
+      }
+      const label = String(body.label || '').trim();
+      const supabase = createSupabase();
+      const { data: existing } = await supabase
+        .from('series')
+        .select('code')
+        .eq('code', code)
+        .maybeSingle();
+      if (existing) {
+        return jsonResponse(400, { ok: false, error: `code ${code} déjà utilisé` });
+      }
+      const { data: last } = await supabase
+        .from('series')
+        .select('sort_order')
+        .order('sort_order', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const sort_order = (last?.sort_order ?? 0) + 1;
+      const row = {
+        code,
+        label,
+        sort_order,
+        icon_work_id: null,
+        year_start: null,
+        year_end: null,
+        description: '',
+      };
+      const { error } = await supabase.from('series').insert(row);
+      if (error) throw error;
+      const series = await fetchSeriesWithCounts(supabase);
+      return jsonResponse(200, { ok: true, series });
+    }
+
     if (req.method === 'POST' && path === '/api/series/save') {
       const body = await req.json();
       if (!checkToken(String(body.token || ''))) {

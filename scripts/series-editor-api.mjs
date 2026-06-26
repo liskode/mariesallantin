@@ -195,6 +195,51 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
+    if (req.method === 'POST' && url.pathname === '/api/series/create') {
+      const body = JSON.parse(await readBody(req));
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      const code = String(body.code || '').trim().toUpperCase();
+      if (!/^[A-Z0-9]{2,12}$/.test(code)) {
+        sendJson(res, 400, { ok: false, error: 'code invalide (2–12 caractères A-Z, 0-9)' });
+        return;
+      }
+      const label = String(body.label || '').trim();
+      const supabase = createSupabase();
+      const { data: existing } = await supabase
+        .from('series')
+        .select('code')
+        .eq('code', code)
+        .maybeSingle();
+      if (existing) {
+        sendJson(res, 400, { ok: false, error: `code ${code} déjà utilisé` });
+        return;
+      }
+      const { data: last } = await supabase
+        .from('series')
+        .select('sort_order')
+        .order('sort_order', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      const sort_order = (last?.sort_order ?? 0) + 1;
+      const row = {
+        code,
+        label,
+        sort_order,
+        icon_work_id: null,
+        year_start: null,
+        year_end: null,
+        description: '',
+      };
+      const { error } = await supabase.from('series').insert(row);
+      if (error) throw error;
+      const series = await fetchSeriesWithCounts(supabase);
+      sendJson(res, 200, { ok: true, series });
+      return;
+    }
+
     if (req.method === 'POST' && url.pathname === '/api/series/save') {
       const body = JSON.parse(await readBody(req));
       if (body.token !== TOKEN) {

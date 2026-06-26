@@ -31,7 +31,7 @@
     <div class="catalogue-login-box">
       <h1 class="catalogue-login-title">Séries</h1>
       <p class="catalogue-intro" style="margin-bottom: 16px;">
-        Édition des fiches séries : libellé, icône (<strong>MS####</strong>), années et description.
+        Édition des fiches séries : libellé, vignette, années et description.
       </p>
       <label class="catalogue-login-label" for="series-pass">Mot de passe</label>
       <input type="password" id="series-pass" class="catalogue-login-input" autocomplete="current-password" />
@@ -45,13 +45,14 @@
     <main class="catalogue-page">
       <div class="catalogue-standalone-inner catalogue-standalone-main">
         <p class="catalogue-intro" id="series-intro">
-          Modifiez les champs puis enregistrez. L’icône est une œuvre du catalogue (ex. MS0024).
+          Cliquez sur une vignette pour choisir l’œuvre iconique parmi les œuvres de la série.
         </p>
 
         <div class="legend-editor-toolbar">
           <p class="catalogue-count" id="series-count" aria-live="polite">0 série(s)</p>
           <div class="catalogue-edit-tools">
-            <button type="button" class="legend-editor-btn legend-editor-btn--primary" id="series-save-btn" disabled>
+            <button type="button" class="legend-editor-btn" id="series-add-btn">+ Nouvelle série</button>
+            <button type="button" class="legend-editor-btn legend-editor-btn--save legend-editor-btn--save-clean" id="series-save-btn" disabled>
               Enregistrer les modifications
             </button>
             <button type="button" class="legend-editor-btn" id="series-reload-btn">Recharger</button>
@@ -66,10 +67,8 @@
               <tr>
                 <th scope="col">Code</th>
                 <th scope="col">Libellé</th>
-                <th scope="col">Icône</th>
-                <th scope="col">MS####</th>
-                <th scope="col">Début</th>
-                <th scope="col">Fin</th>
+                <th scope="col">Vignette</th>
+                <th scope="col" class="series-years-th">Année</th>
                 <th scope="col">Description</th>
                 <th scope="col">Œuvres</th>
               </tr>
@@ -80,6 +79,17 @@
       </div>
     </main>
   </div>
+
+  <dialog id="series-vignette-dialog" class="series-vignette-dialog">
+    <div class="series-vignette-dialog-panel">
+      <header class="series-vignette-dialog-header">
+        <h2 class="series-vignette-dialog-title" id="series-vignette-dialog-title">Choisir une vignette</h2>
+        <button type="button" class="series-vignette-dialog-close" id="series-vignette-dialog-close" aria-label="Fermer">×</button>
+      </header>
+      <p class="series-vignette-dialog-hint" id="series-vignette-dialog-hint"></p>
+      <div id="series-vignette-mosaic" class="series-vignette-mosaic"></div>
+    </div>
+  </dialog>
 
   <script src="series.js"></script>
 </body>

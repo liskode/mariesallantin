@@ -224,9 +224,17 @@
     return c.code || c._tempId;
   }
 
+  function updateSaveBtn() {
+    if (!saveBtn) return;
+    const dirty = dirtyCodes.size > 0;
+    saveBtn.disabled = !dirty;
+    saveBtn.classList.toggle('legend-editor-btn--save-dirty', dirty);
+    saveBtn.classList.toggle('legend-editor-btn--save-clean', !dirty);
+  }
+
   function markDirty(code) {
     dirtyCodes.add(code);
-    if (saveBtn) saveBtn.disabled = dirtyCodes.size === 0;
+    updateSaveBtn();
   }
 
   /** @type {HTMLDivElement | null} */
@@ -450,7 +458,7 @@
     if (!j.ok) throw new Error(j.error || 'chargement impossible');
     collectors = await enrichCollectorsWithThumbs(j.collectors || []);
     dirtyCodes.clear();
-    if (saveBtn) saveBtn.disabled = true;
+    updateSaveBtn();
     renderTable();
     setStatus('');
   }
@@ -465,17 +473,21 @@
     saveBtn.disabled = true;
     setStatus('Enregistrement…');
 
-    const r = await apiFetch('/api/collectors/save', {
-      method: 'POST',
-      body: JSON.stringify({ token, collectors: toSave }),
-    });
-    const j = await r.json();
-    if (!j.ok) throw new Error(j.error || 'échec enregistrement');
+    try {
+      const r = await apiFetch('/api/collectors/save', {
+        method: 'POST',
+        body: JSON.stringify({ token, collectors: toSave }),
+      });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || 'échec enregistrement');
 
-    collectors = await enrichCollectorsWithThumbs(j.collectors || collectors);
-    dirtyCodes.clear();
-    renderTable();
-    setStatus('Enregistré (' + toSave.length + ' fiche(s)).');
+      collectors = await enrichCollectorsWithThumbs(j.collectors || collectors);
+      dirtyCodes.clear();
+      renderTable();
+      setStatus('Enregistré (' + toSave.length + ' fiche(s)).');
+    } finally {
+      updateSaveBtn();
+    }
   }
 
   async function createCollector() {

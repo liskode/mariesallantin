@@ -15,10 +15,14 @@
   let resolvedApiBase = '';
   /** @type {Map<string, string> | null} */
   let workMediaById = null;
+  /** @type {Map<string, object[]>} */
+  let worksBySeries = new Map();
   /** @type {Array<object>} */
   let seriesList = [];
   const dirtyCodes = new Set();
   let token = '';
+  /** @type {{ series: object, iconImg: HTMLImageElement, workInput: HTMLInputElement, tr: HTMLTableRowElement } | null} */
+  let vignettePickerCtx = null;
 
   const loginEl = document.getElementById('series-login');
   const appEl = document.getElementById('series-app');
@@ -31,6 +35,12 @@
   const statusEl = document.getElementById('series-status');
   const saveBtn = document.getElementById('series-save-btn');
   const reloadBtn = document.getElementById('series-reload-btn');
+  const addBtn = document.getElementById('series-add-btn');
+  const vignetteDialog = document.getElementById('series-vignette-dialog');
+  const vignetteDialogTitle = document.getElementById('series-vignette-dialog-title');
+  const vignetteDialogHint = document.getElementById('series-vignette-dialog-hint');
+  const vignetteMosaic = document.getElementById('series-vignette-mosaic');
+  const vignetteDialogClose = document.getElementById('series-vignette-dialog-close');
 
   async function loadSiteConfig() {
     if (siteConfig) return siteConfig;
@@ -134,31 +144,51 @@
       .join('/');
   }
 
-  function thumbUrlForWorkId(workId) {
-    if (!workMediaById || !workId) return '';
-    const media = workMediaById.get(workId);
-    if (!media) return '';
+  function thumbUrlForWork(work) {
+    if (!work) return '';
+    const media = typeof work === 'string' ? workMediaById && workMediaById.get(work) : work.media;
+    const workId = typeof work === 'string' ? work : work.id;
+    if (!media && workId && workMediaById) {
+      const m = workMediaById.get(workId);
+      if (m) return thumbUrlForMedia(m);
+    }
+    return media ? thumbUrlForMedia(String(media)) : '';
+  }
+
+  function thumbUrlForMedia(media) {
     const thumbRel = webThumbRelFromMediaFp(media);
     return thumbRel
       ? MEDIA_BASE + encodeMediaPath(thumbRel)
       : MEDIA_BASE + encodeMediaPath(media);
   }
 
-  async function loadWorkMediaMap() {
-    if (workMediaById) return workMediaById;
+  function thumbUrlForWorkId(workId) {
+    if (!workId) return '';
+    if (workMediaById && workMediaById.has(workId)) {
+      return thumbUrlForMedia(workMediaById.get(workId));
+    }
+    return '';
+  }
+
+  async function loadWorksCatalog() {
+    if (workMediaById) return;
     workMediaById = new Map();
+    worksBySeries = new Map();
     try {
       const r = await fetch(MEDIA_BASE + 'works.json');
       if (r.ok) {
         const j = await r.json();
         for (const w of j.works || []) {
           if (w.id && w.media) workMediaById.set(w.id, String(w.media));
+          for (const code of w.series || []) {
+            if (!worksBySeries.has(code)) worksBySeries.set(code, []);
+            worksBySeries.get(code).push(w);
+          }
         }
       }
     } catch {
       /* optionnel */
     }
-    return workMediaById;
   }
 
   function setStatus(msg, isError) {
@@ -167,9 +197,17 @@
     statusEl.style.color = isError ? '#b00020' : '';
   }
 
+  function updateSaveBtn() {
+    if (!saveBtn) return;
+    const dirty = dirtyCodes.size > 0;
+    saveBtn.disabled = !dirty;
+    saveBtn.classList.toggle('legend-editor-btn--save-dirty', dirty);
+    saveBtn.classList.toggle('legend-editor-btn--save-clean', !dirty);
+  }
+
   function markDirty(code) {
     dirtyCodes.add(code);
-    if (saveBtn) saveBtn.disabled = dirtyCodes.size === 0;
+    updateSaveBtn();
   }
 
   function updateIconPreview(imgEl, workId) {
@@ -191,6 +229,108 @@
     }
   }
 
+  function parseYearInput(raw) {
+    const v = String(raw || '').replace(/\D/g, '').slice(0, 4);
+    if (!v) return { display: '', value: null };
+    const n = parseInt(v, 10);
+    if (v.length === 4 && n >= 1000 && n <= 9999) return { display: v, value: n };
+    return { display: v, value: null };
+  }
+
+  function bindYearInput(input, seriesObj, field, tr) {
+    input.type = 'text';
+    input.inputMode = 'numeric';
+    input.maxLength = 4;
+    input.className = 'legend-input series-year-input';
+    input.placeholder = '····';
+    input.value = seriesObj[field] != null ? String(seriesObj[field]) : '';
+    input.addEventListener('input', () => {
+      const digits = input.value.replace(/\D/g, '').slice(0, 4);
+      input.value = digits;
+      const parsed = parseYearInput(digits);
+      seriesObj[field] = parsed.value;
+      markDirty(seriesObj.code);
+      tr.classList.add('legend-editor-row--dirty');
+    });
+  }
+
+  function closeVignetteDialog() {
+    vignettePickerCtx = null;
+    if (vignetteDialog && vignetteDialog.open) vignetteDialog.close();
+  }
+
+  function openVignettePicker(seriesObj, iconImg, workInput, tr) {
+    if (!vignetteDialog || !vignetteMosaic) return;
+    vignettePickerCtx = { series: seriesObj, iconImg, workInput, tr };
+    const works = worksBySeries.get(seriesObj.code) || [];
+    const label = seriesObj.label || seriesObj.code;
+
+    if (vignetteDialogTitle) {
+      vignetteDialogTitle.textContent = 'Vignette — ' + label;
+    }
+    if (vignetteDialogHint) {
+      vignetteDialogHint.textContent = works.length
+        ? works.length + ' œuvre(s) dans cette série. Cliquez pour choisir.'
+        : 'Aucune œuvre liée à cette série dans works.json.';
+    }
+
+    vignetteMosaic.innerHTML = '';
+    if (!works.length) {
+      const empty = document.createElement('p');
+      empty.className = 'series-vignette-mosaic-empty';
+      empty.textContent = 'Aucune vignette disponible.';
+      vignetteMosaic.appendChild(empty);
+    } else {
+      for (const w of works) {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'series-vignette-mosaic-item';
+        if (seriesObj.icon_work_id === w.id) {
+          btn.classList.add('series-vignette-mosaic-item--selected');
+        }
+        btn.title = w.id + (w.title ? ' — ' + w.title : '');
+
+        const img = document.createElement('img');
+        img.className = 'series-vignette-mosaic-thumb';
+        img.alt = '';
+        img.width = 72;
+        img.height = 72;
+        const url = thumbUrlForWork(w);
+        if (url) {
+          img.src = url;
+          img.onerror = function () {
+            if (w.media) {
+              img.onerror = null;
+              img.src = MEDIA_BASE + encodeMediaPath(w.media);
+            }
+          };
+        }
+
+        const idEl = document.createElement('span');
+        idEl.className = 'series-vignette-mosaic-id';
+        idEl.textContent = w.id;
+
+        btn.appendChild(img);
+        btn.appendChild(idEl);
+        btn.addEventListener('click', () => {
+          seriesObj.icon_work_id = w.id;
+          if (workInput) workInput.value = w.id;
+          updateIconPreview(iconImg, w.id);
+          markDirty(seriesObj.code);
+          tr.classList.add('legend-editor-row--dirty');
+          closeVignetteDialog();
+        });
+        vignetteMosaic.appendChild(btn);
+      }
+    }
+
+    if (typeof vignetteDialog.showModal === 'function') {
+      vignetteDialog.showModal();
+    } else {
+      vignetteDialog.setAttribute('open', '');
+    }
+  }
+
   function renderTable() {
     if (!tbody) return;
     tbody.innerHTML = '';
@@ -206,7 +346,7 @@
       const tdLabel = document.createElement('td');
       const labelInput = document.createElement('input');
       labelInput.type = 'text';
-      labelInput.className = 'legend-input';
+      labelInput.className = 'legend-input series-label-input';
       labelInput.value = s.label || '';
       labelInput.addEventListener('input', () => {
         s.label = labelInput.value;
@@ -215,53 +355,69 @@
       });
       tdLabel.appendChild(labelInput);
 
-      const tdIcon = document.createElement('td');
-      tdIcon.className = 'series-icon-cell';
+      const tdVignette = document.createElement('td');
+      tdVignette.className = 'series-vignette-cell';
+
+      const thumbBtn = document.createElement('button');
+      thumbBtn.type = 'button';
+      thumbBtn.className = 'series-vignette-btn';
+      thumbBtn.title = 'Choisir une vignette dans la série';
+
       const iconImg = document.createElement('img');
       iconImg.className = 'series-icon-thumb';
       iconImg.alt = '';
-      iconImg.width = 56;
-      iconImg.height = 56;
+      iconImg.width = 36;
+      iconImg.height = 36;
       updateIconPreview(iconImg, s.icon_work_id);
-      tdIcon.appendChild(iconImg);
 
-      const tdWorkId = document.createElement('td');
+      const placeholder = document.createElement('span');
+      placeholder.className = 'series-icon-placeholder';
+      placeholder.textContent = '＋';
+      placeholder.hidden = !!s.icon_work_id;
+
+      thumbBtn.appendChild(iconImg);
+      thumbBtn.appendChild(placeholder);
+
       const workInput = document.createElement('input');
       workInput.type = 'text';
       workInput.className = 'legend-input series-work-id-input';
-      workInput.placeholder = 'MS0000';
+      workInput.placeholder = 'MS####';
+      workInput.maxLength = 6;
       workInput.value = s.icon_work_id || '';
       workInput.addEventListener('input', () => {
         s.icon_work_id = workInput.value.trim().toUpperCase();
+        placeholder.hidden = !!s.icon_work_id;
         updateIconPreview(iconImg, s.icon_work_id);
         markDirty(s.code);
         tr.classList.add('legend-editor-row--dirty');
       });
-      tdWorkId.appendChild(workInput);
 
-      function yearCell(field) {
-        const td = document.createElement('td');
-        const input = document.createElement('input');
-        input.type = 'number';
-        input.min = '1000';
-        input.max = '9999';
-        input.step = '1';
-        input.className = 'legend-input series-year-input';
-        input.value = s[field] != null ? String(s[field]) : '';
-        input.addEventListener('input', () => {
-          const v = input.value.trim();
-          s[field] = v ? parseInt(v, 10) : null;
-          markDirty(s.code);
-          tr.classList.add('legend-editor-row--dirty');
-        });
-        td.appendChild(input);
-        return td;
-      }
+      thumbBtn.addEventListener('click', () => {
+        openVignettePicker(s, iconImg, workInput, tr);
+      });
+
+      tdVignette.appendChild(thumbBtn);
+      tdVignette.appendChild(workInput);
+
+      const tdYears = document.createElement('td');
+      tdYears.className = 'series-years-cell';
+      const yearStart = document.createElement('input');
+      const yearEnd = document.createElement('input');
+      bindYearInput(yearStart, s, 'year_start', tr);
+      bindYearInput(yearEnd, s, 'year_end', tr);
+      const yearSep = document.createElement('span');
+      yearSep.className = 'series-years-sep';
+      yearSep.textContent = 'à';
+      tdYears.appendChild(yearStart);
+      tdYears.appendChild(yearSep);
+      tdYears.appendChild(yearEnd);
 
       const tdDesc = document.createElement('td');
       const descArea = document.createElement('textarea');
       descArea.className = 'legend-input series-desc-textarea';
-      descArea.rows = 3;
+      descArea.rows = 2;
+      descArea.title = 'Coller le texte ici';
+      descArea.placeholder = 'Coller…';
       descArea.value = s.description || '';
       descArea.addEventListener('input', () => {
         s.description = descArea.value;
@@ -276,10 +432,8 @@
 
       tr.appendChild(tdCode);
       tr.appendChild(tdLabel);
-      tr.appendChild(tdIcon);
-      tr.appendChild(tdWorkId);
-      tr.appendChild(yearCell('year_start'));
-      tr.appendChild(yearCell('year_end'));
+      tr.appendChild(tdVignette);
+      tr.appendChild(tdYears);
       tr.appendChild(tdDesc);
       tr.appendChild(tdCount);
       tbody.appendChild(tr);
@@ -290,13 +444,13 @@
 
   async function loadSeries() {
     setStatus('Chargement…');
-    await loadWorkMediaMap();
+    await loadWorksCatalog();
     const r = await apiFetch('/api/series?token=' + encodeURIComponent(token));
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || 'chargement impossible');
     seriesList = j.series || [];
     dirtyCodes.clear();
-    if (saveBtn) saveBtn.disabled = true;
+    updateSaveBtn();
     renderTable();
     setStatus('');
   }
@@ -309,16 +463,45 @@
     }
     saveBtn.disabled = true;
     setStatus('Enregistrement…');
-    const r = await apiFetch('/api/series/save', {
+    try {
+      const r = await apiFetch('/api/series/save', {
+        method: 'POST',
+        body: JSON.stringify({ token, series: toSave }),
+      });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || 'échec enregistrement');
+      seriesList = j.series || seriesList;
+      dirtyCodes.clear();
+      renderTable();
+      setStatus('Enregistré (' + toSave.length + ' fiche(s)).');
+    } finally {
+      updateSaveBtn();
+    }
+  }
+
+  async function createSeries() {
+    const code = window.prompt(
+      'Code de la nouvelle série (2–12 caractères, ex. ABSTR) :'
+    );
+    if (!code) return;
+    const normalized = code.trim().toUpperCase();
+    if (!/^[A-Z0-9]{2,12}$/.test(normalized)) {
+      setStatus('Code invalide : 2–12 caractères A-Z ou chiffres.', true);
+      return;
+    }
+    const label = window.prompt('Libellé de la série (optionnel) :') || '';
+    setStatus('Création…');
+    const r = await apiFetch('/api/series/create', {
       method: 'POST',
-      body: JSON.stringify({ token, series: toSave }),
+      body: JSON.stringify({ token, code: normalized, label: label.trim() }),
     });
     const j = await r.json();
-    if (!j.ok) throw new Error(j.error || 'échec enregistrement');
+    if (!j.ok) throw new Error(j.error || 'échec création');
     seriesList = j.series || seriesList;
     dirtyCodes.clear();
+    updateSaveBtn();
     renderTable();
-    setStatus('Enregistré (' + toSave.length + ' fiche(s)).');
+    setStatus('Série ' + normalized + ' créée.');
   }
 
   async function checkApiHealth() {
@@ -392,6 +575,23 @@
   if (reloadBtn) {
     reloadBtn.addEventListener('click', () => {
       loadSeries().catch((e) => setStatus(String(e.message || e), true));
+    });
+  }
+  if (addBtn) {
+    addBtn.addEventListener('click', () => {
+      createSeries().catch((e) => setStatus(String(e.message || e), true));
+    });
+  }
+  if (vignetteDialogClose) {
+    vignetteDialogClose.addEventListener('click', closeVignetteDialog);
+  }
+  if (vignetteDialog) {
+    vignetteDialog.addEventListener('click', (e) => {
+      if (e.target === vignetteDialog) closeVignetteDialog();
+    });
+    vignetteDialog.addEventListener('cancel', (e) => {
+      e.preventDefault();
+      closeVignetteDialog();
     });
   }
 
