@@ -2,8 +2,7 @@
  * Éditeur tableaux (œuvres) — API locale (dev) ou Edge Function Supabase (en ligne).
  */
 (function () {
-  const EDIT_PASS = 'MS75';
-  const AUTH_KEY = 'works_edit_ok';
+  const AUTH = () => window.EditorCommon;
   const MEDIA_BASE = 'media/';
   const PAGE_SIZE = 50;
   const PRODUCTION_API =
@@ -298,10 +297,21 @@
     openSeriesPanel = null;
   }
 
+  function seriesPanelColumnCount() {
+    const n = (meta.series || []).length;
+    if (n <= 8) return 2;
+    if (n <= 16) return 3;
+    if (n <= 30) return 4;
+    return 5;
+  }
+
   function positionSeriesPanel(toggle, panel) {
     const rect = toggle.getBoundingClientRect();
+    const cols = seriesPanelColumnCount();
     panel.classList.add('works-series-panel--fixed');
-    panel.style.minWidth = Math.max(rect.width, 160) + 'px';
+    panel.dataset.columns = String(cols);
+    const minW = Math.max(rect.width, cols * 5.75 * 16);
+    panel.style.minWidth = minW + 'px';
     panel.style.left = rect.left + 'px';
     panel.style.top = rect.bottom + 2 + 'px';
     const panelRect = panel.getBoundingClientRect();
@@ -319,6 +329,7 @@
 
   function optionLabel(x, mode) {
     if (mode === 'name') return x.label || x.code;
+    if (mode === 'label') return x.label || x.code;
     if (mode === 'code') return x.code;
     return x.label ? `${x.code} — ${x.label}` : x.code;
   }
@@ -383,6 +394,10 @@
     panel.className = 'works-series-panel catalogue-multiselect-panel';
     panel.hidden = true;
 
+    const grid = document.createElement('div');
+    grid.className = 'works-series-panel-grid';
+    grid.style.setProperty('--works-series-cols', String(seriesPanelColumnCount()));
+
     const selected = new Set(work.series_codes || []);
 
     sortByCode(meta.series).forEach((x) => {
@@ -404,8 +419,10 @@
       });
       label.appendChild(cb);
       label.appendChild(document.createTextNode(x.code));
-      panel.appendChild(label);
+      grid.appendChild(label);
     });
+
+    panel.appendChild(grid);
 
     const newBtn = document.createElement('button');
     newBtn.type = 'button';
@@ -785,8 +802,9 @@
           placeholder: '—',
           allowEmpty: false,
           allowNew: false,
-          labelMode: 'code',
+          labelMode: 'label',
           defaultValue: 'OK',
+          extraClass: 'works-photo-select',
         })
       );
 
@@ -880,14 +898,15 @@
   function bindEvents() {
     loginBtn.addEventListener('click', async () => {
       const pass = passEl.value.trim();
-      if (pass !== EDIT_PASS) {
+      const ec = AUTH();
+      if (!ec || !ec.validatePassword(pass)) {
         loginErr.hidden = false;
         loginErr.textContent = 'Mot de passe incorrect.';
         return;
       }
       loginErr.hidden = true;
       token = pass;
-      sessionStorage.setItem(AUTH_KEY, '1');
+      ec.setSessionToken(pass);
       await enterApp();
     });
 
@@ -940,8 +959,9 @@
   async function init() {
     bindEvents();
     await showApiHint();
-    if (sessionStorage.getItem(AUTH_KEY) === '1') {
-      token = EDIT_PASS;
+    if (AUTH() && AUTH().hasSession()) {
+      token = AUTH().getSessionToken() || '';
+      if (passEl) passEl.value = token;
       await enterApp();
     }
   }

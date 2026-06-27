@@ -2,8 +2,7 @@
  * Éditeur formats & techniques — API locale ou Edge Function Supabase.
  */
 (function () {
-  const EDIT_PASS = 'MS75';
-  const AUTH_KEY = 'codes_edit_ok';
+  const AUTH = () => window.EditorCommon;
   const PRODUCTION_API =
     'https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/codes-api';
 
@@ -449,15 +448,16 @@
 
   async function tryLogin() {
     const pass = passEl ? passEl.value : '';
-    if (pass !== EDIT_PASS) {
+    const ec = AUTH();
+    if (!ec || !ec.validatePassword(pass)) {
       if (loginErr) {
         loginErr.textContent = 'Mot de passe incorrect.';
         loginErr.hidden = false;
       }
       return;
     }
-    token = pass;
-    sessionStorage.setItem(AUTH_KEY, '1');
+    token = pass.trim();
+    ec.setSessionToken(token);
     if (!(await checkApiHealth())) {
       if (loginErr) {
         loginErr.textContent = isProductionHost()
@@ -504,8 +504,8 @@
   }
 
   checkApiHealth();
-  if (sessionStorage.getItem(AUTH_KEY) === '1' && passEl) {
-    passEl.value = EDIT_PASS;
+  if (AUTH() && AUTH().hasSession() && passEl) {
+    passEl.value = AUTH().getSessionToken() || '';
     tryLogin();
   }
 })();

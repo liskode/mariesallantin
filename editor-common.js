@@ -14,6 +14,53 @@
   ];
 
   const LOCAL_EDITOR_PORTS = new Set(['47832', '47833', '47834', '47835']);
+  const EDIT_PASS = 'MS75';
+  const AUTH_STORAGE_KEY = 'mariesallantin_editor_token';
+  const LEGACY_AUTH_KEYS = [
+    'works_edit_ok',
+    'series_edit_ok',
+    'codes_edit_ok',
+    'collectors_edit_ok',
+    'catalogue_edit_mode_ok',
+  ];
+
+  function validatePassword(pass) {
+    return String(pass || '').trim() === EDIT_PASS;
+  }
+
+  function migrateLegacyAuth() {
+    for (const key of LEGACY_AUTH_KEYS) {
+      if (sessionStorage.getItem(key) === '1') {
+        sessionStorage.setItem(AUTH_STORAGE_KEY, EDIT_PASS);
+        LEGACY_AUTH_KEYS.forEach((k) => sessionStorage.removeItem(k));
+        return EDIT_PASS;
+      }
+    }
+    return null;
+  }
+
+  function getSessionToken() {
+    const stored = sessionStorage.getItem(AUTH_STORAGE_KEY);
+    if (stored === EDIT_PASS) return stored;
+    return migrateLegacyAuth();
+  }
+
+  function hasSession() {
+    return getSessionToken() === EDIT_PASS;
+  }
+
+  function setSessionToken(pass) {
+    const p = String(pass || '').trim();
+    if (p !== EDIT_PASS) return false;
+    sessionStorage.setItem(AUTH_STORAGE_KEY, p);
+    LEGACY_AUTH_KEYS.forEach((k) => sessionStorage.removeItem(k));
+    return true;
+  }
+
+  function clearSession() {
+    sessionStorage.removeItem(AUTH_STORAGE_KEY);
+    LEGACY_AUTH_KEYS.forEach((k) => sessionStorage.removeItem(k));
+  }
 
   /**
    * @param {number} count
@@ -112,6 +159,12 @@
   global.EditorCommon = {
     TRASH_ICON,
     EDITOR_TABS,
+    EDIT_PASS,
+    validatePassword,
+    getSessionToken,
+    hasSession,
+    setSessionToken,
+    clearSession,
     appendDeleteCell,
     renderEditorTabs,
     mountEditorTabs,
