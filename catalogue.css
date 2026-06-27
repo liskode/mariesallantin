@@ -1702,6 +1702,7 @@ body.catalogue-standalone {
   object-fit: cover;
   border-radius: 4px;
   background: #f2f3f7;
+  cursor: zoom-in;
 }
 
 .works-thumb-img--empty {
@@ -1732,15 +1733,35 @@ body.catalogue-standalone {
   white-space: nowrap;
 }
 
-.works-series-cell {
-  max-width: 8rem;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.works-select-cell {
+  padding: 3px 4px;
+  vertical-align: middle;
 }
 
-.works-edit-row-btn {
-  padding: 4px 8px;
+.works-row-select {
+  width: 100%;
+  min-width: 5.5rem;
+  max-width: 11rem;
   font-size: 0.78rem;
+  padding: 3px 4px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  background: #fff;
+}
+
+.works-collector-select {
+  min-width: 7rem;
+  max-width: 14rem;
+}
+
+.works-row-series-select {
+  min-width: 6.5rem;
+  max-width: 10rem;
+  height: auto;
+}
+
+.works-series-select-cell {
+  max-width: 10rem;
 }
 
 .works-editor-empty {

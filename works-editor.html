@@ -84,7 +84,6 @@
                 <th scope="col">Collectionneur</th>
                 <th scope="col">Pub.</th>
                 <th scope="col">Photo</th>
-                <th scope="col" class="editor-action-th"><span class="visually-hidden">Éditer</span></th>
               </tr>
             </thead>
             <tbody id="works-tbody"></tbody>
@@ -94,69 +93,7 @@
     </main>
   </div>
 
-  <div id="works-edit-backdrop" class="catalogue-edit-backdrop" hidden></div>
-  <dialog id="works-edit-dialog" class="catalogue-edit-dialog" aria-labelledby="works-edit-title">
-    <button type="button" class="catalogue-edit-close" id="works-edit-close" aria-label="Fermer">×</button>
-    <div class="catalogue-edit-layout">
-      <div class="catalogue-edit-left">
-        <img id="works-edit-image" class="catalogue-edit-image" alt="" />
-        <p class="catalogue-edit-id" id="works-edit-id"></p>
-      </div>
-      <form class="catalogue-edit-form" id="works-edit-form">
-        <h2 id="works-edit-title">Édition tableau</h2>
-        <label class="catalogue-edit-label">
-          <span>Titre / légende</span>
-          <textarea id="works-edit-title-input" rows="4"></textarea>
-        </label>
-        <label class="catalogue-edit-label">
-          <span>Année (4 chiffres)</span>
-          <input id="works-edit-year" type="text" inputmode="numeric" maxlength="4" />
-        </label>
-        <label class="catalogue-edit-label">
-          <span>Format</span>
-          <select id="works-edit-format"></select>
-        </label>
-        <div class="works-edit-dimensions">
-          <label class="catalogue-edit-label">
-            <span>Largeur (cm)</span>
-            <input id="works-edit-width" type="text" inputmode="decimal" />
-          </label>
-          <label class="catalogue-edit-label">
-            <span>Hauteur (cm)</span>
-            <input id="works-edit-height" type="text" inputmode="decimal" />
-          </label>
-        </div>
-        <label class="catalogue-edit-label">
-          <span>Technique</span>
-          <select id="works-edit-technique"></select>
-        </label>
-        <label class="catalogue-edit-label">
-          <span>Séries (sélection multiple)</span>
-          <button type="button" class="catalogue-multiselect-toggle" id="works-edit-series-toggle">Choisir…</button>
-          <div class="catalogue-multiselect-panel" id="works-edit-series-panel" hidden></div>
-          <select id="works-edit-series-add" class="works-edit-series-add-select">
-            <option value="">Ajouter une série…</option>
-          </select>
-        </label>
-        <label class="catalogue-edit-label">
-          <span>Collectionneur</span>
-          <select id="works-edit-collector"></select>
-        </label>
-        <label class="catalogue-edit-label">
-          <span>Statut publication</span>
-          <select id="works-edit-publication"></select>
-        </label>
-        <label class="catalogue-edit-label">
-          <span>Statut photo</span>
-          <select id="works-edit-photo"></select>
-        </label>
-        <p class="catalogue-edit-error" id="works-edit-error" hidden></p>
-        <div class="catalogue-edit-actions">
-          <button type="submit" class="catalogue-edit-save">Appliquer à cette œuvre</button>
-        </div>
-      </form>
-    </div>
-  </dialog>
+  <img id="works-preview-img" class="catalogue-preview" alt="" aria-hidden="true" />
 
   <script src="editor-common.js"></script>
   <script src="works-editor.js"></script>

@@ -38,8 +38,6 @@
   let token = '';
   let filterText = '';
   let currentPage = 0;
-  /** @type {string | null} */
-  let activeEditId = null;
 
   const loginEl = document.getElementById('works-login');
   const appEl = document.getElementById('works-app');
@@ -57,25 +55,7 @@
   const pagePrevBtn = document.getElementById('works-page-prev');
   const pageNextBtn = document.getElementById('works-page-next');
   const pageInfoEl = document.getElementById('works-page-info');
-  const editDialog = document.getElementById('works-edit-dialog');
-  const editBackdrop = document.getElementById('works-edit-backdrop');
-  const editCloseBtn = document.getElementById('works-edit-close');
-  const editForm = document.getElementById('works-edit-form');
-  const editImage = document.getElementById('works-edit-image');
-  const editIdEl = document.getElementById('works-edit-id');
-  const editTitleInput = document.getElementById('works-edit-title-input');
-  const editYearInput = document.getElementById('works-edit-year');
-  const editFormatSel = document.getElementById('works-edit-format');
-  const editWidthInput = document.getElementById('works-edit-width');
-  const editHeightInput = document.getElementById('works-edit-height');
-  const editTechniqueSel = document.getElementById('works-edit-technique');
-  const editSeriesToggle = document.getElementById('works-edit-series-toggle');
-  const editSeriesPanel = document.getElementById('works-edit-series-panel');
-  const editSeriesAddSel = document.getElementById('works-edit-series-add');
-  const editCollectorSel = document.getElementById('works-edit-collector');
-  const editPublicationSel = document.getElementById('works-edit-publication');
-  const editPhotoSel = document.getElementById('works-edit-photo');
-  const editErrorEl = document.getElementById('works-edit-error');
+  const previewImg = document.getElementById('works-preview-img');
 
   async function loadSiteConfig() {
     if (siteConfig) return siteConfig;
@@ -270,8 +250,9 @@
     saveBtn.classList.toggle('legend-editor-btn--save-clean', !dirty);
   }
 
-  function markDirty(id) {
+  function markDirty(id, tr) {
     dirtyIds.add(id);
+    if (tr) tr.classList.add('legend-editor-row--dirty');
     updateSaveBtn();
   }
 
@@ -279,17 +260,28 @@
     return meta.formats.find((f) => f.code === code) || null;
   }
 
-  function labelForCode(list, code) {
-    if (!code) return '—';
-    const item = list.find((x) => x.code === code);
-    return item && item.label ? item.label : code;
+  function optionLabel(x, mode) {
+    if (mode === 'name') return x.label || x.code;
+    if (mode === 'code') return x.code;
+    return x.label ? `${x.code} — ${x.label}` : x.code;
   }
 
-  function fillCodeSelect(selectEl, options, placeholder, allowEmpty, allowNew) {
-    if (!selectEl) return;
-    const previous = selectEl.value;
+  /**
+   * @param {HTMLSelectElement} selectEl
+   * @param {Array<{code:string,label?:string}>} options
+   * @param {{ placeholder?: string, allowEmpty?: boolean, allowNew?: boolean, labelMode?: string, currentValue?: string }} cfg
+   */
+  function fillSelectOptions(selectEl, options, cfg) {
+    const {
+      placeholder = '—',
+      allowEmpty = true,
+      allowNew = false,
+      labelMode = 'code-label',
+      currentValue = '',
+    } = cfg || {};
+
     selectEl.innerHTML = '';
-    if (allowEmpty !== false) {
+    if (allowEmpty) {
       const optEmpty = document.createElement('option');
       optEmpty.value = '';
       optEmpty.textContent = placeholder;
@@ -298,66 +290,38 @@
     options.forEach((x) => {
       const o = document.createElement('option');
       o.value = x.code;
-      o.textContent = x.label ? `${x.code} — ${x.label}` : x.code;
+      o.textContent = optionLabel(x, labelMode);
       selectEl.appendChild(o);
     });
-    if (allowNew !== false) {
+    if (allowNew) {
       const optNew = document.createElement('option');
       optNew.value = NEW_OPTION_VALUE;
       optNew.textContent = '— Nouveau —';
       optNew.className = 'works-select-new-option';
       selectEl.appendChild(optNew);
     }
-    if (previous && previous !== NEW_OPTION_VALUE) {
-      selectEl.value = previous;
+    if (currentValue && currentValue !== NEW_OPTION_VALUE) {
+      selectEl.value = currentValue;
     }
   }
 
-  function renderSeriesPanel(selectedCodes) {
-    if (!editSeriesPanel) return;
-    editSeriesPanel.innerHTML = '';
-    (meta.series || []).forEach((x) => {
-      const label = document.createElement('label');
-      label.className = 'catalogue-series-option';
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.value = x.code;
-      cb.checked = selectedCodes.includes(x.code);
-      label.appendChild(cb);
-      label.appendChild(document.createTextNode(x.label ? `${x.code} — ${x.label}` : x.code));
-      editSeriesPanel.appendChild(label);
-    });
-    renderSeriesAddSelect(selectedCodes);
-  }
-
-  function renderSeriesAddSelect(selectedCodes) {
-    if (!editSeriesAddSel) return;
+  function fillSeriesMultiSelect(selectEl, selectedCodes, allowNew) {
     const selected = new Set(selectedCodes || []);
-    editSeriesAddSel.innerHTML = '';
-    const optEmpty = document.createElement('option');
-    optEmpty.value = '';
-    optEmpty.textContent = 'Ajouter une série…';
-    editSeriesAddSel.appendChild(optEmpty);
+    selectEl.innerHTML = '';
     (meta.series || []).forEach((x) => {
-      if (selected.has(x.code)) return;
       const o = document.createElement('option');
       o.value = x.code;
       o.textContent = x.label ? `${x.code} — ${x.label}` : x.code;
-      editSeriesAddSel.appendChild(o);
+      o.selected = selected.has(x.code);
+      selectEl.appendChild(o);
     });
-    const optNew = document.createElement('option');
-    optNew.value = NEW_OPTION_VALUE;
-    optNew.textContent = '— Nouveau —';
-    optNew.className = 'works-select-new-option';
-    editSeriesAddSel.appendChild(optNew);
-  }
-
-  function checkSeriesCode(code) {
-    if (!editSeriesPanel || !code) return;
-    const cb = editSeriesPanel.querySelector(`input[type="checkbox"][value="${CSS.escape(code)}"]`);
-    if (cb) cb.checked = true;
-    updateSeriesToggleText();
-    renderSeriesAddSelect(readSelectedSeriesCodes());
+    if (allowNew) {
+      const optNew = document.createElement('option');
+      optNew.value = NEW_OPTION_VALUE;
+      optNew.textContent = '— Nouveau —';
+      optNew.className = 'works-select-new-option';
+      selectEl.appendChild(optNew);
+    }
   }
 
   async function createFormatFromPrompt() {
@@ -452,47 +416,137 @@
       else if (kind === 'collector') created = await createCollectorFromPrompt();
       else return false;
     } catch (e) {
-      if (editErrorEl) {
-        editErrorEl.hidden = false;
-        editErrorEl.textContent = String(e.message || e);
-      }
+      setStatus(String(e.message || e), true);
       return true;
     }
     if (!created) return true;
-    populateEditSelects();
-    selectEl.value = created;
-    selectEl.dataset.prevValue = created;
-    if (kind === 'format') applyFormatDimensions(created);
-    if (editErrorEl) {
-      editErrorEl.hidden = true;
-      editErrorEl.textContent = '';
+    return created;
+  }
+
+  function applyFormatDimensionsToWork(work, formatCode) {
+    const fmt = formatByCode(formatCode);
+    if (!fmt || !work) return;
+    if (fmt.width_cm != null) work.width_cm = fmt.width_cm;
+    if (fmt.height_cm != null) work.height_cm = fmt.height_cm;
+  }
+
+  function createCodeSelectCell(work, tr, field, kind, options, cfg) {
+    const td = document.createElement('td');
+    td.className = 'works-select-cell';
+    const select = document.createElement('select');
+    select.className = 'legend-select works-row-select' + (cfg.extraClass ? ' ' + cfg.extraClass : '');
+
+    fillSelectOptions(select, options, {
+      placeholder: cfg.placeholder,
+      allowEmpty: cfg.allowEmpty !== false,
+      allowNew: cfg.allowNew !== false,
+      labelMode: cfg.labelMode || 'code-label',
+      currentValue: work[field] || cfg.defaultValue || '',
+    });
+
+    select.addEventListener('focus', () => {
+      select.dataset.prevValue = select.value;
+    });
+
+    select.addEventListener('change', async () => {
+      if (cfg.allowNew !== false && select.value === NEW_OPTION_VALUE) {
+        const created = await handleSelectNew(select, kind);
+        if (created === true) return;
+        if (created) {
+          work[field] = created;
+          if (kind === 'format') applyFormatDimensionsToWork(work, created);
+          markDirty(work.id, tr);
+          renderTable();
+          setStatus(
+            (kind === 'format' ? 'Format' : kind === 'technique' ? 'Technique' : 'Collectionneur') +
+              ' ' + created + ' créé.'
+          );
+        }
+        return;
+      }
+
+      const v = String(select.value || '').trim().toUpperCase();
+      work[field] = v && v !== NEW_OPTION_VALUE ? v : null;
+      if (kind === 'format') applyFormatDimensionsToWork(work, work[field]);
+      markDirty(work.id, tr);
+    });
+
+    td.appendChild(select);
+    return td;
+  }
+
+  function createSeriesSelectCell(work, tr) {
+    const td = document.createElement('td');
+    td.className = 'works-select-cell works-series-select-cell';
+
+    const select = document.createElement('select');
+    select.multiple = true;
+    select.size = 2;
+    select.className = 'legend-select works-row-select works-row-series-select';
+    select.title = 'Maintenir Ctrl (Cmd) pour sélectionner plusieurs séries';
+    fillSeriesMultiSelect(select, work.series_codes || [], true);
+
+    select.addEventListener('change', async () => {
+      const values = [...select.selectedOptions].map((o) => o.value);
+      if (values.includes(NEW_OPTION_VALUE)) {
+        const newOpt = select.querySelector(`option[value="${NEW_OPTION_VALUE}"]`);
+        if (newOpt) newOpt.selected = false;
+        try {
+          const code = await createSeriesFromPrompt();
+          if (code) {
+            if (!work.series_codes) work.series_codes = [];
+            if (!work.series_codes.includes(code)) work.series_codes.push(code);
+            markDirty(work.id, tr);
+            renderTable();
+            setStatus('Série ' + code + ' créée.');
+          }
+        } catch (e) {
+          setStatus(String(e.message || e), true);
+        }
+        return;
+      }
+      work.series_codes = values.filter((v) => v !== NEW_OPTION_VALUE);
+      markDirty(work.id, tr);
+    });
+
+    td.appendChild(select);
+    return td;
+  }
+
+  function fullImageUrlForWorkId(workId) {
+    if (!workId || !workMediaById || !workMediaById.has(workId)) return '';
+    return MEDIA_BASE + encodeMediaPath(workMediaById.get(workId));
+  }
+
+  function attachThumbPreview(thumb, fullSrc) {
+    if (!thumb || !fullSrc) return;
+    thumb.style.cursor = 'zoom-in';
+
+    thumb.addEventListener('mouseenter', (e) => {
+      if (!previewImg) return;
+      previewImg.src = fullSrc;
+      previewImg.classList.add('is-visible');
+      positionThumbPreview(e);
+    });
+    thumb.addEventListener('mousemove', positionThumbPreview);
+    thumb.addEventListener('mouseleave', () => {
+      if (!previewImg) return;
+      previewImg.classList.remove('is-visible');
+      previewImg.removeAttribute('src');
+    });
+
+    function positionThumbPreview(e) {
+      if (!previewImg || !previewImg.classList.contains('is-visible')) return;
+      const pad = 16;
+      const w = previewImg.offsetWidth || 400;
+      const h = previewImg.offsetHeight || 300;
+      let x = e.clientX + pad;
+      let y = e.clientY + pad;
+      if (x + w > window.innerWidth - pad) x = e.clientX - w - pad;
+      if (y + h > window.innerHeight - pad) y = e.clientY - h - pad;
+      previewImg.style.left = Math.max(pad, x) + 'px';
+      previewImg.style.top = Math.max(pad, y) + 'px';
     }
-    setStatus(`${kind === 'format' ? 'Format' : kind === 'technique' ? 'Technique' : 'Collectionneur'} ${created} créé.`);
-    return true;
-  }
-
-  function bindSelectNewHandler(selectEl, kind, onRegularChange) {
-    if (!selectEl) return;
-    selectEl.addEventListener('focus', () => {
-      selectEl.dataset.prevValue = selectEl.value;
-    });
-    selectEl.addEventListener('change', async () => {
-      if (await handleSelectNew(selectEl, kind)) return;
-      if (onRegularChange) onRegularChange();
-    });
-  }
-
-  function readSelectedSeriesCodes() {
-    if (!editSeriesPanel) return [];
-    return [...editSeriesPanel.querySelectorAll('input[type="checkbox"]:checked')]
-      .map((el) => String(el.value || '').trim().toUpperCase())
-      .filter(Boolean);
-  }
-
-  function updateSeriesToggleText() {
-    if (!editSeriesToggle) return;
-    const selected = readSelectedSeriesCodes();
-    editSeriesToggle.textContent = selected.length ? selected.join(', ') : 'Choisir…';
   }
 
   function filteredWorks() {
@@ -554,7 +608,7 @@
     if (!pageItems.length) {
       const tr = document.createElement('tr');
       const td = document.createElement('td');
-      td.colSpan = 11;
+      td.colSpan = 10;
       td.textContent = filterText.trim()
         ? 'Aucun tableau ne correspond au filtre.'
         : 'Aucun tableau.';
@@ -587,6 +641,8 @@
       } else {
         img.classList.add('works-thumb-img--empty');
       }
+      const fullSrc = fullImageUrlForWorkId(work.id);
+      if (fullSrc) attachThumbPreview(img, fullSrc);
       tdThumb.appendChild(img);
       tr.appendChild(tdThumb);
 
@@ -606,217 +662,47 @@
       tdYear.textContent = work.year != null ? String(work.year) : '—';
       tr.appendChild(tdYear);
 
-      const tdFormat = document.createElement('td');
-      tdFormat.className = 'works-code-ref-cell';
-      tdFormat.textContent = work.format_code || '—';
-      tdFormat.title = labelForCode(meta.formats, work.format_code);
-      tr.appendChild(tdFormat);
-
-      const tdTechnique = document.createElement('td');
-      tdTechnique.className = 'works-code-ref-cell';
-      tdTechnique.textContent = work.technique_code || '—';
-      tdTechnique.title = labelForCode(meta.techniques, work.technique_code);
-      tr.appendChild(tdTechnique);
-
-      const tdSeries = document.createElement('td');
-      tdSeries.className = 'works-series-cell';
-      const seriesCodes = work.series_codes || [];
-      tdSeries.textContent = seriesCodes.length ? seriesCodes.join(', ') : '—';
-      tr.appendChild(tdSeries);
-
-      const tdCollector = document.createElement('td');
-      tdCollector.className = 'works-code-ref-cell';
-      tdCollector.textContent = work.collector_code || '—';
-      tdCollector.title = labelForCode(meta.collectors, work.collector_code);
-      tr.appendChild(tdCollector);
-
-      const tdPub = document.createElement('td');
-      tdPub.className = 'works-status-cell';
-      tdPub.textContent = work.publication_status_code || '—';
-      tdPub.title = labelForCode(meta.publication_statuses, work.publication_status_code);
-      tr.appendChild(tdPub);
-
-      const tdPhoto = document.createElement('td');
-      tdPhoto.className = 'works-status-cell';
-      tdPhoto.textContent = work.photo_status_code || '—';
-      tdPhoto.title = labelForCode(meta.photo_statuses, work.photo_status_code);
-      tr.appendChild(tdPhoto);
-
-      const tdAct = document.createElement('td');
-      tdAct.className = 'editor-action-cell';
-      const editBtn = document.createElement('button');
-      editBtn.type = 'button';
-      editBtn.className = 'legend-editor-btn works-edit-row-btn';
-      editBtn.textContent = 'Éditer';
-      editBtn.addEventListener('click', () => openEditDialog(work.id));
-      tdAct.appendChild(editBtn);
-      tr.appendChild(tdAct);
+      tr.appendChild(
+        createCodeSelectCell(work, tr, 'format_code', 'format', meta.formats, {
+          placeholder: 'Aucun',
+          labelMode: 'code-label',
+        })
+      );
+      tr.appendChild(
+        createCodeSelectCell(work, tr, 'technique_code', 'technique', meta.techniques, {
+          placeholder: 'Aucune',
+          labelMode: 'code-label',
+        })
+      );
+      tr.appendChild(createSeriesSelectCell(work, tr));
+      tr.appendChild(
+        createCodeSelectCell(work, tr, 'collector_code', 'collector', meta.collectors, {
+          placeholder: 'Aucun',
+          labelMode: 'name',
+          extraClass: 'works-collector-select',
+        })
+      );
+      tr.appendChild(
+        createCodeSelectCell(work, tr, 'publication_status_code', 'publication', meta.publication_statuses, {
+          placeholder: '—',
+          allowEmpty: false,
+          allowNew: false,
+          labelMode: 'code-label',
+          defaultValue: 'N',
+        })
+      );
+      tr.appendChild(
+        createCodeSelectCell(work, tr, 'photo_status_code', 'photo', meta.photo_statuses, {
+          placeholder: '—',
+          allowEmpty: false,
+          allowNew: false,
+          labelMode: 'code-label',
+          defaultValue: 'OK',
+        })
+      );
 
       tbody.appendChild(tr);
     }
-  }
-
-  function populateEditSelects() {
-    fillCodeSelect(editFormatSel, meta.formats, 'Aucun format', true, true);
-    fillCodeSelect(editTechniqueSel, meta.techniques, 'Aucune technique', true, true);
-    fillCodeSelect(editCollectorSel, meta.collectors, 'Aucun collectionneur', true, true);
-    fillCodeSelect(editPublicationSel, meta.publication_statuses, '', false, false);
-    fillCodeSelect(editPhotoSel, meta.photo_statuses, '', false, false);
-  }
-
-  function applyFormatDimensions(formatCode) {
-    const fmt = formatByCode(formatCode);
-    if (!fmt) return;
-    if (editWidthInput && fmt.width_cm != null) {
-      editWidthInput.value = String(fmt.width_cm);
-    }
-    if (editHeightInput && fmt.height_cm != null) {
-      editHeightInput.value = String(fmt.height_cm);
-    }
-  }
-
-  function closeEditDialog() {
-    activeEditId = null;
-    if (editBackdrop) editBackdrop.hidden = true;
-    if (editDialog && editDialog.open) editDialog.close();
-    if (editErrorEl) {
-      editErrorEl.hidden = true;
-      editErrorEl.textContent = '';
-    }
-    if (editSeriesPanel) editSeriesPanel.hidden = true;
-  }
-
-  function openEditDialog(workId) {
-    const work = worksList.find((w) => w.id === workId);
-    if (!work || !editDialog) return;
-    activeEditId = workId;
-
-    populateEditSelects();
-
-    const url = thumbUrlForWorkId(work.id);
-    if (editImage) {
-      if (url) {
-        editImage.src = url;
-        editImage.hidden = false;
-        editImage.onerror = function () {
-          const full = workMediaById && workMediaById.get(work.id);
-          if (full) {
-            editImage.onerror = null;
-            editImage.src = MEDIA_BASE + encodeMediaPath(full);
-          }
-        };
-      } else {
-        editImage.removeAttribute('src');
-        editImage.hidden = true;
-      }
-    }
-
-    if (editIdEl) {
-      const fn = work.filename_original || '';
-      editIdEl.textContent = fn ? `${work.id} — ${fn}` : work.id;
-    }
-    if (editTitleInput) editTitleInput.value = work.title || '';
-    if (editYearInput) editYearInput.value = work.year != null ? String(work.year) : '';
-    if (editFormatSel) editFormatSel.value = work.format_code || '';
-    if (editWidthInput) {
-      editWidthInput.value = work.width_cm != null ? String(work.width_cm) : '';
-    }
-    if (editHeightInput) {
-      editHeightInput.value = work.height_cm != null ? String(work.height_cm) : '';
-    }
-    if (editTechniqueSel) editTechniqueSel.value = work.technique_code || '';
-    if (editCollectorSel) editCollectorSel.value = work.collector_code || '';
-    if (editPublicationSel) {
-      editPublicationSel.value = work.publication_status_code || 'N';
-    }
-    if (editPhotoSel) editPhotoSel.value = work.photo_status_code || 'OK';
-
-    renderSeriesPanel(work.series_codes || []);
-    if (editSeriesPanel) editSeriesPanel.hidden = true;
-    updateSeriesToggleText();
-
-    if (editBackdrop) editBackdrop.hidden = false;
-    if (typeof editDialog.showModal === 'function') editDialog.showModal();
-  }
-
-  function validateYear(v) {
-    const t = String(v || '').trim();
-    if (!t) return null;
-    if (!/^\d{4}$/.test(t)) return undefined;
-    return parseInt(t, 10);
-  }
-
-  function parseCmInput(v) {
-    const t = String(v || '').trim().replace(',', '.');
-    if (!t) return null;
-    const n = parseFloat(t);
-    if (Number.isNaN(n) || n <= 0) return undefined;
-    return Math.round(n * 100) / 100;
-  }
-
-  function applyEditFromDialog() {
-    if (!activeEditId) return;
-    const work = worksList.find((w) => w.id === activeEditId);
-    if (!work) return;
-
-    const year = validateYear(editYearInput && editYearInput.value);
-    if (year === undefined) {
-      if (editErrorEl) {
-        editErrorEl.hidden = false;
-        editErrorEl.textContent = 'Année invalide : saisir 4 chiffres (ex. 1987) ou laisser vide.';
-      }
-      return;
-    }
-
-    const width = parseCmInput(editWidthInput && editWidthInput.value);
-    const height = parseCmInput(editHeightInput && editHeightInput.value);
-    if (width === undefined || height === undefined) {
-      if (editErrorEl) {
-        editErrorEl.hidden = false;
-        editErrorEl.textContent = 'Dimensions invalides : nombres positifs ou champs vides.';
-      }
-      return;
-    }
-
-    if (editErrorEl) {
-      editErrorEl.hidden = true;
-      editErrorEl.textContent = '';
-    }
-
-    work.title = editTitleInput ? editTitleInput.value.trim() : work.title;
-    work.year = year;
-    work.format_code = editFormatSel
-      ? (() => {
-          const v = String(editFormatSel.value || '').trim().toUpperCase();
-          return v && v !== NEW_OPTION_VALUE ? v : null;
-        })()
-      : work.format_code;
-    work.technique_code = editTechniqueSel
-      ? (() => {
-          const v = String(editTechniqueSel.value || '').trim().toUpperCase();
-          return v && v !== NEW_OPTION_VALUE ? v : null;
-        })()
-      : work.technique_code;
-    work.collector_code = editCollectorSel
-      ? (() => {
-          const v = String(editCollectorSel.value || '').trim().toUpperCase();
-          return v && v !== NEW_OPTION_VALUE ? v : null;
-        })()
-      : work.collector_code;
-    work.publication_status_code = editPublicationSel
-      ? String(editPublicationSel.value || 'N').trim().toUpperCase()
-      : work.publication_status_code;
-    work.photo_status_code = editPhotoSel
-      ? String(editPhotoSel.value || 'OK').trim().toUpperCase()
-      : work.photo_status_code;
-    work.width_cm = width;
-    work.height_cm = height;
-    work.series_codes = readSelectedSeriesCodes();
-
-    markDirty(work.id);
-    closeEditDialog();
-    renderTable();
-    setStatus(`Modifications locales sur ${work.id} — pensez à enregistrer.`);
   }
 
   async function loadMeta() {
@@ -847,8 +733,8 @@
         year: w.year,
         format_code: w.format_code,
         technique_code: w.technique_code,
-        publication_status_code: w.publication_status_code,
-        photo_status_code: w.photo_status_code,
+        publication_status_code: w.publication_status_code || 'N',
+        photo_status_code: w.photo_status_code || 'OK',
         collector_code: w.collector_code,
         width_cm: w.width_cm,
         height_cm: w.height_cm,
@@ -955,59 +841,6 @@
         renderTable();
       }
     });
-
-    editCloseBtn.addEventListener('click', closeEditDialog);
-    editBackdrop.addEventListener('click', closeEditDialog);
-
-    editForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      applyEditFromDialog();
-    });
-
-    editSeriesToggle.addEventListener('click', () => {
-      if (!editSeriesPanel) return;
-      editSeriesPanel.hidden = !editSeriesPanel.hidden;
-    });
-
-    editSeriesPanel.addEventListener('change', () => {
-      updateSeriesToggleText();
-      renderSeriesAddSelect(readSelectedSeriesCodes());
-    });
-
-    if (editSeriesAddSel) {
-      editSeriesAddSel.addEventListener('change', async () => {
-        const value = editSeriesAddSel.value;
-        editSeriesAddSel.value = '';
-        if (!value) return;
-        if (value === NEW_OPTION_VALUE) {
-          try {
-            const code = await createSeriesFromPrompt();
-            if (code) {
-              renderSeriesPanel(readSelectedSeriesCodes());
-              checkSeriesCode(code);
-              if (editErrorEl) {
-                editErrorEl.hidden = true;
-                editErrorEl.textContent = '';
-              }
-              setStatus('Série ' + code + ' créée.');
-            }
-          } catch (e) {
-            if (editErrorEl) {
-              editErrorEl.hidden = false;
-              editErrorEl.textContent = String(e.message || e);
-            }
-          }
-          return;
-        }
-        checkSeriesCode(value);
-      });
-    }
-
-    bindSelectNewHandler(editFormatSel, 'format', () => {
-      applyFormatDimensions(editFormatSel.value);
-    });
-    bindSelectNewHandler(editTechniqueSel, 'technique');
-    bindSelectNewHandler(editCollectorSel, 'collector');
   }
 
   async function init() {
