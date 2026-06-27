@@ -1681,6 +1681,37 @@ body.catalogue-standalone {
 
 .works-editor-table {
   font-size: 0.8rem;
+  table-layout: fixed;
+  width: 100%;
+}
+
+.works-editor-table .works-col-code {
+  width: 4.6rem;
+}
+
+.works-editor-table .works-col-title {
+  width: 28%;
+  min-width: 12rem;
+}
+
+.works-editor-table .works-col-year {
+  width: 3.6rem;
+}
+
+.works-editor-table .works-col-format {
+  width: 4.8rem;
+}
+
+.works-editor-table .works-col-technique {
+  width: 4rem;
+}
+
+.works-editor-table .works-col-pub {
+  width: 3.2rem;
+}
+
+.works-editor-table .works-col-photo {
+  width: 3.6rem;
 }
 
 .works-editor-table th,
@@ -1716,7 +1747,18 @@ body.catalogue-standalone {
 }
 
 .works-title-cell {
-  max-width: 14rem;
+  min-width: 0;
+}
+
+.works-editor-table .works-title-input {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+  box-sizing: border-box;
+  font-size: 0.8rem;
+  padding: 3px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
 }
 
 .works-year-cell,
@@ -1740,7 +1782,7 @@ body.catalogue-standalone {
 
 .works-row-select {
   width: 100%;
-  min-width: 4.5rem;
+  min-width: 0;
   max-width: 8rem;
   font-family: ui-monospace, monospace;
   font-size: 0.78rem;
@@ -1748,18 +1790,42 @@ body.catalogue-standalone {
   border: 1px solid var(--border);
   border-radius: 4px;
   background: #fff;
+  box-sizing: border-box;
+}
+
+.works-select-compact {
+  min-width: 0;
+  max-width: none;
+  padding: 2px 3px;
+  font-size: 0.75rem;
+}
+
+.works-select-format {
+  width: 4.6rem;
+}
+
+.works-select-technique {
+  width: 3.6rem;
+}
+
+.works-select-pub {
+  width: 2.8rem;
+}
+
+.works-select-photo {
+  width: 3.2rem;
 }
 
 .works-collector-select {
-  min-width: 7rem;
-  max-width: 14rem;
+  min-width: 5rem;
+  max-width: 10rem;
   font-family: inherit;
 }
 
 .works-photo-select {
-  min-width: 6.5rem;
-  max-width: 11rem;
-  font-family: inherit;
+  min-width: 0;
+  max-width: none;
+  font-family: ui-monospace, monospace;
 }
 
 .works-series-picker-cell {

@@ -739,6 +739,23 @@
     if (fmt.height_cm != null) work.height_cm = fmt.height_cm;
   }
 
+  function createTitleCell(work, tr) {
+    const td = document.createElement('td');
+    td.className = 'works-title-cell';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'legend-input works-title-input';
+    input.value = work.title || '';
+    input.placeholder = '—';
+    input.setAttribute('aria-label', 'Titre de ' + (work.id || ''));
+    input.addEventListener('input', () => {
+      work.title = input.value;
+      markDirty(work.id, tr);
+    });
+    td.appendChild(input);
+    return td;
+  }
+
   function createCodeSelectCell(work, tr, field, kind, options, cfg) {
     const td = document.createElement('td');
     td.className = 'works-select-cell';
@@ -867,12 +884,6 @@
     if (pageNextBtn) pageNextBtn.disabled = currentPage >= pages - 1;
   }
 
-  function truncate(text, max) {
-    const s = String(text || '').trim();
-    if (s.length <= max) return s;
-    return s.slice(0, max - 1) + '…';
-  }
-
   function renderTable() {
     if (!tbody) return;
     const list = displayedWorks();
@@ -930,11 +941,7 @@
       tdId.textContent = work.id;
       tr.appendChild(tdId);
 
-      const tdTitle = document.createElement('td');
-      tdTitle.className = 'works-title-cell';
-      tdTitle.textContent = truncate(work.title, 48) || '—';
-      tdTitle.title = work.title || '';
-      tr.appendChild(tdTitle);
+      tr.appendChild(createTitleCell(work, tr));
 
       const tdYear = document.createElement('td');
       tdYear.className = 'works-year-cell';
@@ -945,6 +952,7 @@
         createCodeSelectCell(work, tr, 'format_code', 'format', meta.formats, {
           placeholder: '—',
           labelMode: 'code',
+          extraClass: 'works-select-compact works-select-format',
         })
       );
       tr.appendChild(
@@ -952,6 +960,7 @@
           placeholder: '—',
           labelMode: 'code-label',
           closedLabelMode: 'code',
+          extraClass: 'works-select-compact works-select-technique',
         })
       );
       tr.appendChild(createSeriesPickerCell(work, tr));
@@ -970,6 +979,7 @@
           labelMode: 'code-label',
           closedLabelMode: 'code',
           defaultValue: 'N',
+          extraClass: 'works-select-compact works-select-pub',
         })
       );
       tr.appendChild(
@@ -977,9 +987,10 @@
           placeholder: '—',
           allowEmpty: false,
           allowNew: false,
-          labelMode: 'label',
+          labelMode: 'code-label',
+          closedLabelMode: 'code',
           defaultValue: 'OK',
-          extraClass: 'works-photo-select',
+          extraClass: 'works-select-compact works-select-photo',
         })
       );
 

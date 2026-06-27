@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250627-5" />
+  <link rel="stylesheet" href="catalogue.css?v=20250627-6" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -77,7 +77,7 @@
             <thead>
               <tr>
                 <th scope="col" class="works-thumb-th">Vignette</th>
-                <th scope="col" class="catalogue-th">
+                <th scope="col" class="catalogue-th works-col-code">
                   <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="id" title="Trier par code (croissant)">
                     <span class="catalogue-sort-icons" aria-hidden="true">
                       <span class="catalogue-sort-up">▲</span>
@@ -85,8 +85,8 @@
                     <span class="catalogue-sort-label">Code</span>
                   </button>
                 </th>
-                <th scope="col">Titre</th>
-                <th scope="col" class="catalogue-th">
+                <th scope="col" class="works-col-title">Titre</th>
+                <th scope="col" class="catalogue-th works-col-year">
                   <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="year" title="Trier par année (croissant)">
                     <span class="catalogue-sort-icons" aria-hidden="true">
                       <span class="catalogue-sort-up">▲</span>
@@ -94,8 +94,8 @@
                     <span class="catalogue-sort-label">Année</span>
                   </button>
                 </th>
-                <th scope="col">Format</th>
-                <th scope="col" class="catalogue-th">
+                <th scope="col" class="works-col-format">Format</th>
+                <th scope="col" class="catalogue-th works-col-technique">
                   <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="technique" title="Trier par technique (croissant)">
                     <span class="catalogue-sort-icons" aria-hidden="true">
                       <span class="catalogue-sort-up">▲</span>
@@ -120,7 +120,7 @@
                     <span class="catalogue-sort-label">Collectionneur</span>
                   </button>
                 </th>
-                <th scope="col" class="catalogue-th">
+                <th scope="col" class="catalogue-th works-col-pub">
                   <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="publication" title="Trier par statut publication (croissant)">
                     <span class="catalogue-sort-icons" aria-hidden="true">
                       <span class="catalogue-sort-up">▲</span>
@@ -128,7 +128,7 @@
                     <span class="catalogue-sort-label">Pub.</span>
                   </button>
                 </th>
-                <th scope="col" class="catalogue-th">
+                <th scope="col" class="catalogue-th works-col-photo">
                   <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="photo" title="Trier par statut photo (croissant)">
                     <span class="catalogue-sort-icons" aria-hidden="true">
                       <span class="catalogue-sort-up">▲</span>
@@ -148,6 +148,6 @@
   <img id="works-preview-img" class="catalogue-preview" alt="" aria-hidden="true" />
 
   <script src="editor-common.js?v=20250627-4"></script>
-  <script src="works-editor.js?v=20250627-7"></script>
+  <script src="works-editor.js?v=20250627-8"></script>
 </body>
 </html>
