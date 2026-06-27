@@ -9,8 +9,8 @@
   <meta http-equiv="Expires" content="0" />
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
-  <title>Gestion des œuvres — édition</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250627-4" />
+  <title>Interface d'édition des fichiers du catalogue</title>
+  <link rel="stylesheet" href="catalogue.css?v=20250627-5" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -21,8 +21,7 @@
         <img class="catalogue-header-ms-logo" src="images/logoMS.png" alt="Marie Sallantin" width="240" height="96" />
       </a>
       <div class="catalogue-header-text catalogue-header-text--center">
-        <h1>Gestion des œuvres</h1>
-        <p class="catalogue-header-subtitle">Interface d'édition des fichiers du catalogue</p>
+        <h1>Interface d'édition des fichiers du catalogue</h1>
       </div>
       <a class="catalogue-header-adagp" href="https://www.adagp.fr" target="_blank" rel="noopener noreferrer" title="ADAGP">
         <img class="catalogue-header-adagp-logo" src="images/ADAGP_logo.png" alt="ADAGP" width="120" height="48" />
@@ -34,7 +33,7 @@
 
   <div id="works-login" class="catalogue-login">
     <div class="catalogue-login-box">
-      <h1 class="catalogue-login-title">Gestion des œuvres</h1>
+      <h1 class="catalogue-login-title">Interface d'édition des fichiers du catalogue</h1>
       <p class="catalogue-intro" style="margin-bottom: 16px;">
         Édition des fiches œuvres : titres, codes format et technique, séries, collectionneur, statuts.
       </p>
@@ -78,15 +77,65 @@
             <thead>
               <tr>
                 <th scope="col" class="works-thumb-th">Vignette</th>
-                <th scope="col">Code</th>
+                <th scope="col" class="catalogue-th">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="id" title="Trier par code (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Code</span>
+                  </button>
+                </th>
                 <th scope="col">Titre</th>
-                <th scope="col">Année</th>
+                <th scope="col" class="catalogue-th">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="year" title="Trier par année (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Année</span>
+                  </button>
+                </th>
                 <th scope="col">Format</th>
-                <th scope="col">Technique</th>
-                <th scope="col">Séries</th>
-                <th scope="col">Collectionneur</th>
-                <th scope="col">Pub.</th>
-                <th scope="col">Photo</th>
+                <th scope="col" class="catalogue-th">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="technique" title="Trier par technique (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Technique</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th catalogue-th--has-filter works-series-filter-th">
+                  <span class="works-col-header-label">Séries</span>
+                  <label class="works-header-filter">
+                    <span class="works-header-filter-label">Filtrer</span>
+                    <select id="works-filter-series" class="catalogue-select catalogue-select--header" aria-label="Filtrer par série">
+                      <option value="">Toutes</option>
+                    </select>
+                  </label>
+                </th>
+                <th scope="col" class="catalogue-th">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="collector" title="Trier par collectionneur (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Collectionneur</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="publication" title="Trier par statut publication (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Pub.</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="photo" title="Trier par statut photo (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Photo</span>
+                  </button>
+                </th>
               </tr>
             </thead>
             <tbody id="works-tbody"></tbody>
@@ -99,6 +148,6 @@
   <img id="works-preview-img" class="catalogue-preview" alt="" aria-hidden="true" />
 
   <script src="editor-common.js?v=20250627-4"></script>
-  <script src="works-editor.js?v=20250627-5"></script>
+  <script src="works-editor.js?v=20250627-7"></script>
 </body>
 </html>

@@ -1853,6 +1853,40 @@ body.catalogue-standalone {
   padding: 24px 12px !important;
 }
 
+.works-col-header-label {
+  display: block;
+  font-weight: 600;
+  color: var(--primary);
+  line-height: 1.25;
+  margin-bottom: 4px;
+}
+
+.works-header-filter {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  margin: 0;
+  font-weight: 400;
+}
+
+.works-header-filter-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  line-height: 1.2;
+}
+
+.works-series-filter-th {
+  min-width: 96px;
+}
+
+.works-sort-btn--asc-only .catalogue-sort-down {
+  display: none;
+}
+
 .works-edit-dimensions {
   display: grid;
   grid-template-columns: 1fr 1fr;

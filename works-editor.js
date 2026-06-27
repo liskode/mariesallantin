@@ -36,6 +36,8 @@
   const dirtyIds = new Set();
   let token = '';
   let filterText = '';
+  let seriesFilter = '';
+  let sortColumn = 'order';
   let currentPage = 0;
 
   const loginEl = document.getElementById('works-login');
@@ -50,6 +52,7 @@
   const saveBtn = document.getElementById('works-save-btn');
   const reloadBtn = document.getElementById('works-reload-btn');
   const filterEl = document.getElementById('works-filter');
+  const seriesFilterEl = document.getElementById('works-filter-series');
   const paginationEl = document.getElementById('works-pagination');
   const pagePrevBtn = document.getElementById('works-page-prev');
   const pageNextBtn = document.getElementById('works-page-next');
@@ -255,6 +258,141 @@
     dirtyIds.add(id);
     if (tr) tr.classList.add('legend-editor-row--dirty');
     updateSaveBtn();
+  }
+
+  function msIdSortKey(id) {
+    const m = String(id || '').match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : 0;
+  }
+
+  function collectorByCode(code) {
+    if (!code) return null;
+    return (meta.collectors || []).find((c) => c.code === code) || null;
+  }
+
+  function collectorSortLabel(code) {
+    const c = collectorByCode(code);
+    return (c && c.name) || String(code || '').trim();
+  }
+
+  function getWorkSortValue(work, col) {
+    switch (col) {
+      case 'id':
+        return msIdSortKey(work.id);
+      case 'year':
+        return work.year != null && work.year !== '' ? Number(work.year) : null;
+      case 'technique':
+        return String(work.technique_code || '').trim().toUpperCase();
+      case 'collector':
+        return collectorSortLabel(work.collector_code).toLocaleLowerCase('fr');
+      case 'publication':
+        return String(work.publication_status_code || 'N').trim().toUpperCase();
+      case 'photo':
+        return String(work.photo_status_code || 'OK').trim().toUpperCase();
+      case 'order':
+      default:
+        return Number.isFinite(Number(work.sort_order)) ? Number(work.sort_order) : msIdSortKey(work.id);
+    }
+  }
+
+  function compareWorks(a, b) {
+    const va = getWorkSortValue(a, sortColumn);
+    const vb = getWorkSortValue(b, sortColumn);
+
+    if (sortColumn === 'year') {
+      const aNull = va == null || Number.isNaN(va);
+      const bNull = vb == null || Number.isNaN(vb);
+      if (aNull && bNull) return msIdSortKey(a.id) - msIdSortKey(b.id);
+      if (aNull) return 1;
+      if (bNull) return -1;
+      const diff = va - vb;
+      if (diff !== 0) return diff;
+      return msIdSortKey(a.id) - msIdSortKey(b.id);
+    }
+
+    if (typeof va === 'number' && typeof vb === 'number') {
+      const diff = va - vb;
+      if (diff !== 0) return diff;
+      return msIdSortKey(a.id) - msIdSortKey(b.id);
+    }
+
+    const sa = String(va ?? '');
+    const sb = String(vb ?? '');
+    const emptyRank = (s) => (s ? 0 : 1);
+    const rankDiff = emptyRank(sa) - emptyRank(sb);
+    if (rankDiff !== 0) return rankDiff;
+    const diff = sa.localeCompare(sb, 'fr', { numeric: true, sensitivity: 'base' });
+    if (diff !== 0) return diff;
+    return msIdSortKey(a.id) - msIdSortKey(b.id);
+  }
+
+  function sortWorks(list) {
+    return [...list].sort(compareWorks);
+  }
+
+  function filterWorks(list) {
+    let result = list;
+    const q = filterText.trim().toLowerCase();
+    if (q) {
+      result = result.filter((w) => {
+        const id = String(w.id || '').toLowerCase();
+        const title = String(w.title || '').toLowerCase();
+        return id.includes(q) || title.includes(q);
+      });
+    }
+    if (seriesFilter) {
+      if (seriesFilter === '__none__') {
+        result = result.filter((w) => !(w.series_codes || []).length);
+      } else {
+        result = result.filter((w) => (w.series_codes || []).includes(seriesFilter));
+      }
+    }
+    return result;
+  }
+
+  function displayedWorks() {
+    return sortWorks(filterWorks(worksList));
+  }
+
+  function updateSortButtonsUI() {
+    document.querySelectorAll('.works-sort-btn').forEach((btn) => {
+      const key = btn.getAttribute('data-sort-key');
+      const active = key === sortColumn;
+      btn.classList.toggle('catalogue-sort-btn--active', active);
+      const up = btn.querySelector('.catalogue-sort-up');
+      if (up) up.classList.toggle('is-active', active);
+      const th = btn.closest('th');
+      if (th) {
+        if (active) th.setAttribute('aria-sort', 'ascending');
+        else th.removeAttribute('aria-sort');
+      }
+    });
+  }
+
+  function populateSeriesFilterSelect() {
+    if (!seriesFilterEl) return;
+    const prev = seriesFilterEl.value;
+    seriesFilterEl.innerHTML = '';
+    const optAll = document.createElement('option');
+    optAll.value = '';
+    optAll.textContent = 'Toutes';
+    seriesFilterEl.appendChild(optAll);
+    const optNone = document.createElement('option');
+    optNone.value = '__none__';
+    optNone.textContent = 'Non renseigné';
+    seriesFilterEl.appendChild(optNone);
+    sortByCode(meta.series).forEach((s) => {
+      const o = document.createElement('option');
+      o.value = s.code;
+      o.textContent = s.label ? `${s.code} — ${s.label}` : s.code;
+      seriesFilterEl.appendChild(o);
+    });
+    if ([...seriesFilterEl.options].some((o) => o.value === prev)) {
+      seriesFilterEl.value = prev;
+    } else {
+      seriesFilterEl.value = '';
+      seriesFilter = '';
+    }
   }
 
   function sortByCode(list) {
@@ -692,13 +830,11 @@
   }
 
   function filteredWorks() {
-    const q = filterText.trim().toLowerCase();
-    if (!q) return worksList;
-    return worksList.filter((w) => {
-      const id = String(w.id || '').toLowerCase();
-      const title = String(w.title || '').toLowerCase();
-      return id.includes(q) || title.includes(q);
-    });
+    return displayedWorks();
+  }
+
+  function hasActiveFilters() {
+    return Boolean(filterText.trim() || seriesFilter);
   }
 
   function pageCount(list) {
@@ -739,9 +875,10 @@
 
   function renderTable() {
     if (!tbody) return;
-    const list = filteredWorks();
+    const list = displayedWorks();
     updateCountLabel(list);
     updatePagination(list);
+    updateSortButtonsUI();
 
     const start = currentPage * PAGE_SIZE;
     const pageItems = list.slice(start, start + PAGE_SIZE);
@@ -751,8 +888,8 @@
       const tr = document.createElement('tr');
       const td = document.createElement('td');
       td.colSpan = 10;
-      td.textContent = filterText.trim()
-        ? 'Aucun tableau ne correspond au filtre.'
+      td.textContent = hasActiveFilters()
+        ? 'Aucun tableau ne correspond aux filtres.'
         : 'Aucun tableau.';
       td.className = 'works-editor-empty';
       tr.appendChild(td);
@@ -813,7 +950,8 @@
       tr.appendChild(
         createCodeSelectCell(work, tr, 'technique_code', 'technique', meta.techniques, {
           placeholder: '—',
-          labelMode: 'code',
+          labelMode: 'code-label',
+          closedLabelMode: 'code',
         })
       );
       tr.appendChild(createSeriesPickerCell(work, tr));
@@ -855,6 +993,7 @@
     if (!r.ok || !j.ok) throw new Error(j.error || 'meta failed');
     meta = j.meta || meta;
     sortMetaLists();
+    populateSeriesFilterSelect();
   }
 
   async function loadWorks() {
@@ -971,6 +1110,22 @@
       filterText = filterEl.value;
       currentPage = 0;
       renderTable();
+    });
+
+    if (seriesFilterEl) {
+      seriesFilterEl.addEventListener('change', () => {
+        seriesFilter = seriesFilterEl.value;
+        currentPage = 0;
+        renderTable();
+      });
+    }
+
+    document.querySelectorAll('.works-sort-btn').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        sortColumn = btn.getAttribute('data-sort-key') || 'order';
+        currentPage = 0;
+        renderTable();
+      });
     });
 
     pagePrevBtn.addEventListener('click', () => {
