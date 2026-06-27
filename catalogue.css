@@ -1675,12 +1675,35 @@ body.catalogue-standalone {
   min-width: 0;
 }
 
+.works-editor-filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+}
+
+.works-editor-filter-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 .works-editor-filter-input {
-  min-width: min(240px, 100%);
+  min-width: min(200px, 100%);
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
   font: inherit;
+}
+
+.works-editor-filter--series .works-editor-filter-input {
+  min-width: min(160px, 100%);
+  font-family: ui-monospace, monospace;
+  font-size: 0.82rem;
 }
 
 .works-editor-pagination {
@@ -1974,8 +1997,8 @@ body.catalogue-standalone {
   line-height: 1.2;
 }
 
-.works-series-filter-th {
-  min-width: 96px;
+.works-editor-table .works-col-series {
+  width: 19ch;
 }
 
 .works-sort-btn--asc-only .catalogue-sort-down {
