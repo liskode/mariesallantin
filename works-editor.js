@@ -4,7 +4,7 @@
 (function () {
   const AUTH = () => window.EditorCommon;
   const MEDIA_BASE = 'media/';
-  const PAGE_SIZE = 50;
+  const DEFAULT_PAGE_SIZE = 50;
   const PRODUCTION_API =
     'https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api';
   const PRODUCTION_CODES_API =
@@ -57,6 +57,8 @@
   const pagePrevBtn = document.getElementById('works-page-prev');
   const pageNextBtn = document.getElementById('works-page-next');
   const pageInfoEl = document.getElementById('works-page-info');
+  const pageSizeEl = document.getElementById('works-page-size');
+  const stickyBarEl = document.getElementById('works-sticky-bar');
   const previewImg = document.getElementById('works-preview-img');
   /** @type {HTMLElement | null} */
   let openSeriesPanel = null;
@@ -279,8 +281,12 @@
     switch (col) {
       case 'id':
         return msIdSortKey(work.id);
+      case 'title':
+        return String(work.title || '').trim().toLocaleLowerCase('fr');
       case 'year':
         return work.year != null && work.year !== '' ? Number(work.year) : null;
+      case 'format':
+        return String(work.format_code || '').trim().toUpperCase();
       case 'technique':
         return String(work.technique_code || '').trim().toUpperCase();
       case 'collector':
@@ -854,8 +860,31 @@
     return Boolean(filterText.trim() || seriesFilter);
   }
 
+  function getPageSize() {
+    if (!pageSizeEl) return DEFAULT_PAGE_SIZE;
+    const v = String(pageSizeEl.value || String(DEFAULT_PAGE_SIZE));
+    if (v === 'all') return Infinity;
+    const n = parseInt(v, 10);
+    return Number.isNaN(n) || n < 1 ? DEFAULT_PAGE_SIZE : n;
+  }
+
+  function syncStickyToolbarHeight() {
+    if (!stickyBarEl) return;
+    const h = Math.ceil(stickyBarEl.getBoundingClientRect().height);
+    document.documentElement.style.setProperty('--works-sticky-toolbar-height', h + 'px');
+  }
+
   function pageCount(list) {
-    return Math.max(1, Math.ceil(list.length / PAGE_SIZE));
+    const pageSize = getPageSize();
+    if (!Number.isFinite(pageSize) || pageSize <= 0 || list.length <= pageSize) return 1;
+    return Math.max(1, Math.ceil(list.length / pageSize));
+  }
+
+  function slicePageItems(list) {
+    const pageSize = getPageSize();
+    if (!Number.isFinite(pageSize) || pageSize <= 0 || list.length <= pageSize) return list;
+    const start = currentPage * pageSize;
+    return list.slice(start, start + pageSize);
   }
 
   function updateCountLabel(list) {
@@ -871,17 +900,20 @@
   }
 
   function updatePagination(list) {
+    const pageSize = getPageSize();
     const pages = pageCount(list);
     if (currentPage >= pages) currentPage = Math.max(0, pages - 1);
-    const show = pages > 1;
-    if (paginationEl) paginationEl.hidden = !show;
+    const paginated =
+      Number.isFinite(pageSize) && pageSize > 0 && list.length > pageSize;
+    if (paginationEl) paginationEl.hidden = !paginated;
     if (pageInfoEl) {
-      pageInfoEl.textContent = show
+      pageInfoEl.textContent = paginated
         ? `Page ${currentPage + 1} / ${pages}`
         : '';
     }
     if (pagePrevBtn) pagePrevBtn.disabled = currentPage <= 0;
     if (pageNextBtn) pageNextBtn.disabled = currentPage >= pages - 1;
+    syncStickyToolbarHeight();
   }
 
   function renderTable() {
@@ -891,8 +923,7 @@
     updatePagination(list);
     updateSortButtonsUI();
 
-    const start = currentPage * PAGE_SIZE;
-    const pageItems = list.slice(start, start + PAGE_SIZE);
+    const pageItems = slicePageItems(list);
     tbody.innerHTML = '';
 
     if (!pageItems.length) {
@@ -1067,6 +1098,7 @@
       await loadMeta();
       await loadWorks();
       setStatus('');
+      syncStickyToolbarHeight();
     } catch (e) {
       setStatus(String(e.message || e), true);
     }
@@ -1139,20 +1171,31 @@
       });
     });
 
-    pagePrevBtn.addEventListener('click', () => {
+    pagePrevBtn?.addEventListener('click', () => {
       if (currentPage > 0) {
         currentPage -= 1;
         renderTable();
       }
     });
 
-    pageNextBtn.addEventListener('click', () => {
+    pageNextBtn?.addEventListener('click', () => {
       const pages = pageCount(filteredWorks());
       if (currentPage < pages - 1) {
         currentPage += 1;
         renderTable();
       }
     });
+
+    pageSizeEl?.addEventListener('change', () => {
+      currentPage = 0;
+      renderTable();
+    });
+
+    window.addEventListener('resize', syncStickyToolbarHeight);
+    if (stickyBarEl && typeof ResizeObserver !== 'undefined') {
+      const ro = new ResizeObserver(() => syncStickyToolbarHeight());
+      ro.observe(stickyBarEl);
+    }
 
     document.addEventListener('click', () => {
       closeAllSeriesPanels();
@@ -1161,6 +1204,7 @@
 
   async function init() {
     bindEvents();
+    syncStickyToolbarHeight();
     await showApiHint();
     if (AUTH() && AUTH().hasSession()) {
       token = AUTH().getSessionToken() || '';

@@ -1646,21 +1646,37 @@ body.catalogue-standalone {
 }
 
 /* Éditeur tableaux (œuvres) */
+.works-editor-sticky-bar {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  background: var(--background);
+  padding: 8px 0 10px;
+  margin: 0 0 8px;
+  box-shadow: 0 1px 0 var(--border);
+}
+
+.works-editor-sticky-bar .legend-editor-toolbar {
+  margin-bottom: 0;
+}
+
 .works-editor-toolbar {
   flex-wrap: wrap;
   gap: 12px;
+  justify-content: space-between;
 }
 
 .works-editor-toolbar-left {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 10px 14px;
   flex: 1 1 auto;
+  min-width: 0;
 }
 
 .works-editor-filter-input {
-  min-width: min(280px, 100%);
+  min-width: min(240px, 100%);
   padding: 8px 10px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -1668,10 +1684,23 @@ body.catalogue-standalone {
 }
 
 .works-editor-pagination {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 8px 0 12px;
+  margin: 0;
+  flex-shrink: 0;
+}
+
+.works-editor-table-wrap {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.works-editor-table thead th {
+  position: sticky;
+  top: var(--works-sticky-toolbar-height, 3.5rem);
+  z-index: 10;
+  background: #f0f2f7;
+  box-shadow: 0 1px 0 var(--border);
 }
 
 .works-editor-page-info {

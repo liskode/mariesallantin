@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250627-6" />
+  <link rel="stylesheet" href="catalogue.css?v=20250627-7" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -48,31 +48,41 @@
   <div id="works-app" class="catalogue-app" hidden>
     <main class="catalogue-page">
       <div class="catalogue-standalone-inner catalogue-standalone-main">
-        <div class="legend-editor-toolbar works-editor-toolbar">
-          <div class="works-editor-toolbar-left">
-            <p class="catalogue-count" id="works-count" aria-live="polite">0 tableau(x)</p>
-            <label class="works-editor-filter">
-              <span class="visually-hidden">Filtrer</span>
-              <input type="search" id="works-filter" class="works-editor-filter-input" placeholder="Filtrer par code ou titre…" autocomplete="off" />
-            </label>
+        <div class="works-editor-sticky-bar" id="works-sticky-bar">
+          <div class="legend-editor-toolbar works-editor-toolbar">
+            <div class="works-editor-toolbar-left">
+              <p class="catalogue-count" id="works-count" aria-live="polite">0 tableau(x)</p>
+              <label class="works-editor-filter">
+                <span class="visually-hidden">Filtrer</span>
+                <input type="search" id="works-filter" class="works-editor-filter-input" placeholder="Filtrer par code ou titre…" autocomplete="off" />
+              </label>
+              <div class="catalogue-pagination works-editor-pagination" id="works-pagination" hidden>
+                <button type="button" class="catalogue-page-btn" id="works-page-prev" aria-label="Page précédente" disabled>←</button>
+                <span id="works-page-info" class="catalogue-page-label">Page 1 / 1</span>
+                <button type="button" class="catalogue-page-btn" id="works-page-next" aria-label="Page suivante">→</button>
+                <label class="catalogue-page-size-label">
+                  <span class="catalogue-page-size-text">Œuvres par page</span>
+                  <select id="works-page-size" class="catalogue-select catalogue-select--inline" aria-label="Nombre d'œuvres par page">
+                    <option value="50" selected>50</option>
+                    <option value="100">100</option>
+                    <option value="200">200</option>
+                    <option value="all">Tout</option>
+                  </select>
+                </label>
+              </div>
+            </div>
+            <div class="catalogue-edit-tools">
+              <button type="button" class="legend-editor-btn legend-editor-btn--save legend-editor-btn--save-clean" id="works-save-btn" disabled>
+                Enregistrer les modifications
+              </button>
+              <button type="button" class="legend-editor-btn" id="works-reload-btn">Recharger</button>
+            </div>
           </div>
-          <div class="catalogue-edit-tools">
-            <button type="button" class="legend-editor-btn legend-editor-btn--save legend-editor-btn--save-clean" id="works-save-btn" disabled>
-              Enregistrer les modifications
-            </button>
-            <button type="button" class="legend-editor-btn" id="works-reload-btn">Recharger</button>
-          </div>
-        </div>
-
-        <div class="works-editor-pagination" id="works-pagination" hidden>
-          <button type="button" class="legend-editor-btn" id="works-page-prev" disabled>← Précédent</button>
-          <span id="works-page-info" class="works-editor-page-info"></span>
-          <button type="button" class="legend-editor-btn" id="works-page-next">Suivant →</button>
         </div>
 
         <p id="works-status" class="legend-editor-api-hint" aria-live="polite"></p>
 
-        <div class="legend-editor-table-wrap">
+        <div class="legend-editor-table-wrap works-editor-table-wrap">
           <table class="catalogue-table legend-editor-table works-editor-table">
             <thead>
               <tr>
@@ -85,7 +95,14 @@
                     <span class="catalogue-sort-label">Code</span>
                   </button>
                 </th>
-                <th scope="col" class="works-col-title">Titre</th>
+                <th scope="col" class="catalogue-th works-col-title">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="title" title="Trier par titre (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Titre</span>
+                  </button>
+                </th>
                 <th scope="col" class="catalogue-th works-col-year">
                   <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="year" title="Trier par année (croissant)">
                     <span class="catalogue-sort-icons" aria-hidden="true">
@@ -94,7 +111,14 @@
                     <span class="catalogue-sort-label">Année</span>
                   </button>
                 </th>
-                <th scope="col" class="works-col-format">Format</th>
+                <th scope="col" class="catalogue-th works-col-format">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="format" title="Trier par format (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Format</span>
+                  </button>
+                </th>
                 <th scope="col" class="catalogue-th works-col-technique">
                   <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="technique" title="Trier par technique (croissant)">
                     <span class="catalogue-sort-icons" aria-hidden="true">
@@ -148,6 +172,6 @@
   <img id="works-preview-img" class="catalogue-preview" alt="" aria-hidden="true" />
 
   <script src="editor-common.js?v=20250627-4"></script>
-  <script src="works-editor.js?v=20250627-8"></script>
+  <script src="works-editor.js?v=20250627-10"></script>
 </body>
 </html>
