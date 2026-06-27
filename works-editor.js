@@ -56,6 +56,8 @@
   const pageNextBtn = document.getElementById('works-page-next');
   const pageInfoEl = document.getElementById('works-page-info');
   const previewImg = document.getElementById('works-preview-img');
+  /** @type {HTMLElement | null} */
+  let openSeriesPanel = null;
 
   async function loadSiteConfig() {
     if (siteConfig) return siteConfig;
@@ -256,6 +258,61 @@
     updateSaveBtn();
   }
 
+  function sortByCode(list) {
+    return [...(list || [])].sort((a, b) =>
+      String(a.code || '').localeCompare(String(b.code || ''), 'fr')
+    );
+  }
+
+  function sortMetaLists() {
+    meta.formats = sortByCode(meta.formats);
+    meta.techniques = sortByCode(meta.techniques);
+    meta.series = sortByCode(meta.series);
+    meta.publication_statuses = sortByCode(meta.publication_statuses);
+    meta.photo_statuses = sortByCode(meta.photo_statuses);
+    meta.collectors = [...(meta.collectors || [])].sort((a, b) =>
+      String(a.label || a.code || '').localeCompare(String(b.label || b.code || ''), 'fr')
+    );
+  }
+
+  function formatSeriesDisplay(codes) {
+    const sorted = sortByCode((codes || []).map((c) => ({ code: c }))).map((x) => x.code);
+    if (!sorted.length) return '—';
+    if (sorted.length <= 3) return sorted.join(', ');
+    return sorted.slice(0, 2).join(', ') + ', ...';
+  }
+
+  function formatSeriesFullTitle(codes) {
+    const sorted = sortByCode((codes || []).map((c) => ({ code: c }))).map((x) => x.code);
+    return sorted.length ? sorted.join(', ') : 'Aucune série';
+  }
+
+  function closeAllSeriesPanels() {
+    document.querySelectorAll('.works-series-panel').forEach((p) => {
+      p.hidden = true;
+      p.classList.remove('works-series-panel--fixed');
+      p.style.top = '';
+      p.style.left = '';
+      p.style.minWidth = '';
+    });
+    openSeriesPanel = null;
+  }
+
+  function positionSeriesPanel(toggle, panel) {
+    const rect = toggle.getBoundingClientRect();
+    panel.classList.add('works-series-panel--fixed');
+    panel.style.minWidth = Math.max(rect.width, 160) + 'px';
+    panel.style.left = rect.left + 'px';
+    panel.style.top = rect.bottom + 2 + 'px';
+    const panelRect = panel.getBoundingClientRect();
+    if (panelRect.bottom > window.innerHeight - 8) {
+      panel.style.top = Math.max(8, rect.top - panelRect.height - 2) + 'px';
+    }
+    if (panelRect.right > window.innerWidth - 8) {
+      panel.style.left = Math.max(8, window.innerWidth - panelRect.width - 8) + 'px';
+    }
+  }
+
   function formatByCode(code) {
     return meta.formats.find((f) => f.code === code) || null;
   }
@@ -276,7 +333,7 @@
       placeholder = '—',
       allowEmpty = true,
       allowNew = false,
-      labelMode = 'code-label',
+      labelMode = 'code',
       currentValue = '',
     } = cfg || {};
 
@@ -287,7 +344,7 @@
       optEmpty.textContent = placeholder;
       selectEl.appendChild(optEmpty);
     }
-    options.forEach((x) => {
+    sortByCode(options).forEach((x) => {
       const o = document.createElement('option');
       o.value = x.code;
       o.textContent = optionLabel(x, labelMode);
@@ -305,23 +362,89 @@
     }
   }
 
-  function fillSeriesMultiSelect(selectEl, selectedCodes, allowNew) {
-    const selected = new Set(selectedCodes || []);
-    selectEl.innerHTML = '';
-    (meta.series || []).forEach((x) => {
-      const o = document.createElement('option');
-      o.value = x.code;
-      o.textContent = x.label ? `${x.code} — ${x.label}` : x.code;
-      o.selected = selected.has(x.code);
-      selectEl.appendChild(o);
+  function updateSeriesToggle(toggle, work) {
+    toggle.textContent = formatSeriesDisplay(work.series_codes);
+    toggle.title = formatSeriesFullTitle(work.series_codes);
+  }
+
+  function createSeriesPickerCell(work, tr) {
+    const td = document.createElement('td');
+    td.className = 'works-select-cell works-series-picker-cell';
+
+    const wrap = document.createElement('div');
+    wrap.className = 'works-series-picker';
+
+    const toggle = document.createElement('button');
+    toggle.type = 'button';
+    toggle.className = 'works-series-toggle';
+    updateSeriesToggle(toggle, work);
+
+    const panel = document.createElement('div');
+    panel.className = 'works-series-panel catalogue-multiselect-panel';
+    panel.hidden = true;
+
+    const selected = new Set(work.series_codes || []);
+
+    sortByCode(meta.series).forEach((x) => {
+      const label = document.createElement('label');
+      label.className = 'works-series-option catalogue-series-option';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = x.code;
+      cb.checked = selected.has(x.code);
+      cb.addEventListener('change', () => {
+        if (!work.series_codes) work.series_codes = [];
+        if (cb.checked) {
+          if (!work.series_codes.includes(x.code)) work.series_codes.push(x.code);
+        } else {
+          work.series_codes = work.series_codes.filter((c) => c !== x.code);
+        }
+        updateSeriesToggle(toggle, work);
+        markDirty(work.id, tr);
+      });
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(x.code));
+      panel.appendChild(label);
     });
-    if (allowNew) {
-      const optNew = document.createElement('option');
-      optNew.value = NEW_OPTION_VALUE;
-      optNew.textContent = '— Nouveau —';
-      optNew.className = 'works-select-new-option';
-      selectEl.appendChild(optNew);
-    }
+
+    const newBtn = document.createElement('button');
+    newBtn.type = 'button';
+    newBtn.className = 'works-series-new-btn';
+    newBtn.textContent = '— Nouveau —';
+    newBtn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      try {
+        const code = await createSeriesFromPrompt();
+        if (code) {
+          if (!work.series_codes) work.series_codes = [];
+          if (!work.series_codes.includes(code)) work.series_codes.push(code);
+          markDirty(work.id, tr);
+          renderTable();
+          setStatus('Série ' + code + ' créée.');
+        }
+      } catch (err) {
+        setStatus(String(err.message || err), true);
+      }
+    });
+    panel.appendChild(newBtn);
+
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const willOpen = panel.hidden;
+      closeAllSeriesPanels();
+      if (willOpen) {
+        panel.hidden = false;
+        openSeriesPanel = panel;
+        positionSeriesPanel(toggle, panel);
+      }
+    });
+
+    panel.addEventListener('click', (e) => e.stopPropagation());
+
+    wrap.appendChild(toggle);
+    wrap.appendChild(panel);
+    td.appendChild(wrap);
+    return td;
   }
 
   async function createFormatFromPrompt() {
@@ -340,6 +463,7 @@
     if (!j.ok) throw new Error(j.error || 'échec création format');
     syncMetaFormats(j.formats);
     if (j.techniques) syncMetaTechniques(j.techniques);
+    sortMetaLists();
     return j.createdCode || normalized;
   }
 
@@ -359,6 +483,7 @@
     if (!j.ok) throw new Error(j.error || 'échec création technique');
     if (j.formats) syncMetaFormats(j.formats);
     syncMetaTechniques(j.techniques);
+    sortMetaLists();
     return j.createdCode || normalized;
   }
 
@@ -383,6 +508,7 @@
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || 'échec création collectionneur');
     syncMetaCollectors(j.collectors);
+    sortMetaLists();
     return j.collector && j.collector.code ? j.collector.code : null;
   }
 
@@ -402,6 +528,7 @@
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || 'échec création série');
     syncMetaSeries(j.series);
+    sortMetaLists();
     return normalized;
   }
 
@@ -468,44 +595,6 @@
       const v = String(select.value || '').trim().toUpperCase();
       work[field] = v && v !== NEW_OPTION_VALUE ? v : null;
       if (kind === 'format') applyFormatDimensionsToWork(work, work[field]);
-      markDirty(work.id, tr);
-    });
-
-    td.appendChild(select);
-    return td;
-  }
-
-  function createSeriesSelectCell(work, tr) {
-    const td = document.createElement('td');
-    td.className = 'works-select-cell works-series-select-cell';
-
-    const select = document.createElement('select');
-    select.multiple = true;
-    select.size = 2;
-    select.className = 'legend-select works-row-select works-row-series-select';
-    select.title = 'Maintenir Ctrl (Cmd) pour sélectionner plusieurs séries';
-    fillSeriesMultiSelect(select, work.series_codes || [], true);
-
-    select.addEventListener('change', async () => {
-      const values = [...select.selectedOptions].map((o) => o.value);
-      if (values.includes(NEW_OPTION_VALUE)) {
-        const newOpt = select.querySelector(`option[value="${NEW_OPTION_VALUE}"]`);
-        if (newOpt) newOpt.selected = false;
-        try {
-          const code = await createSeriesFromPrompt();
-          if (code) {
-            if (!work.series_codes) work.series_codes = [];
-            if (!work.series_codes.includes(code)) work.series_codes.push(code);
-            markDirty(work.id, tr);
-            renderTable();
-            setStatus('Série ' + code + ' créée.');
-          }
-        } catch (e) {
-          setStatus(String(e.message || e), true);
-        }
-        return;
-      }
-      work.series_codes = values.filter((v) => v !== NEW_OPTION_VALUE);
       markDirty(work.id, tr);
     });
 
@@ -664,17 +753,17 @@
 
       tr.appendChild(
         createCodeSelectCell(work, tr, 'format_code', 'format', meta.formats, {
-          placeholder: 'Aucun',
-          labelMode: 'code-label',
+          placeholder: '—',
+          labelMode: 'code',
         })
       );
       tr.appendChild(
         createCodeSelectCell(work, tr, 'technique_code', 'technique', meta.techniques, {
-          placeholder: 'Aucune',
-          labelMode: 'code-label',
+          placeholder: '—',
+          labelMode: 'code',
         })
       );
-      tr.appendChild(createSeriesSelectCell(work, tr));
+      tr.appendChild(createSeriesPickerCell(work, tr));
       tr.appendChild(
         createCodeSelectCell(work, tr, 'collector_code', 'collector', meta.collectors, {
           placeholder: 'Aucun',
@@ -687,7 +776,7 @@
           placeholder: '—',
           allowEmpty: false,
           allowNew: false,
-          labelMode: 'code-label',
+          labelMode: 'code',
           defaultValue: 'N',
         })
       );
@@ -696,7 +785,7 @@
           placeholder: '—',
           allowEmpty: false,
           allowNew: false,
-          labelMode: 'code-label',
+          labelMode: 'code',
           defaultValue: 'OK',
         })
       );
@@ -710,6 +799,7 @@
     const j = await r.json();
     if (!r.ok || !j.ok) throw new Error(j.error || 'meta failed');
     meta = j.meta || meta;
+    sortMetaLists();
   }
 
   async function loadWorks() {
@@ -840,6 +930,10 @@
         currentPage += 1;
         renderTable();
       }
+    });
+
+    document.addEventListener('click', () => {
+      closeAllSeriesPanels();
     });
   }
 

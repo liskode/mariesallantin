@@ -406,9 +406,9 @@
       const tdDesc = document.createElement('td');
       const descArea = document.createElement('textarea');
       descArea.className = 'legend-input series-desc-textarea';
-      descArea.rows = 2;
-      descArea.title = 'Coller le texte ici';
-      descArea.placeholder = 'Coller…';
+      descArea.rows = 1;
+      descArea.title = 'Coller ici le descriptif';
+      descArea.placeholder = 'Coller ici le descriptif';
       descArea.value = s.description || '';
       descArea.addEventListener('input', () => {
         s.description = descArea.value;
