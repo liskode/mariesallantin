@@ -327,6 +327,33 @@
     return meta.formats.find((f) => f.code === code) || null;
   }
 
+  function refreshSelectOptionLabels(selectEl, options, labelMode, { onlySelected = false } = {}) {
+    Array.from(selectEl.options).forEach((o) => {
+      if (!o.value) return;
+      const item = options.find((x) => x.code === o.value);
+      if (!item) return;
+      if (onlySelected && o !== selectEl.options[selectEl.selectedIndex]) return;
+      o.textContent = optionLabel(item, labelMode);
+    });
+  }
+
+  /** Menu ouvert : libellés complets ; cellule fermée : code seul (select natif). */
+  function attachClosedCodeSelectDisplay(selectEl, options, openLabelMode, closedLabelMode) {
+    const collapse = () =>
+      refreshSelectOptionLabels(selectEl, options, closedLabelMode, { onlySelected: true });
+    const expand = () => refreshSelectOptionLabels(selectEl, options, openLabelMode);
+
+    selectEl.addEventListener('mousedown', expand);
+    selectEl.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        expand();
+      }
+    });
+    selectEl.addEventListener('change', collapse);
+    selectEl.addEventListener('blur', collapse);
+    collapse();
+  }
+
   function optionLabel(x, mode) {
     if (mode === 'name') return x.label || x.code;
     if (mode === 'label') return x.label || x.code;
@@ -588,6 +615,15 @@
       currentValue: work[field] || cfg.defaultValue || '',
     });
 
+    if (cfg.closedLabelMode) {
+      attachClosedCodeSelectDisplay(
+        select,
+        options,
+        cfg.labelMode || 'code-label',
+        cfg.closedLabelMode
+      );
+    }
+
     select.addEventListener('focus', () => {
       select.dataset.prevValue = select.value;
     });
@@ -793,7 +829,8 @@
           placeholder: '—',
           allowEmpty: false,
           allowNew: false,
-          labelMode: 'code',
+          labelMode: 'code-label',
+          closedLabelMode: 'code',
           defaultValue: 'N',
         })
       );
