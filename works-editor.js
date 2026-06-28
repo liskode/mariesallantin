@@ -61,6 +61,26 @@
   const previewImg = document.getElementById('works-preview-img');
   /** @type {HTMLElement | null} */
   let openSeriesPanel = null;
+  /** @type {ResizeObserver | null} */
+  let stickyBarObserver = null;
+
+  function updateWorksStickyOffset() {
+    const bar = document.getElementById('works-sticky-bar');
+    const wrap = document.querySelector('.works-editor-table-wrap');
+    if (!bar || !wrap) return;
+    wrap.style.setProperty('--works-sticky-offset', `${Math.ceil(bar.offsetHeight)}px`);
+  }
+
+  function bindStickyHeaderOffset() {
+    const bar = document.getElementById('works-sticky-bar');
+    if (!bar || stickyBarObserver) return;
+    updateWorksStickyOffset();
+    window.addEventListener('resize', updateWorksStickyOffset);
+    if (typeof ResizeObserver !== 'undefined') {
+      stickyBarObserver = new ResizeObserver(updateWorksStickyOffset);
+      stickyBarObserver.observe(bar);
+    }
+  }
 
   async function loadSiteConfig() {
     if (siteConfig) return siteConfig;
@@ -990,6 +1010,7 @@
     }
     if (pagePrevBtn) pagePrevBtn.disabled = currentPage <= 0;
     if (pageNextBtn) pageNextBtn.disabled = currentPage >= pages - 1;
+    updateWorksStickyOffset();
   }
 
   function renderTable() {
@@ -1163,6 +1184,7 @@
   async function enterApp() {
     loginEl.hidden = true;
     appEl.hidden = false;
+    bindStickyHeaderOffset();
     setStatus('Chargement…');
     try {
       await loadWorksCatalog();

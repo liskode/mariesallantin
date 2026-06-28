@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250627-13" />
+  <link rel="stylesheet" href="catalogue.css?v=20250627-23" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -53,7 +53,7 @@
         <p id="works-status" class="legend-editor-api-hint" aria-live="polite"></p>
 
         <div class="legend-editor-table-wrap works-editor-table-wrap">
-          <div class="works-editor-sticky-stack" id="works-sticky-bar">
+          <div class="works-editor-sticky-bar" id="works-sticky-bar">
             <div class="legend-editor-toolbar works-editor-toolbar">
               <div class="works-editor-toolbar-left">
                 <p class="catalogue-count" id="works-count" aria-live="polite">0 tableau(x)</p>
@@ -87,99 +87,95 @@
                 <button type="button" class="legend-editor-btn" id="works-reload-btn">Recharger</button>
               </div>
             </div>
-            <table class="catalogue-table legend-editor-table works-editor-table works-editor-table--head">
-              <thead>
-                <tr>
-                  <th scope="col" class="works-thumb-th">Vignette</th>
-                  <th scope="col" class="catalogue-th works-col-code">
-                    <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="id" title="Trier par code (croissant)">
-                      <span class="catalogue-sort-icons" aria-hidden="true">
-                        <span class="catalogue-sort-up">▲</span>
-                      </span>
-                      <span class="catalogue-sort-label">Code</span>
-                    </button>
-                  </th>
-                  <th scope="col" class="catalogue-th works-col-title">
-                    <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="title" title="Trier par titre (croissant)">
-                      <span class="catalogue-sort-icons" aria-hidden="true">
-                        <span class="catalogue-sort-up">▲</span>
-                      </span>
-                      <span class="catalogue-sort-label">Titre</span>
-                    </button>
-                  </th>
-                  <th scope="col" class="catalogue-th works-col-year">
-                    <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="year" title="Trier par année (croissant)">
-                      <span class="catalogue-sort-icons" aria-hidden="true">
-                        <span class="catalogue-sort-up">▲</span>
-                      </span>
-                      <span class="catalogue-sort-label">Année</span>
-                    </button>
-                  </th>
-                  <th scope="col" class="catalogue-th works-col-format">
-                    <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="format" title="Trier par format (croissant)">
-                      <span class="catalogue-sort-icons" aria-hidden="true">
-                        <span class="catalogue-sort-up">▲</span>
-                      </span>
-                      <span class="catalogue-sort-label">Format</span>
-                    </button>
-                  </th>
-                  <th scope="col" class="catalogue-th works-col-technique">
-                    <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="technique" title="Trier par technique (croissant)">
-                      <span class="catalogue-sort-icons" aria-hidden="true">
-                        <span class="catalogue-sort-up">▲</span>
-                      </span>
-                      <span class="catalogue-sort-label">Technique</span>
-                    </button>
-                  </th>
-                  <th scope="col" class="catalogue-th works-col-series">
-                    <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="series" title="Trier par séries (croissant)">
-                      <span class="catalogue-sort-icons" aria-hidden="true">
-                        <span class="catalogue-sort-up">▲</span>
-                      </span>
-                      <span class="catalogue-sort-label">Séries</span>
-                    </button>
-                  </th>
-                  <th scope="col" class="catalogue-th">
-                    <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="collector" title="Trier par collectionneur (croissant)">
-                      <span class="catalogue-sort-icons" aria-hidden="true">
-                        <span class="catalogue-sort-up">▲</span>
-                      </span>
-                      <span class="catalogue-sort-label">Collectionneur</span>
-                    </button>
-                  </th>
-                  <th scope="col" class="catalogue-th works-col-pub">
-                    <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="publication" title="Trier par statut publication (croissant)">
-                      <span class="catalogue-sort-icons" aria-hidden="true">
-                        <span class="catalogue-sort-up">▲</span>
-                      </span>
-                      <span class="catalogue-sort-label">Pub.</span>
-                    </button>
-                  </th>
-                  <th scope="col" class="catalogue-th works-col-photo">
-                    <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="photo" title="Trier par statut photo (croissant)">
-                      <span class="catalogue-sort-icons" aria-hidden="true">
-                        <span class="catalogue-sort-up">▲</span>
-                      </span>
-                      <span class="catalogue-sort-label">Photo</span>
-                    </button>
-                  </th>
-                </tr>
-              </thead>
-            </table>
           </div>
-          <table class="catalogue-table legend-editor-table works-editor-table works-editor-table--body">
-            <thead class="visually-hidden">
+          <table class="catalogue-table legend-editor-table works-editor-table">
+            <colgroup>
+              <col class="works-col-thumb" />
+              <col class="works-col-code" />
+              <col class="works-col-title" />
+              <col class="works-col-year" />
+              <col class="works-col-format" />
+              <col class="works-col-technique" />
+              <col class="works-col-series" />
+              <col class="works-col-collector" />
+              <col class="works-col-pub" />
+              <col class="works-col-photo" />
+            </colgroup>
+            <thead>
               <tr>
-                <th scope="col">Vignette</th>
-                <th scope="col">Code</th>
-                <th scope="col">Titre</th>
-                <th scope="col">Année</th>
-                <th scope="col">Format</th>
-                <th scope="col">Technique</th>
-                <th scope="col">Séries</th>
-                <th scope="col">Collectionneur</th>
-                <th scope="col">Pub.</th>
-                <th scope="col">Photo</th>
+                <th scope="col" class="works-thumb-th">Vignette</th>
+                <th scope="col" class="catalogue-th works-col-code">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="id" title="Trier par code (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Code</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th works-col-title">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="title" title="Trier par titre (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Titre</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th works-col-year">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="year" title="Trier par année (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Année</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th works-col-format">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="format" title="Trier par format (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Format</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th works-col-technique">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="technique" title="Trier par technique (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Technique</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th works-col-series">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="series" title="Trier par séries (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Séries</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th works-col-collector">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="collector" title="Trier par collectionneur (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Collectionneur</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th works-col-pub">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="publication" title="Trier par statut publication (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Pub.</span>
+                  </button>
+                </th>
+                <th scope="col" class="catalogue-th works-col-photo">
+                  <button type="button" class="catalogue-sort-btn works-sort-btn works-sort-btn--asc-only" data-sort-key="photo" title="Trier par statut photo (croissant)">
+                    <span class="catalogue-sort-icons" aria-hidden="true">
+                      <span class="catalogue-sort-up">▲</span>
+                    </span>
+                    <span class="catalogue-sort-label">Photo</span>
+                  </button>
+                </th>
               </tr>
             </thead>
             <tbody id="works-tbody"></tbody>
@@ -192,6 +188,6 @@
   <img id="works-preview-img" class="catalogue-preview" alt="" aria-hidden="true" />
 
   <script src="editor-common.js?v=20250627-5"></script>
-  <script src="works-editor.js?v=20250627-15"></script>
+  <script src="works-editor.js?v=20250627-17"></script>
 </body>
 </html>
