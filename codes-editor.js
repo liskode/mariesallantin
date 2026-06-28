@@ -207,6 +207,17 @@
     window.setTimeout(() => tr.classList.remove('codes-editor-row--focus'), 2500);
   }
 
+  function sortByCode(list) {
+    return [...(list || [])].sort((a, b) =>
+      String(a.code || '').localeCompare(String(b.code || ''), 'fr')
+    );
+  }
+
+  function sortCodeLists() {
+    formatsList = sortByCode(formatsList);
+    techniquesList = sortByCode(techniquesList);
+  }
+
   function renderFormats() {
     if (!formatsTbody) return;
     formatsTbody.innerHTML = '';
@@ -282,6 +293,7 @@
   }
 
   function renderAll() {
+    sortCodeLists();
     renderFormats();
     renderTechniques();
     if (countEl) {

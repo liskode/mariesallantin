@@ -73,7 +73,6 @@ async function fetchFormats(supabase: SupabaseClient) {
   const { data, error } = await supabase
     .from('formats')
     .select('code, label, sort_order, width_cm, height_cm, created_at, updated_at')
-    .order('sort_order', { ascending: true })
     .order('code', { ascending: true });
   if (error) throw error;
   return data || [];
@@ -83,7 +82,6 @@ async function fetchTechniques(supabase: SupabaseClient) {
   const { data, error } = await supabase
     .from('techniques')
     .select('code, label, sort_order, created_at, updated_at')
-    .order('sort_order', { ascending: true })
     .order('code', { ascending: true });
   if (error) throw error;
   return data || [];

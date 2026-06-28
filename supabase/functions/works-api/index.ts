@@ -85,9 +85,8 @@ async function fetchMeta(supabase: SupabaseClient) {
       supabase
         .from('formats')
         .select('code, label, width_cm, height_cm')
-        .order('sort_order')
         .order('code'),
-      supabase.from('techniques').select('code, label').order('sort_order').order('code'),
+      supabase.from('techniques').select('code, label').order('code'),
       supabase.from('series').select('code, label').order('sort_order').order('code'),
       supabase.from('collectors').select('code, name').order('name'),
       supabase

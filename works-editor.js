@@ -467,7 +467,7 @@
 
   function refreshSelectOptionLabels(selectEl, options, labelMode, { onlySelected = false } = {}) {
     Array.from(selectEl.options).forEach((o) => {
-      if (!o.value) return;
+      if (!o.value || o.disabled || o.classList.contains('works-select-separator')) return;
       const item = options.find((x) => x.code === o.value);
       if (!item) return;
       if (onlySelected && o !== selectEl.options[selectEl.selectedIndex]) return;
@@ -499,10 +499,42 @@
     return x.label ? `${x.code} — ${x.label}` : x.code;
   }
 
+  function usedFormatCodes() {
+    const used = new Set();
+    for (const w of worksList) {
+      if (w.format_code) used.add(w.format_code);
+    }
+    return used;
+  }
+
+  function usedTechniqueCodes() {
+    const used = new Set();
+    for (const w of worksList) {
+      if (w.technique_code) used.add(w.technique_code);
+    }
+    return used;
+  }
+
+  function appendSelectSeparator(selectEl) {
+    const sep = document.createElement('option');
+    sep.disabled = true;
+    sep.value = '';
+    sep.textContent = '────────';
+    sep.className = 'works-select-separator';
+    selectEl.appendChild(sep);
+  }
+
+  function appendSelectOption(selectEl, item, labelMode) {
+    const o = document.createElement('option');
+    o.value = item.code;
+    o.textContent = optionLabel(item, labelMode);
+    selectEl.appendChild(o);
+  }
+
   /**
    * @param {HTMLSelectElement} selectEl
    * @param {Array<{code:string,label?:string}>} options
-   * @param {{ placeholder?: string, allowEmpty?: boolean, allowNew?: boolean, labelMode?: string, currentValue?: string }} cfg
+   * @param {{ placeholder?: string, allowEmpty?: boolean, allowNew?: boolean, labelMode?: string, currentValue?: string, groupUsedFirst?: boolean, usedCodesSet?: Set<string> }} cfg
    */
   function fillSelectOptions(selectEl, options, cfg) {
     const {
@@ -511,6 +543,8 @@
       allowNew = false,
       labelMode = 'code',
       currentValue = '',
+      groupUsedFirst = false,
+      usedCodesSet = null,
     } = cfg || {};
 
     selectEl.innerHTML = '';
@@ -520,12 +554,20 @@
       optEmpty.textContent = placeholder;
       selectEl.appendChild(optEmpty);
     }
-    sortByCode(options).forEach((x) => {
-      const o = document.createElement('option');
-      o.value = x.code;
-      o.textContent = optionLabel(x, labelMode);
-      selectEl.appendChild(o);
-    });
+
+    const sorted = sortByCode(options);
+    if (groupUsedFirst && usedCodesSet) {
+      const used = sorted.filter((x) => usedCodesSet.has(x.code));
+      const other = sorted.filter((x) => !usedCodesSet.has(x.code));
+      used.forEach((x) => appendSelectOption(selectEl, x, labelMode));
+      if (used.length && other.length) appendSelectSeparator(selectEl);
+      other.forEach((x) => appendSelectOption(selectEl, x, labelMode));
+      if (allowNew && (used.length || other.length)) appendSelectSeparator(selectEl);
+    } else {
+      sorted.forEach((x) => appendSelectOption(selectEl, x, labelMode));
+      if (allowNew && sorted.length) appendSelectSeparator(selectEl);
+    }
+
     if (allowNew) {
       const optNew = document.createElement('option');
       optNew.value = NEW_OPTION_VALUE;
@@ -756,6 +798,50 @@
     return td;
   }
 
+  function createYearCell(work, tr) {
+    const td = document.createElement('td');
+    td.className = 'works-year-cell';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.inputMode = 'numeric';
+    input.maxLength = 4;
+    input.className = 'legend-input works-year-input';
+    input.value = work.year != null && work.year !== '' ? String(work.year) : '';
+    input.placeholder = '—';
+    input.setAttribute('aria-label', 'Année de ' + (work.id || ''));
+    input.addEventListener('input', () => {
+      const t = input.value.trim();
+      if (!t) {
+        work.year = null;
+        markDirty(work.id, tr);
+        return;
+      }
+      if (/^\d{4}$/.test(t)) {
+        work.year = parseInt(t, 10);
+        markDirty(work.id, tr);
+      }
+    });
+    input.addEventListener('blur', () => {
+      const t = input.value.trim();
+      if (!t) {
+        work.year = null;
+        input.value = '';
+        markDirty(work.id, tr);
+        return;
+      }
+      if (!/^\d{4}$/.test(t)) {
+        input.value = work.year != null ? String(work.year) : '';
+        setStatus('Année invalide : 4 chiffres attendus.', true);
+        return;
+      }
+      work.year = parseInt(t, 10);
+      input.value = t;
+      markDirty(work.id, tr);
+    });
+    td.appendChild(input);
+    return td;
+  }
+
   function createCodeSelectCell(work, tr, field, kind, options, cfg) {
     const td = document.createElement('td');
     td.className = 'works-select-cell';
@@ -768,6 +854,13 @@
       allowNew: cfg.allowNew !== false,
       labelMode: cfg.labelMode || 'code-label',
       currentValue: work[field] || cfg.defaultValue || '',
+      groupUsedFirst: kind === 'format' || kind === 'technique',
+      usedCodesSet:
+        kind === 'format'
+          ? usedFormatCodes()
+          : kind === 'technique'
+            ? usedTechniqueCodes()
+            : null,
     });
 
     if (cfg.closedLabelMode) {
@@ -956,11 +1049,7 @@
       tr.appendChild(tdId);
 
       tr.appendChild(createTitleCell(work, tr));
-
-      const tdYear = document.createElement('td');
-      tdYear.className = 'works-year-cell';
-      tdYear.textContent = work.year != null ? String(work.year) : '—';
-      tr.appendChild(tdYear);
+      tr.appendChild(createYearCell(work, tr));
 
       tr.appendChild(
         createCodeSelectCell(work, tr, 'format_code', 'format', meta.formats, {

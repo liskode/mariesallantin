@@ -6,6 +6,7 @@
     "supabase:import-works": "node scripts/import-works-to-supabase.mjs",
     "supabase:update-dimensions": "node scripts/update-works-dimensions-cm.mjs",
     "supabase:strip-title-dimensions": "node scripts/strip-works-title-dimensions.mjs",
+    "supabase:normalize-titles": "node scripts/update-works-titles-case.mjs",
     "supabase:update-collectors": "node scripts/update-works-collectors.mjs",
     "supabase:update-formats": "node scripts/update-works-format-from-filename.mjs",
     "collectors:api": "node scripts/collectors-editor-api.mjs",

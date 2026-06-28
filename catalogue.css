@@ -142,6 +142,19 @@ body.catalogue-standalone {
   margin-bottom: 4px;
 }
 
+.works-editor-priority-subtitle {
+  margin: 0;
+  color: #c62828;
+  font-size: 0.92rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.works-editor-priority-subtitle--login {
+  margin: 0 0 16px;
+}
+
 @media (max-width: 640px) {
   .catalogue-standalone-header-inner--logos {
     grid-template-columns: auto 1fr;
@@ -1666,19 +1679,39 @@ body.catalogue-standalone {
   margin: 0 0 6px;
 }
 
-.works-editor-sticky-bar {
+.works-editor-sticky-stack {
   position: sticky;
   top: 0;
   z-index: 30;
   background: var(--background);
-  padding: 8px 0 10px;
-  margin: 0 0 8px;
+  padding: 8px 0 0;
+  margin: 0;
   box-shadow: 0 1px 0 var(--border);
-  flex-shrink: 0;
 }
 
-.works-editor-sticky-bar .legend-editor-toolbar {
-  margin-bottom: 0;
+.works-editor-sticky-stack .legend-editor-toolbar {
+  margin-bottom: 8px;
+  padding: 0 10px;
+}
+
+.works-editor-sticky-stack .works-editor-table--head {
+  margin: 0;
+  border-radius: 0;
+  box-shadow: none;
+  border: none;
+  border-top: 1px solid var(--border);
+}
+
+.works-editor-sticky-stack .works-editor-table--head thead th {
+  background: #f0f2f7;
+}
+
+.works-editor-table--body {
+  border-top: none;
+}
+
+.works-editor-table--body thead.visually-hidden + tbody tr:first-child td {
+  border-top: none;
 }
 
 .works-editor-toolbar {
@@ -1743,12 +1776,10 @@ body.catalogue-standalone {
   border: 1px solid var(--border);
 }
 
-.works-editor-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  background: #f0f2f7;
-  box-shadow: 0 1px 0 var(--border);
+.works-editor-table-wrap .works-editor-table--body {
+  box-shadow: none;
+  border: none;
+  border-radius: 0;
 }
 
 .works-editor-page-info {
@@ -1843,6 +1874,18 @@ body.catalogue-standalone {
   text-align: center;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
+}
+
+.works-editor-table .works-year-input {
+  width: 3.4rem;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-size: 0.8rem;
+  padding: 3px 4px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
 }
 
 .works-code-ref-cell,
@@ -2047,4 +2090,10 @@ body.catalogue-standalone {
 .catalogue-edit-label select option.works-select-new-option {
   font-weight: 600;
   color: var(--accent);
+}
+
+.works-row-select option.works-select-separator,
+.catalogue-edit-label select option.works-select-separator {
+  color: var(--muted, #888);
+  font-size: 0.85em;
 }
