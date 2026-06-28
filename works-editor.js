@@ -58,7 +58,6 @@
   const pageNextBtn = document.getElementById('works-page-next');
   const pageInfoEl = document.getElementById('works-page-info');
   const pageSizeEl = document.getElementById('works-page-size');
-  const stickyBarEl = document.getElementById('works-sticky-bar');
   const previewImg = document.getElementById('works-preview-img');
   /** @type {HTMLElement | null} */
   let openSeriesPanel = null;
@@ -338,6 +337,17 @@
     return [...list].sort(compareWorks);
   }
 
+  function stripAccents(s) {
+    return String(s)
+      .normalize('NFD')
+      .replace(/\p{M}/gu, '');
+  }
+
+  /** Recherche titre : insensible à la casse, aux accents et à la forme Unicode (NFC/NFD). */
+  function normalizeForSearch(s) {
+    return stripAccents(String(s || '')).toLowerCase();
+  }
+
   function parseSeriesFilterTokens(raw) {
     return String(raw || '')
       .trim()
@@ -355,11 +365,9 @@
 
   function filterWorks(list) {
     let result = list;
-    const q = filterText.trim().toLowerCase();
+    const q = normalizeForSearch(filterText);
     if (q) {
-      result = result.filter((w) =>
-        String(w.title || '').toLowerCase().includes(q)
-      );
+      result = result.filter((w) => normalizeForSearch(w.title).includes(q));
     }
     const seriesTokens = parseSeriesFilterTokens(seriesFilterText);
     if (seriesTokens.length) {
@@ -854,12 +862,6 @@
     return Number.isNaN(n) || n < 1 ? DEFAULT_PAGE_SIZE : n;
   }
 
-  function syncStickyToolbarHeight() {
-    if (!stickyBarEl) return;
-    const h = Math.ceil(stickyBarEl.getBoundingClientRect().height);
-    document.documentElement.style.setProperty('--works-sticky-toolbar-height', h + 'px');
-  }
-
   function pageCount(list) {
     const pageSize = getPageSize();
     if (!Number.isFinite(pageSize) || pageSize <= 0 || list.length <= pageSize) return 1;
@@ -899,7 +901,6 @@
     }
     if (pagePrevBtn) pagePrevBtn.disabled = currentPage <= 0;
     if (pageNextBtn) pageNextBtn.disabled = currentPage >= pages - 1;
-    syncStickyToolbarHeight();
   }
 
   function renderTable() {
@@ -1083,7 +1084,6 @@
       await loadMeta();
       await loadWorks();
       setStatus('');
-      syncStickyToolbarHeight();
     } catch (e) {
       setStatus(String(e.message || e), true);
     }
@@ -1174,12 +1174,6 @@
       renderTable();
     });
 
-    window.addEventListener('resize', syncStickyToolbarHeight);
-    if (stickyBarEl && typeof ResizeObserver !== 'undefined') {
-      const ro = new ResizeObserver(() => syncStickyToolbarHeight());
-      ro.observe(stickyBarEl);
-    }
-
     document.addEventListener('click', () => {
       closeAllSeriesPanels();
     });
@@ -1187,7 +1181,6 @@
 
   async function init() {
     bindEvents();
-    syncStickyToolbarHeight();
     await showApiHint();
     if (AUTH() && AUTH().hasSession()) {
       token = AUTH().getSessionToken() || '';
