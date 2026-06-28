@@ -99,7 +99,7 @@ async function main() {
   console.log('Sans dimension     :', stats.missing);
   console.log('Erreurs            :', stats.errors);
   if (ms17) {
-    console.log('Exemple MS0017     :', ms17.width_cm, '×', ms17.height_cm, 'cm');
+    console.log('Exemple MS0017     :', ms17.height_cm, '×', ms17.width_cm, 'cm');
   }
   if (stats.errors > 0) process.exitCode = 1;
 }

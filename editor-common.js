@@ -15,6 +15,8 @@
 
   const LOCAL_EDITOR_PORTS = new Set(['47832', '47833', '47834', '47835']);
   const EDIT_PASS = 'MS75';
+  const SAVE_BTN_LABEL_DIRTY = 'Enregistrer les modifications';
+  const SAVE_BTN_LABEL_CLEAN = 'Modifications enregistrées';
   const AUTH_STORAGE_KEY = 'mariesallantin_editor_token';
   const LEGACY_AUTH_KEYS = [
     'works_edit_ok',
@@ -60,6 +62,18 @@
   function clearSession() {
     sessionStorage.removeItem(AUTH_STORAGE_KEY);
     LEGACY_AUTH_KEYS.forEach((k) => sessionStorage.removeItem(k));
+  }
+
+  /**
+   * @param {HTMLButtonElement | null} btn
+   * @param {boolean} dirty
+   */
+  function updateSaveButton(btn, dirty) {
+    if (!btn) return;
+    btn.disabled = !dirty;
+    btn.classList.toggle('legend-editor-btn--save-dirty', dirty);
+    btn.classList.toggle('legend-editor-btn--save-clean', !dirty);
+    btn.textContent = dirty ? SAVE_BTN_LABEL_DIRTY : SAVE_BTN_LABEL_CLEAN;
   }
 
   /**
@@ -165,6 +179,9 @@
     hasSession,
     setSessionToken,
     clearSession,
+    updateSaveButton,
+    SAVE_BTN_LABEL_DIRTY,
+    SAVE_BTN_LABEL_CLEAN,
     appendDeleteCell,
     renderEditorTabs,
     mountEditorTabs,

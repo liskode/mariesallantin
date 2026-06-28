@@ -224,11 +224,7 @@
   }
 
   function updateSaveBtn() {
-    if (!saveBtn) return;
-    const dirty = dirtyCodes.size > 0;
-    saveBtn.disabled = !dirty;
-    saveBtn.classList.toggle('legend-editor-btn--save-dirty', dirty);
-    saveBtn.classList.toggle('legend-editor-btn--save-clean', !dirty);
+    EditorCommon.updateSaveButton(saveBtn, dirtyCodes.size > 0);
   }
 
   function markDirty(code) {

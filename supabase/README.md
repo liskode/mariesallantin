@@ -142,7 +142,7 @@ supabase functions deploy codes-api --no-verify-jwt --project-ref leezsypadtvypd
 
 3. Ouvrir **https://mariesallantin.art/codes-editor.html** (mot de passe `MS75`)
 
-Deux panneaux côte à côte : formats (code, libellé, largeur/hauteur cm) et techniques (code, libellé). Boutons **+ Nouveau** pour ajouter un code vide puis compléter la ligne.
+Deux panneaux côte à côte : formats (code, libellé, hauteur/largeur cm) et techniques (code, libellé). Boutons **+ Nouveau** pour ajouter un code vide puis compléter la ligne.
 
 Développement local : `npm run codes:api` → http://127.0.0.1:47834/
 

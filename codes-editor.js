@@ -140,11 +140,10 @@
   }
 
   function updateSaveBtn() {
-    if (!saveBtn) return;
-    const dirty = dirtyFormats.size > 0 || dirtyTechniques.size > 0;
-    saveBtn.disabled = !dirty;
-    saveBtn.classList.toggle('legend-editor-btn--save-dirty', dirty);
-    saveBtn.classList.toggle('legend-editor-btn--save-clean', !dirty);
+    EditorCommon.updateSaveButton(
+      saveBtn,
+      dirtyFormats.size > 0 || dirtyTechniques.size > 0
+    );
   }
 
   function markFormatDirty(code) {
@@ -228,15 +227,6 @@
       bindTextInput(labelInput, f, 'label', 'format', tr);
       tdLabel.appendChild(labelInput);
 
-      const tdW = document.createElement('td');
-      const wInput = document.createElement('input');
-      wInput.type = 'text';
-      wInput.inputMode = 'decimal';
-      wInput.className = 'legend-input codes-cm-input';
-      wInput.value = cmDisplay(f.width_cm);
-      bindCmInput(wInput, f, 'width_cm', tr);
-      tdW.appendChild(wInput);
-
       const tdH = document.createElement('td');
       const hInput = document.createElement('input');
       hInput.type = 'text';
@@ -246,10 +236,19 @@
       bindCmInput(hInput, f, 'height_cm', tr);
       tdH.appendChild(hInput);
 
+      const tdW = document.createElement('td');
+      const wInput = document.createElement('input');
+      wInput.type = 'text';
+      wInput.inputMode = 'decimal';
+      wInput.className = 'legend-input codes-cm-input';
+      wInput.value = cmDisplay(f.width_cm);
+      bindCmInput(wInput, f, 'width_cm', tr);
+      tdW.appendChild(wInput);
+
       tr.appendChild(tdCode);
       tr.appendChild(tdLabel);
-      tr.appendChild(tdW);
       tr.appendChild(tdH);
+      tr.appendChild(tdW);
       appendCountAndDelete(tr, f, 'format');
       formatsTbody.appendChild(tr);
     }
