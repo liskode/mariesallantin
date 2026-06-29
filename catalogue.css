@@ -1859,6 +1859,7 @@ body.catalogue-standalone {
 .works-code-cell {
   font-family: ui-monospace, monospace;
   font-weight: 600;
+  color: #a0a0a8;
   white-space: nowrap;
 }
 
