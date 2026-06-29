@@ -14,7 +14,7 @@
   const PRODUCTION_SERIES_API =
     'https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/series-api';
   const NEW_OPTION_VALUE = '__new__';
-  /** Écart relatif H/L (hauteur ÷ largeur) : vert < 5 %, orange 5–10 %, rouge > 10 %. */
+  /** Écart relatif H/L (hauteur ÷ largeur) : vert < 5 %, jaune foncé 5–10 %, rouge > 10 %. */
   const FORMAT_RATIO_OK = 0.05;
   const FORMAT_RATIO_WARN = 0.10;
   const RASTER_EXT = new Set([
@@ -271,6 +271,17 @@
   function thumbUrlForWork(work) {
     const media = mediaPathForWork(work);
     return media ? thumbUrlForMedia(media) : '';
+  }
+
+  function originalFilenameLabel(work) {
+    if (!work) return '';
+    const fn = String(work.filename_original || '').trim();
+    if (fn) return fn;
+    const media = mediaPathForWork(work);
+    if (!media) return '';
+    const base = media.split('/').pop() || '';
+    if (!base || /^MS\d{4}\.\w+$/i.test(base)) return '';
+    return base;
   }
 
   async function loadWorksCatalog() {
@@ -1313,6 +1324,8 @@
       const tdId = document.createElement('td');
       tdId.className = 'works-code-cell';
       tdId.textContent = work.id;
+      const origFilename = originalFilenameLabel(work);
+      if (origFilename) tdId.title = origFilename;
       tr.appendChild(tdId);
 
       tr.appendChild(createTitleCell(work, tr));
