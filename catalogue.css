@@ -1757,8 +1757,21 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   flex-shrink: 0;
 }
 
+.works-import-toolbar-btn {
+  flex-shrink: 0;
+  padding: 6px 7px;
+  line-height: 0;
+  opacity: 0.82;
+}
+
+.works-import-toolbar-btn:hover:not(:disabled) {
+  opacity: 1;
+}
+
 .works-import-toolbar-btn .legend-editor-btn-picto {
-  filter: brightness(0) invert(1);
+  width: 16px;
+  height: 16px;
+  display: block;
 }
 
 .works-editor-toolbar-left {
@@ -1768,12 +1781,6 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   gap: 10px 14px;
   flex: 1 1 auto;
   min-width: 0;
-}
-
-.works-import-toolbar-btn {
-  flex-shrink: 0;
-  font-weight: 600;
-  white-space: nowrap;
 }
 
 .works-editor-filter {
