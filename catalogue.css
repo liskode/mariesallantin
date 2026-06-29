@@ -2390,6 +2390,21 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   font-size: 0.82rem;
 }
 
+.works-import-preview-thumb-th,
+.works-import-preview-thumb-cell {
+  width: 52px;
+  padding: 4px 6px;
+}
+
+.works-import-preview-thumb {
+  display: block;
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 4px;
+  background: #f2f3f7;
+}
+
 .works-import-preview-row--error td {
   color: #b42318;
   background: #fef3f2;

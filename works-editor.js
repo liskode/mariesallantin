@@ -250,9 +250,22 @@
       : MEDIA_BASE + encodeMediaPath(media);
   }
 
-  function thumbUrlForWorkId(workId) {
-    if (!workId || !workMediaById || !workMediaById.has(workId)) return '';
-    return thumbUrlForMedia(workMediaById.get(workId));
+  function mediaPathForWork(work) {
+    if (!work || !work.id) return '';
+    if (workMediaById && workMediaById.has(work.id)) {
+      return workMediaById.get(work.id);
+    }
+    const orig = String(work.filename_original || '').trim().replace(/\\/g, '/');
+    if (orig && orig.toUpperCase().startsWith(work.id.toUpperCase())) {
+      return 'catalogue/' + orig;
+    }
+    const ext = String(work.image_ext || 'jpeg').replace(/^\./, '');
+    return 'catalogue/' + work.id + '.' + ext;
+  }
+
+  function thumbUrlForWork(work) {
+    const media = mediaPathForWork(work);
+    return media ? thumbUrlForMedia(media) : '';
   }
 
   async function loadWorksCatalog() {
@@ -948,9 +961,9 @@
     return td;
   }
 
-  function fullImageUrlForWorkId(workId) {
-    if (!workId || !workMediaById || !workMediaById.has(workId)) return '';
-    return MEDIA_BASE + encodeMediaPath(workMediaById.get(workId));
+  function fullImageUrlForWork(work) {
+    const media = mediaPathForWork(work);
+    return media ? MEDIA_BASE + encodeMediaPath(media) : '';
   }
 
   function attachThumbPreview(thumb, fullSrc) {
@@ -1071,11 +1084,11 @@
       img.className = 'works-thumb-img';
       img.alt = '';
       img.loading = 'lazy';
-      const url = thumbUrlForWorkId(work.id);
+      const url = thumbUrlForWork(work);
       if (url) {
         img.src = url;
         img.onerror = function () {
-          const full = workMediaById && workMediaById.get(work.id);
+          const full = mediaPathForWork(work);
           if (full) {
             img.onerror = null;
             img.src = MEDIA_BASE + encodeMediaPath(full);
@@ -1084,7 +1097,7 @@
       } else {
         img.classList.add('works-thumb-img--empty');
       }
-      const fullSrc = fullImageUrlForWorkId(work.id);
+      const fullSrc = fullImageUrlForWork(work);
       if (fullSrc) attachThumbPreview(img, fullSrc);
       tdThumb.appendChild(img);
       tr.appendChild(tdThumb);
@@ -1262,6 +1275,30 @@
   let importSelectedFiles = [];
   /** @type {Array<object>} */
   let importPlan = [];
+  /** @type {string[]} */
+  let importPreviewObjectUrls = [];
+
+  function revokeImportPreviewObjectUrls() {
+    for (const url of importPreviewObjectUrls) {
+      try {
+        URL.revokeObjectURL(url);
+      } catch {
+        /* ignore */
+      }
+    }
+    importPreviewObjectUrls = [];
+  }
+
+  function importPreviewUrlForFileName(name) {
+    const file = importSelectedFiles.find((f) => f.name === name);
+    if (!file) return '';
+    const dot = file.name.lastIndexOf('.');
+    if (dot < 0) return '';
+    if (!RASTER_EXT.has(file.name.slice(dot).toLowerCase())) return '';
+    const url = URL.createObjectURL(file);
+    importPreviewObjectUrls.push(url);
+    return url;
+  }
 
   function updateImportEnvNotice() {
     const el = importEnvNoticeEl;
@@ -1342,6 +1379,7 @@
 
   function renderImportPreview(plan) {
     if (!importPreviewTbody || !importPreviewWrap || !importSubmitBtn) return;
+    revokeImportPreviewObjectUrls();
     importPreviewTbody.innerHTML = '';
     let okCount = 0;
     for (const row of plan) {
@@ -1349,6 +1387,18 @@
       if (row.error) tr.className = 'works-import-preview-row--error';
       else if (row.warning) tr.className = 'works-import-preview-row--warn';
       else okCount += 1;
+
+      const tdThumb = document.createElement('td');
+      tdThumb.className = 'works-import-preview-thumb-cell';
+      const previewUrl = importPreviewUrlForFileName(row.originalName || '');
+      if (previewUrl) {
+        const img = document.createElement('img');
+        img.className = 'works-import-preview-thumb';
+        img.alt = '';
+        img.src = previewUrl;
+        tdThumb.appendChild(img);
+      }
+      tr.appendChild(tdThumb);
 
       const tdFile = document.createElement('td');
       tdFile.textContent = row.originalName || '';
@@ -1405,6 +1455,9 @@
         if (errCount) msg += ' · ' + errCount + ' erreur(s)';
         if (warnCount) msg += ' · ' + warnCount + ' avertissement(s)';
         if (!isLocalDevServer()) msg += ' — simulation (aucune écriture)';
+        else if (okCount === 0 && plan.length) {
+          msg += ' — corrigez les erreurs (codes inconnus, etc.) pour activer Importer';
+        }
         importStatusEl.textContent = msg;
       }
       importStatusEl.classList.remove('legend-editor-api-hint--error');
@@ -1431,7 +1484,12 @@
     const j = await r.json();
     if (!r.ok || !j.ok) {
       if (importStatusEl) {
-        importStatusEl.textContent = formatApiError(j.error) || 'aperçu impossible';
+        let errMsg = formatApiError(j.error) || 'aperçu impossible';
+        if (errMsg === 'not found' || r.status === 404) {
+          errMsg =
+            'API locale obsolète ou arrêtée — arrêtez le terminal (Ctrl+C) puis relancez npm run works:api';
+        }
+        importStatusEl.textContent = errMsg;
         importStatusEl.classList.add('legend-editor-api-hint--error');
       }
       importPlan = [];
@@ -1457,6 +1515,7 @@
 
   async function openImportDialog() {
     if (!importDialog) return;
+    revokeImportPreviewObjectUrls();
     importSelectedFiles = [];
     importPlan = [];
     if (importFilesEl) importFilesEl.value = '';
@@ -1559,6 +1618,8 @@
       }
       setStatus('Rechargement…');
       try {
+        workMediaById = null;
+        await loadWorksCatalog();
         await loadMeta();
         await loadWorks();
         setStatus('Données rechargées.');
