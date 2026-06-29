@@ -7,6 +7,7 @@ const FAMILY_LABELS = {
   F: 'Figure',
   P: 'Paysage',
   C: 'Carré',
+  _: 'Hors Format',
 };
 
 /** @param {string} code */

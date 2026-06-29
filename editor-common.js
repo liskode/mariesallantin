@@ -171,7 +171,7 @@
   }
 
   const FORMAT_FAMILY_ORDER = ['F', 'P', 'C'];
-  const FORMAT_FAMILY_LABELS = { F: 'Figure', P: 'Paysage', C: 'Carré' };
+  const FORMAT_FAMILY_LABELS = { F: 'Figure', P: 'Paysage', C: 'Carré', _: 'Hors Format' };
 
   function formatFamily(code) {
     const last = String(code || '').trim().toUpperCase().slice(-1);

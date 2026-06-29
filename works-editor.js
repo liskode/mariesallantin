@@ -534,14 +534,6 @@
     return x.label ? `${x.code} — ${x.label}` : x.code;
   }
 
-  function usedFormatCodes() {
-    const used = new Set();
-    for (const w of worksList) {
-      if (w.format_code) used.add(w.format_code);
-    }
-    return used;
-  }
-
   function usedTechniqueCodes() {
     const used = new Set();
     for (const w of worksList) {
@@ -592,27 +584,16 @@
     }
 
     const appendItems = (items) => {
-      if (groupUsedFirst && usedCodesSet) {
-        const used = items.filter((x) => usedCodesSet.has(x.code));
-        const other = items.filter((x) => !usedCodesSet.has(x.code));
-        used.forEach((x) => appendSelectOption(selectEl, x, labelMode));
-        if (used.length && other.length) appendSelectSeparator(selectEl);
-        other.forEach((x) => appendSelectOption(selectEl, x, labelMode));
-      } else {
-        items.forEach((x) => appendSelectOption(selectEl, x, labelMode));
-      }
+      items.forEach((x) => appendSelectOption(selectEl, x, labelMode));
     };
 
     if (groupFormatsByFamily) {
       const ec = AUTH();
       const groups = ec && ec.groupFormatsByFamily ? ec.groupFormatsByFamily(options) : [];
       if (groups.length) {
-        groups.forEach((g, idx) => {
+        groups.forEach((g) => {
           if (g.label) appendSelectSeparator(selectEl, g.label);
           appendItems(g.items);
-          if (idx < groups.length - 1 && !g.label && groups[idx + 1]?.label) {
-            appendSelectSeparator(selectEl);
-          }
         });
       } else {
         appendItems(sortFormatsList(options));
@@ -919,14 +900,12 @@
       allowNew: cfg.allowNew !== false,
       labelMode: cfg.labelMode || 'code-label',
       currentValue: work[field] || cfg.defaultValue || '',
-      groupUsedFirst: kind === 'format' || kind === 'technique',
+      groupUsedFirst: kind === 'technique',
       groupFormatsByFamily: kind === 'format',
       usedCodesSet:
-        kind === 'format'
-          ? usedFormatCodes()
-          : kind === 'technique'
-            ? usedTechniqueCodes()
-            : null,
+        kind === 'technique'
+          ? usedTechniqueCodes()
+          : null,
     });
 
     if (cfg.closedLabelMode) {
