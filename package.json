@@ -14,7 +14,8 @@
     "collectors:api": "node scripts/collectors-editor-api.mjs",
     "series:api": "node scripts/series-editor-api.mjs",
     "codes:api": "node scripts/codes-editor-api.mjs",
-    "works:api": "node scripts/works-editor-api.mjs"
+    "works:api": "node scripts/works-editor-api.mjs",
+    "audit:api": "node scripts/audit-log-api.mjs"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.49.8",

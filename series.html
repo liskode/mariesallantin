@@ -7,7 +7,7 @@
   <meta name="series-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/series-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Séries — édition</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250627-4" />
+  <link rel="stylesheet" href="catalogue.css?v=20250629-2" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -35,6 +35,17 @@
       <p class="catalogue-intro" style="margin-bottom: 16px;">
         Édition des fiches séries : libellé, vignette, années et description.
       </p>
+      <fieldset class="catalogue-login-profiles">
+        <legend class="catalogue-login-profiles-legend">Profil</legend>
+        <label class="catalogue-login-profile">
+          <input type="radio" name="editor-role" value="artist" checked />
+          <span>Artiste — titres, années, formats, techniques, séries</span>
+        </label>
+        <label class="catalogue-login-profile">
+          <input type="radio" name="editor-role" value="admin" />
+          <span>Administrateur — accès complet</span>
+        </label>
+      </fieldset>
       <label class="catalogue-login-label" for="series-pass">Mot de passe</label>
       <input type="password" id="series-pass" class="catalogue-login-input" autocomplete="current-password" />
       <button type="button" id="series-login-btn" class="catalogue-login-submit">Ouvrir l’éditeur</button>
@@ -94,7 +105,7 @@
     </div>
   </dialog>
 
-  <script src="editor-common.js?v=20250627-5"></script>
-  <script src="series.js?v=20250627-4"></script>
+  <script src="editor-common.js?v=20250629-2"></script>
+  <script src="series.js?v=20250629-2"></script>
 </body>
 </html>

@@ -1,4 +1,12 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import {
+  ROLES,
+  extractToken,
+  loginResponse,
+  requireAuth,
+  sessionResponse,
+} from '../_shared/editor-auth.ts';
+import { logEditorAction } from '../_shared/audit-log.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -20,11 +28,6 @@ function routePath(pathname: string): string {
     if (pathname.startsWith(prefix + '/')) return pathname.slice(prefix.length);
   }
   return pathname;
-}
-
-function checkToken(token: string): boolean {
-  const expected = Deno.env.get('CATALOGUE_EDITOR_TOKEN') || 'MS75';
-  return token === expected;
 }
 
 function createSupabase(): SupabaseClient {
@@ -102,10 +105,37 @@ Deno.serve(async (req) => {
       return jsonResponse(200, { ok: true, service: 'series-api' });
     }
 
+    if (req.method === 'POST' && path === '/api/login') {
+      const body = await req.json();
+      const result = await loginResponse(String(body.role || ''), String(body.password || ''));
+      if (!result.ok) {
+        return jsonResponse(result.status, { ok: false, error: result.error });
+      }
+      return jsonResponse(200, {
+        ok: true,
+        token: result.token,
+        role: result.role,
+        expiresAt: result.expiresAt,
+        expiresIn: result.expiresIn,
+      });
+    }
+
+    if (req.method === 'GET' && path === '/api/session') {
+      const result = await sessionResponse(extractToken(req));
+      if (!result.ok) {
+        return jsonResponse(result.status, { ok: false, error: result.error });
+      }
+      return jsonResponse(200, {
+        ok: true,
+        role: result.role,
+        expiresAt: result.expiresAt,
+      });
+    }
+
     if (req.method === 'GET' && path === '/api/series') {
-      const token = url.searchParams.get('token') || '';
-      if (!checkToken(token)) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const supabase = createSupabase();
       const series = await fetchSeriesWithCounts(supabase);
@@ -114,8 +144,9 @@ Deno.serve(async (req) => {
 
     if (req.method === 'POST' && path === '/api/series/create') {
       const body = await req.json();
-      if (!checkToken(String(body.token || ''))) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req, body), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const code = String(body.code || '').trim().toUpperCase();
       if (!/^[A-Z0-9]{2,12}$/.test(code)) {
@@ -152,14 +183,22 @@ Deno.serve(async (req) => {
       };
       const { error } = await supabase.from('series').insert(row);
       if (error) throw error;
+      await logEditorAction(supabase, {
+        editor_role: auth.role,
+        action_type: 'save',
+        entity_type: 'series',
+        entity_key: code,
+        snapshot_before: null,
+      });
       const series = await fetchSeriesWithCounts(supabase);
       return jsonResponse(200, { ok: true, series });
     }
 
     if (req.method === 'POST' && path === '/api/series/save') {
       const body = await req.json();
-      if (!checkToken(String(body.token || ''))) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req, body), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const rows = Array.isArray(body.series) ? body.series : [];
       if (!rows.length) {
@@ -167,14 +206,24 @@ Deno.serve(async (req) => {
       }
 
       const supabase = createSupabase();
-      const payload = rows.map((r: Record<string, unknown>) => {
-        const s = normalizeSeriesInput(r);
+      for (const r of rows) {
+        const s = normalizeSeriesInput(r as Record<string, unknown>);
         if (!s.code) throw new Error('code manquant');
-        return s;
-      });
-
-      const { error } = await supabase.from('series').upsert(payload, { onConflict: 'code' });
-      if (error) throw error;
+        const { data: before } = await supabase
+          .from('series')
+          .select('*')
+          .eq('code', s.code)
+          .maybeSingle();
+        const { error } = await supabase.from('series').upsert(s, { onConflict: 'code' });
+        if (error) throw error;
+        await logEditorAction(supabase, {
+          editor_role: auth.role,
+          action_type: 'save',
+          entity_type: 'series',
+          entity_key: s.code,
+          snapshot_before: (before as Record<string, unknown>) || null,
+        });
+      }
 
       const series = await fetchSeriesWithCounts(supabase);
       return jsonResponse(200, { ok: true, series });
@@ -182,14 +231,15 @@ Deno.serve(async (req) => {
 
     if (req.method === 'DELETE' && path.startsWith('/api/series/')) {
       const code = decodeURIComponent(path.slice('/api/series/'.length)).trim().toUpperCase();
-      const token = url.searchParams.get('token') || '';
-      if (!checkToken(token)) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req), ROLES.ADMIN);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'accès réservé aux administrateurs' });
       }
       if (!code) {
         return jsonResponse(400, { ok: false, error: 'code manquant' });
       }
       const supabase = createSupabase();
+      const { data: before } = await supabase.from('series').select('*').eq('code', code).maybeSingle();
       const { count: workCount, error: wErr } = await supabase
         .from('work_series')
         .select('work_id', { count: 'exact', head: true })
@@ -209,6 +259,13 @@ Deno.serve(async (req) => {
       }
       const { error } = await supabase.from('series').delete().eq('code', code);
       if (error) throw error;
+      await logEditorAction(supabase, {
+        editor_role: auth.role,
+        action_type: 'delete',
+        entity_type: 'series',
+        entity_key: code,
+        snapshot_before: (before as Record<string, unknown>) || null,
+      });
       const series = await fetchSeriesWithCounts(supabase);
       return jsonResponse(200, { ok: true, series });
     }

@@ -1,4 +1,12 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import {
+  ROLES,
+  extractToken,
+  loginResponse,
+  requireAuth,
+  sessionResponse,
+} from '../_shared/editor-auth.ts';
+import { logEditorAction } from '../_shared/audit-log.ts';
 
 const COLLECTOR_TYPES = new Set(['Galerie', 'Institutions', 'Particulier']);
 const CODE_RE = /^COL(\d+)$/i;
@@ -23,11 +31,6 @@ function routePath(pathname: string): string {
     if (pathname.startsWith(prefix + '/')) return pathname.slice(prefix.length);
   }
   return pathname;
-}
-
-function checkToken(token: string): boolean {
-  const expected = Deno.env.get('CATALOGUE_EDITOR_TOKEN') || 'MS75';
-  return token === expected;
 }
 
 function createSupabase(): SupabaseClient {
@@ -118,10 +121,37 @@ Deno.serve(async (req) => {
       return jsonResponse(200, { ok: true, service: 'collectors-api' });
     }
 
+    if (req.method === 'POST' && path === '/api/login') {
+      const body = await req.json();
+      const result = await loginResponse(String(body.role || ''), String(body.password || ''));
+      if (!result.ok) {
+        return jsonResponse(result.status, { ok: false, error: result.error });
+      }
+      return jsonResponse(200, {
+        ok: true,
+        token: result.token,
+        role: result.role,
+        expiresAt: result.expiresAt,
+        expiresIn: result.expiresIn,
+      });
+    }
+
+    if (req.method === 'GET' && path === '/api/session') {
+      const result = await sessionResponse(extractToken(req));
+      if (!result.ok) {
+        return jsonResponse(result.status, { ok: false, error: result.error });
+      }
+      return jsonResponse(200, {
+        ok: true,
+        role: result.role,
+        expiresAt: result.expiresAt,
+      });
+    }
+
     if (req.method === 'GET' && path === '/api/collectors') {
-      const token = url.searchParams.get('token') || '';
-      if (!checkToken(token)) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const supabase = createSupabase();
       const collectors = await fetchCollectorsWithCounts(supabase);
@@ -130,30 +160,43 @@ Deno.serve(async (req) => {
 
     if (req.method === 'POST' && path === '/api/collectors/save') {
       const body = await req.json();
-      if (!checkToken(String(body.token || ''))) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req, body), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const rows = Array.isArray(body.collectors) ? body.collectors : [];
       if (!rows.length) {
         return jsonResponse(400, { ok: false, error: 'aucun collectionneur à enregistrer' });
       }
       const supabase = createSupabase();
-      const payload = rows.map((r: Record<string, unknown>) => {
-        const c = normalizeCollectorInput(r);
+      for (const r of rows) {
+        const c = normalizeCollectorInput(r as Record<string, unknown>);
         if (!c.code) throw new Error('code manquant');
         if (!c.name) throw new Error(`nom manquant pour ${c.code}`);
-        return c;
-      });
-      const { error } = await supabase.from('collectors').upsert(payload, { onConflict: 'code' });
-      if (error) throw error;
+        const { data: before } = await supabase
+          .from('collectors')
+          .select('*')
+          .eq('code', c.code)
+          .maybeSingle();
+        const { error } = await supabase.from('collectors').upsert(c, { onConflict: 'code' });
+        if (error) throw error;
+        await logEditorAction(supabase, {
+          editor_role: auth.role,
+          action_type: 'save',
+          entity_type: 'collector',
+          entity_key: c.code,
+          snapshot_before: (before as Record<string, unknown>) || null,
+        });
+      }
       const collectors = await fetchCollectorsWithCounts(supabase);
       return jsonResponse(200, { ok: true, collectors });
     }
 
     if (req.method === 'POST' && path === '/api/collectors/create') {
       const body = await req.json();
-      if (!checkToken(String(body.token || ''))) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req, body), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const c = normalizeCollectorInput((body.collector || {}) as Record<string, unknown>);
       if (!c.name) {
@@ -166,20 +209,28 @@ Deno.serve(async (req) => {
       if (error) {
         return jsonResponse(400, { ok: false, error: error.message });
       }
+      await logEditorAction(supabase, {
+        editor_role: auth.role,
+        action_type: 'save',
+        entity_type: 'collector',
+        entity_key: code,
+        snapshot_before: null,
+      });
       const collectors = await fetchCollectorsWithCounts(supabase);
       return jsonResponse(200, { ok: true, collector: row, collectors });
     }
 
     if (req.method === 'DELETE' && path.startsWith('/api/collectors/')) {
       const code = decodeURIComponent(path.slice('/api/collectors/'.length));
-      const token = url.searchParams.get('token') || '';
-      if (!checkToken(token)) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req), ROLES.ADMIN);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'accès réservé aux administrateurs' });
       }
       if (!code) {
         return jsonResponse(400, { ok: false, error: 'code manquant' });
       }
       const supabase = createSupabase();
+      const { data: before } = await supabase.from('collectors').select('*').eq('code', code).maybeSingle();
       const { count, error: cErr } = await supabase
         .from('works')
         .select('id', { count: 'exact', head: true })
@@ -193,6 +244,13 @@ Deno.serve(async (req) => {
       }
       const { error } = await supabase.from('collectors').delete().eq('code', code);
       if (error) throw error;
+      await logEditorAction(supabase, {
+        editor_role: auth.role,
+        action_type: 'delete',
+        entity_type: 'collector',
+        entity_key: code,
+        snapshot_before: (before as Record<string, unknown>) || null,
+      });
       return jsonResponse(200, { ok: true });
     }
 

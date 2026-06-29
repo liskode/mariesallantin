@@ -1,5 +1,13 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import { sortFormats } from '../_shared/format-sort.ts';
+import {
+  ROLES,
+  extractToken,
+  loginResponse,
+  requireAuth,
+  sessionResponse,
+} from '../_shared/editor-auth.ts';
+import { logEditorAction } from '../_shared/audit-log.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,11 +29,6 @@ function routePath(pathname: string): string {
     if (pathname.startsWith(prefix + '/')) return pathname.slice(prefix.length);
   }
   return pathname;
-}
-
-function checkToken(token: string): boolean {
-  const expected = Deno.env.get('CATALOGUE_EDITOR_TOKEN') || 'MS75';
-  return token === expected;
 }
 
 function createSupabase(): SupabaseClient {
@@ -142,6 +145,27 @@ async function fetchWorksWithSeries(supabase: SupabaseClient) {
   }));
 }
 
+async function fetchWorkSnapshot(supabase: SupabaseClient, workId: string) {
+  const { data: work, error } = await supabase
+    .from('works')
+    .select(
+      'id, title, year, format_code, technique_code, publication_status_code, photo_status_code, collector_code, width_cm, height_cm, sort_order'
+    )
+    .eq('id', workId)
+    .maybeSingle();
+  if (error) throw error;
+  if (!work) return null;
+  const { data: links, error: lErr } = await supabase
+    .from('work_series')
+    .select('series_code')
+    .eq('work_id', workId);
+  if (lErr) throw lErr;
+  return {
+    ...work,
+    series_codes: (links || []).map((l) => l.series_code as string),
+  };
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders });
@@ -155,10 +179,38 @@ Deno.serve(async (req) => {
       return jsonResponse(200, { ok: true, service: 'works-api' });
     }
 
+    if (req.method === 'POST' && path === '/api/login') {
+      const body = await req.json();
+      const result = await loginResponse(String(body.role || ''), String(body.password || ''));
+      if (!result.ok) {
+        return jsonResponse(result.status, { ok: false, error: result.error });
+      }
+      return jsonResponse(200, {
+        ok: true,
+        token: result.token,
+        role: result.role,
+        expiresAt: result.expiresAt,
+        expiresIn: result.expiresIn,
+      });
+    }
+
+    if (req.method === 'GET' && path === '/api/session') {
+      const token = extractToken(req);
+      const result = await sessionResponse(token);
+      if (!result.ok) {
+        return jsonResponse(result.status, { ok: false, error: result.error });
+      }
+      return jsonResponse(200, {
+        ok: true,
+        role: result.role,
+        expiresAt: result.expiresAt,
+      });
+    }
+
     if (req.method === 'GET' && path === '/api/works/meta') {
-      const token = url.searchParams.get('token') || '';
-      if (!checkToken(token)) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const supabase = createSupabase();
       const meta = await fetchMeta(supabase);
@@ -166,9 +218,9 @@ Deno.serve(async (req) => {
     }
 
     if (req.method === 'GET' && path === '/api/works') {
-      const token = url.searchParams.get('token') || '';
-      if (!checkToken(token)) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const supabase = createSupabase();
       const works = await fetchWorksWithSeries(supabase);
@@ -177,8 +229,9 @@ Deno.serve(async (req) => {
 
     if (req.method === 'POST' && path === '/api/works/save') {
       const body = await req.json();
-      if (!checkToken(String(body.token || ''))) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req, body), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const rows = Array.isArray(body.works) ? body.works : [];
       if (!rows.length) {
@@ -190,6 +243,7 @@ Deno.serve(async (req) => {
 
       for (const raw of rows) {
         const { row, series_codes } = normalizeWorkInput(raw as Record<string, unknown>);
+        const snapshotBefore = await fetchWorkSnapshot(supabase, row.id);
         ids.push(row.id);
         const { error } = await supabase.from('works').upsert(row, { onConflict: 'id' });
         if (error) throw error;
@@ -205,6 +259,14 @@ Deno.serve(async (req) => {
           const { error: insErr } = await supabase.from('work_series').insert(payload);
           if (insErr) throw insErr;
         }
+
+        await logEditorAction(supabase, {
+          editor_role: auth.role,
+          action_type: 'save',
+          entity_type: 'work',
+          entity_key: row.id,
+          snapshot_before: snapshotBefore as Record<string, unknown> | null,
+        });
       }
 
       const works = await fetchWorksWithSeries(supabase);

@@ -1234,23 +1234,24 @@
   }
 
   function bindEvents() {
-    loginBtn.addEventListener('click', async () => {
-      const pass = passEl.value.trim();
+    if (loginBtn && passEl) {
       const ec = AUTH();
-      if (!ec || !ec.validatePassword(pass)) {
-        loginErr.hidden = false;
-        loginErr.textContent = 'Mot de passe incorrect.';
-        return;
+      if (ec && ec.bindEditorLogin) {
+        ec.bindEditorLogin({
+          passEl,
+          loginBtn,
+          loginErr,
+          loginRoot: loginEl,
+          getApiBase: apiBase,
+          requiredTabId: 'works',
+          onSuccess: async () => {
+            token = ec.getSessionToken() || '';
+            ec.mountEditorTabs();
+            await enterApp();
+          },
+        });
       }
-      loginErr.hidden = true;
-      token = pass;
-      ec.setSessionToken(pass);
-      await enterApp();
-    });
-
-    passEl.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') loginBtn.click();
-    });
+    }
 
     reloadBtn.addEventListener('click', async () => {
       if (dirtyIds.size && !window.confirm('Recharger et perdre les modifications non enregistrées ?')) {
@@ -1316,10 +1317,17 @@
   async function init() {
     bindEvents();
     await showApiHint();
-    if (AUTH() && AUTH().hasSession()) {
-      token = AUTH().getSessionToken() || '';
-      if (passEl) passEl.value = token;
-      await enterApp();
+    const ec = AUTH();
+    if (ec && ec.hasSession()) {
+      token = ec.getSessionToken() || '';
+      const valid = await ec.validateSession(await apiBase());
+      if (valid && ec.canAccessTab('works')) {
+        ec.mountEditorTabs();
+        await enterApp();
+        return;
+      }
+      ec.clearSession();
+      token = '';
     }
   }
 

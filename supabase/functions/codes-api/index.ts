@@ -1,5 +1,13 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import { sortFormats } from '../_shared/format-sort.ts';
+import {
+  ROLES,
+  extractToken,
+  loginResponse,
+  requireAuth,
+  sessionResponse,
+} from '../_shared/editor-auth.ts';
+import { logEditorAction } from '../_shared/audit-log.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,11 +29,6 @@ function routePath(pathname: string): string {
     if (pathname.startsWith(prefix + '/')) return pathname.slice(prefix.length);
   }
   return pathname;
-}
-
-function checkToken(token: string): boolean {
-  const expected = Deno.env.get('CATALOGUE_EDITOR_TOKEN') || 'MS75';
-  return token === expected;
 }
 
 function createSupabase(): SupabaseClient {
@@ -145,10 +148,37 @@ Deno.serve(async (req) => {
       return jsonResponse(200, { ok: true, service: 'codes-api' });
     }
 
+    if (req.method === 'POST' && path === '/api/login') {
+      const body = await req.json();
+      const result = await loginResponse(String(body.role || ''), String(body.password || ''));
+      if (!result.ok) {
+        return jsonResponse(result.status, { ok: false, error: result.error });
+      }
+      return jsonResponse(200, {
+        ok: true,
+        token: result.token,
+        role: result.role,
+        expiresAt: result.expiresAt,
+        expiresIn: result.expiresIn,
+      });
+    }
+
+    if (req.method === 'GET' && path === '/api/session') {
+      const result = await sessionResponse(extractToken(req));
+      if (!result.ok) {
+        return jsonResponse(result.status, { ok: false, error: result.error });
+      }
+      return jsonResponse(200, {
+        ok: true,
+        role: result.role,
+        expiresAt: result.expiresAt,
+      });
+    }
+
     if (req.method === 'GET' && path === '/api/codes') {
-      const token = url.searchParams.get('token') || '';
-      if (!checkToken(token)) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const supabase = createSupabase();
       const { formats, techniques } = await fetchCodesWithCounts(supabase);
@@ -157,8 +187,9 @@ Deno.serve(async (req) => {
 
     if (req.method === 'POST' && path === '/api/formats/create') {
       const body = await req.json();
-      if (!checkToken(String(body.token || ''))) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req, body), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const code = String(body.code || '').trim().toUpperCase();
       if (!/^[A-Z0-9]{4}$/.test(code)) {
@@ -182,14 +213,22 @@ Deno.serve(async (req) => {
       };
       const { error } = await supabase.from('formats').insert(row);
       if (error) throw error;
+      await logEditorAction(supabase, {
+        editor_role: auth.role,
+        action_type: 'save',
+        entity_type: 'format',
+        entity_key: code,
+        snapshot_before: null,
+      });
       const { formats, techniques } = await fetchCodesWithCounts(supabase);
       return jsonResponse(200, { ok: true, formats, techniques, createdCode: code });
     }
 
     if (req.method === 'POST' && path === '/api/techniques/create') {
       const body = await req.json();
-      if (!checkToken(String(body.token || ''))) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req, body), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const code = String(body.code || '').trim().toUpperCase();
       if (!/^[A-Z0-9]{3}$/.test(code)) {
@@ -211,14 +250,22 @@ Deno.serve(async (req) => {
       };
       const { error } = await supabase.from('techniques').insert(row);
       if (error) throw error;
+      await logEditorAction(supabase, {
+        editor_role: auth.role,
+        action_type: 'save',
+        entity_type: 'technique',
+        entity_key: code,
+        snapshot_before: null,
+      });
       const { formats, techniques } = await fetchCodesWithCounts(supabase);
       return jsonResponse(200, { ok: true, formats, techniques, createdCode: code });
     }
 
     if (req.method === 'POST' && path === '/api/codes/save') {
       const body = await req.json();
-      if (!checkToken(String(body.token || ''))) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req, body), ROLES.ARTIST);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'session invalide ou expirée' });
       }
       const formatRows = Array.isArray(body.formats) ? body.formats : [];
       const techniqueRows = Array.isArray(body.techniques) ? body.techniques : [];
@@ -227,17 +274,39 @@ Deno.serve(async (req) => {
       }
 
       const supabase = createSupabase();
-      if (formatRows.length) {
-        const payload = formatRows.map((r: Record<string, unknown>) => normalizeFormatInput(r));
-        const { error } = await supabase.from('formats').upsert(payload, { onConflict: 'code' });
+      for (const r of formatRows) {
+        const row = normalizeFormatInput(r as Record<string, unknown>);
+        const { data: before } = await supabase
+          .from('formats')
+          .select('*')
+          .eq('code', row.code)
+          .maybeSingle();
+        const { error } = await supabase.from('formats').upsert(row, { onConflict: 'code' });
         if (error) throw error;
+        await logEditorAction(supabase, {
+          editor_role: auth.role,
+          action_type: 'save',
+          entity_type: 'format',
+          entity_key: row.code,
+          snapshot_before: (before as Record<string, unknown>) || null,
+        });
       }
-      if (techniqueRows.length) {
-        const payload = techniqueRows.map((r: Record<string, unknown>) =>
-          normalizeTechniqueInput(r)
-        );
-        const { error } = await supabase.from('techniques').upsert(payload, { onConflict: 'code' });
+      for (const r of techniqueRows) {
+        const row = normalizeTechniqueInput(r as Record<string, unknown>);
+        const { data: before } = await supabase
+          .from('techniques')
+          .select('*')
+          .eq('code', row.code)
+          .maybeSingle();
+        const { error } = await supabase.from('techniques').upsert(row, { onConflict: 'code' });
         if (error) throw error;
+        await logEditorAction(supabase, {
+          editor_role: auth.role,
+          action_type: 'save',
+          entity_type: 'technique',
+          entity_key: row.code,
+          snapshot_before: (before as Record<string, unknown>) || null,
+        });
       }
 
       const { formats, techniques } = await fetchCodesWithCounts(supabase);
@@ -246,14 +315,15 @@ Deno.serve(async (req) => {
 
     if (req.method === 'DELETE' && path.startsWith('/api/formats/')) {
       const code = decodeURIComponent(path.slice('/api/formats/'.length)).trim().toUpperCase();
-      const token = url.searchParams.get('token') || '';
-      if (!checkToken(token)) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req), ROLES.ADMIN);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'accès réservé aux administrateurs' });
       }
       if (!code) {
         return jsonResponse(400, { ok: false, error: 'code manquant' });
       }
       const supabase = createSupabase();
+      const { data: before } = await supabase.from('formats').select('*').eq('code', code).maybeSingle();
       const { count, error: cErr } = await supabase
         .from('works')
         .select('id', { count: 'exact', head: true })
@@ -267,20 +337,28 @@ Deno.serve(async (req) => {
       }
       const { error } = await supabase.from('formats').delete().eq('code', code);
       if (error) throw error;
+      await logEditorAction(supabase, {
+        editor_role: auth.role,
+        action_type: 'delete',
+        entity_type: 'format',
+        entity_key: code,
+        snapshot_before: (before as Record<string, unknown>) || null,
+      });
       const lists = await fetchCodesWithCounts(supabase);
       return jsonResponse(200, { ok: true, ...lists });
     }
 
     if (req.method === 'DELETE' && path.startsWith('/api/techniques/')) {
       const code = decodeURIComponent(path.slice('/api/techniques/'.length)).trim().toUpperCase();
-      const token = url.searchParams.get('token') || '';
-      if (!checkToken(token)) {
-        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const auth = await requireAuth(extractToken(req), ROLES.ADMIN);
+      if (!auth) {
+        return jsonResponse(403, { ok: false, error: 'accès réservé aux administrateurs' });
       }
       if (!code) {
         return jsonResponse(400, { ok: false, error: 'code manquant' });
       }
       const supabase = createSupabase();
+      const { data: before } = await supabase.from('techniques').select('*').eq('code', code).maybeSingle();
       const { count, error: cErr } = await supabase
         .from('works')
         .select('id', { count: 'exact', head: true })
@@ -294,6 +372,13 @@ Deno.serve(async (req) => {
       }
       const { error } = await supabase.from('techniques').delete().eq('code', code);
       if (error) throw error;
+      await logEditorAction(supabase, {
+        editor_role: auth.role,
+        action_type: 'delete',
+        entity_type: 'technique',
+        entity_key: code,
+        snapshot_before: (before as Record<string, unknown>) || null,
+      });
       const lists = await fetchCodesWithCounts(supabase);
       return jsonResponse(200, { ok: true, ...lists });
     }
