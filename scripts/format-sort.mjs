@@ -1,19 +1,20 @@
 /**
- * Tri des formats : famille (F → P → C → autres), puis 3 premiers caractères du code.
+ * Tri des formats : famille (F → P → C → M → autres), puis 3 premiers caractères du code.
  */
 
-const FAMILY_ORDER = ['F', 'P', 'C'];
+const FAMILY_ORDER = ['F', 'P', 'C', 'M'];
 const FAMILY_LABELS = {
   F: 'Figure',
   P: 'Paysage',
   C: 'Carré',
+  M: 'Marine',
   _: 'Hors Format',
 };
 
 /** @param {string} code */
 export function formatFamily(code) {
   const last = String(code || '').trim().toUpperCase().slice(-1);
-  if (last === 'F' || last === 'P' || last === 'C') return last;
+  if (last === 'F' || last === 'P' || last === 'C' || last === 'M') return last;
   return '_';
 }
 
@@ -68,8 +69,7 @@ export function groupFormatsByFamily(list) {
   const buckets = new Map();
 
   for (const item of sorted) {
-    const fam = formatFamily(item.code);
-    const key = fam === 'F' || fam === 'P' || fam === 'C' ? fam : '_';
+    const key = formatFamily(item.code);
     if (!buckets.has(key)) buckets.set(key, []);
     buckets.get(key).push(item);
   }

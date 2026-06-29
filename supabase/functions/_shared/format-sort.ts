@@ -1,15 +1,16 @@
-/** Tri des formats : famille (F → P → C → autres), puis 3 premiers caractères du code. */
+/** Tri des formats : famille (F → P → C → M → autres), puis 3 premiers caractères du code. */
 
-const FAMILY_ORDER = ['F', 'P', 'C'] as const;
+const FAMILY_ORDER = ['F', 'P', 'C', 'M'] as const;
 const FAMILY_LABELS: Record<string, string> = {
   F: 'Figure',
   P: 'Paysage',
   C: 'Carré',
+  M: 'Marine',
 };
 
 export function formatFamily(code: string): string {
   const last = String(code || '').trim().toUpperCase().slice(-1);
-  if (last === 'F' || last === 'P' || last === 'C') return last;
+  if (last === 'F' || last === 'P' || last === 'C' || last === 'M') return last;
   return '_';
 }
 

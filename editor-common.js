@@ -170,12 +170,12 @@
     mountEditorTabs();
   }
 
-  const FORMAT_FAMILY_ORDER = ['F', 'P', 'C'];
-  const FORMAT_FAMILY_LABELS = { F: 'Figure', P: 'Paysage', C: 'Carré', _: 'Hors Format' };
+  const FORMAT_FAMILY_ORDER = ['F', 'P', 'C', 'M'];
+  const FORMAT_FAMILY_LABELS = { F: 'Figure', P: 'Paysage', C: 'Carré', M: 'Marine', _: 'Hors Format' };
 
   function formatFamily(code) {
     const last = String(code || '').trim().toUpperCase().slice(-1);
-    if (last === 'F' || last === 'P' || last === 'C') return last;
+    if (last === 'F' || last === 'P' || last === 'C' || last === 'M') return last;
     return '_';
   }
 
@@ -215,8 +215,7 @@
     const sorted = sortFormats(list);
     const buckets = new Map();
     for (const item of sorted) {
-      const fam = formatFamily(item.code);
-      const key = fam === 'F' || fam === 'P' || fam === 'C' ? fam : '_';
+      const key = formatFamily(item.code);
       if (!buckets.has(key)) buckets.set(key, []);
       buckets.get(key).push(item);
     }
