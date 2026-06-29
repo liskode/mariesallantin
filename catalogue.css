@@ -1744,6 +1744,12 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   min-width: 0;
 }
 
+.works-import-toolbar-btn {
+  flex-shrink: 0;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 .works-editor-filter {
   display: inline-flex;
   align-items: center;

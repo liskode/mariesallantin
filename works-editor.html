@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250630-3" />
+  <link rel="stylesheet" href="catalogue.css?v=20250630-4" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -43,6 +43,7 @@
       <p class="works-editor-priority-subtitle works-editor-priority-subtitle--login">→ Mise à jour titre format technique</p>
       <p class="catalogue-intro" style="margin-bottom: 16px;">
         Édition des fiches œuvres : titres, codes format et technique, séries, collectionneur, statuts.
+        Après connexion, le bouton <strong>Importer des œuvres</strong> apparaît à gauche de la barre d’outils (à côté du nombre de tableaux).
       </p>
       <label class="catalogue-login-label" for="works-pass">Mot de passe</label>
       <input type="password" id="works-pass" class="catalogue-login-input" autocomplete="current-password" />
@@ -61,6 +62,7 @@
           <div class="legend-editor-toolbar works-editor-toolbar">
             <div class="works-editor-toolbar-left">
               <p class="catalogue-count" id="works-count" aria-live="polite">0 tableau(x)</p>
+              <button type="button" class="legend-editor-btn legend-editor-btn--primary works-import-toolbar-btn" id="works-import-btn">Importer des œuvres</button>
               <label class="works-editor-filter">
                 <span class="works-editor-filter-label">Titre</span>
                 <input type="search" id="works-filter-title" class="works-editor-filter-input" placeholder="Filtrer…" autocomplete="off" aria-label="Filtrer par titre" />
@@ -85,7 +87,6 @@
               </div>
             </div>
             <div class="catalogue-edit-tools">
-              <button type="button" class="legend-editor-btn" id="works-import-btn">Importer des œuvres</button>
               <button type="button" class="legend-editor-btn legend-editor-btn--save legend-editor-btn--save-clean" id="works-save-btn" disabled>
                 Modifications enregistrées
               </button>
@@ -247,7 +248,7 @@
     </div>
   </dialog>
 
-  <script src="editor-common.js?v=20250630-2"></script>
-  <script src="works-editor.js?v=20250630-2"></script>
+  <script src="editor-common.js?v=20250630-4"></script>
+  <script src="works-editor.js?v=20250630-4"></script>
 </body>
 </html>
