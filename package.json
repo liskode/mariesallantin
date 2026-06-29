@@ -9,6 +9,7 @@
     "supabase:normalize-titles": "node scripts/update-works-titles-case.mjs",
     "supabase:update-collectors": "node scripts/update-works-collectors.mjs",
     "supabase:update-formats": "node scripts/update-works-format-from-filename.mjs",
+    "supabase:seed-formats": "node scripts/seed-standard-formats.mjs",
     "collectors:api": "node scripts/collectors-editor-api.mjs",
     "series:api": "node scripts/series-editor-api.mjs",
     "codes:api": "node scripts/codes-editor-api.mjs",

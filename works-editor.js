@@ -63,22 +63,32 @@
   let openSeriesPanel = null;
   /** @type {ResizeObserver | null} */
   let stickyBarObserver = null;
+  /** @type {ResizeObserver | null} */
+  let stickyTabsObserver = null;
 
   function updateWorksStickyOffset() {
+    const tabs = document.querySelector('.editor-tabs-nav');
     const bar = document.getElementById('works-sticky-bar');
-    const wrap = document.querySelector('.works-editor-table-wrap');
-    if (!bar || !wrap) return;
-    wrap.style.setProperty('--works-sticky-offset', `${Math.ceil(bar.offsetHeight)}px`);
+    const root = document.documentElement;
+    const tabsH = tabs ? Math.ceil(tabs.getBoundingClientRect().height) : 0;
+    const barH = bar ? Math.ceil(bar.offsetHeight) : 0;
+    root.style.setProperty('--editor-tabs-sticky-offset', `${tabsH}px`);
+    root.style.setProperty('--works-sticky-offset', `${tabsH + barH}px`);
   }
 
   function bindStickyHeaderOffset() {
     const bar = document.getElementById('works-sticky-bar');
+    const tabs = document.querySelector('.editor-tabs-nav');
     if (!bar || stickyBarObserver) return;
     updateWorksStickyOffset();
     window.addEventListener('resize', updateWorksStickyOffset);
     if (typeof ResizeObserver !== 'undefined') {
       stickyBarObserver = new ResizeObserver(updateWorksStickyOffset);
       stickyBarObserver.observe(bar);
+      if (tabs) {
+        stickyTabsObserver = new ResizeObserver(updateWorksStickyOffset);
+        stickyTabsObserver.observe(tabs);
+      }
     }
   }
 
@@ -1075,7 +1085,8 @@
       tr.appendChild(
         createCodeSelectCell(work, tr, 'format_code', 'format', meta.formats, {
           placeholder: '—',
-          labelMode: 'code',
+          labelMode: 'code-label',
+          closedLabelMode: 'code',
           extraClass: 'works-select-compact works-select-format',
         })
       );
@@ -1185,6 +1196,7 @@
     loginEl.hidden = true;
     appEl.hidden = false;
     bindStickyHeaderOffset();
+    requestAnimationFrame(() => updateWorksStickyOffset());
     setStatus('Chargement…');
     try {
       await loadWorksCatalog();

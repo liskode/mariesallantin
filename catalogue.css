@@ -35,6 +35,13 @@ body.catalogue-standalone {
   padding: 0 24px;
 }
 
+body[data-editor-tab="works"] .editor-tabs-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 1px 0 var(--border);
+}
+
 .editor-tabs-inner {
   padding-top: 0;
   padding-bottom: 0;
@@ -1681,8 +1688,8 @@ body.catalogue-standalone {
 
 .works-editor-sticky-bar {
   position: sticky;
-  top: 0;
-  z-index: 31;
+  top: var(--editor-tabs-sticky-offset, 49px);
+  z-index: 40;
   background: var(--background);
   padding: 8px 10px 8px;
   margin: 0;
@@ -1748,9 +1755,7 @@ body.catalogue-standalone {
 .works-editor-table-wrap {
   flex: 1;
   min-height: 0;
-  overflow: auto;
-  -webkit-overflow-scrolling: touch;
-  scrollbar-gutter: stable;
+  overflow: visible;
   background: var(--surface);
   border-radius: var(--radius);
   box-shadow: var(--shadow);
@@ -1772,6 +1777,8 @@ body.catalogue-standalone {
   font-size: 0.8rem;
   table-layout: fixed;
   width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
 }
 
 .works-editor-table col.works-col-thumb {
@@ -1814,10 +1821,16 @@ body.catalogue-standalone {
 
 .works-editor-table thead th {
   position: sticky;
-  top: var(--works-sticky-offset, 56px);
+  top: var(--works-sticky-offset, 120px);
   z-index: 30;
   background: #f0f2f7;
   box-shadow: 0 1px 0 var(--border);
+}
+
+.works-editor-table .catalogue-th {
+  position: sticky;
+  top: var(--works-sticky-offset, 120px);
+  padding: 6px 12px !important;
 }
 
 .works-editor-table .legend-input {
@@ -1829,10 +1842,6 @@ body.catalogue-standalone {
 .works-editor-table td {
   padding: 6px 12px;
   vertical-align: middle;
-}
-
-.works-editor-table .catalogue-th {
-  padding: 6px 12px !important;
 }
 
 .works-thumb-th,
