@@ -151,6 +151,17 @@ function fixKnownTitlePhrases(s) {
     .replace(/\bSans Titre\b/g, 'Sans titre');
 }
 
+/** @param {string} s */
+export function ensureFirstLetterUpper(s) {
+  const text = nfc(s);
+  const m = text.match(/^(\s*[^\p{L}]*)(\p{L})(.*)$/su);
+  if (!m) return text;
+  const [, prefix, first, rest] = m;
+  const upper = first.toLocaleUpperCase('fr-FR');
+  if (first === upper) return text;
+  return prefix + upper + rest;
+}
+
 /**
  * @param {string | null | undefined} title
  * @returns {string}
@@ -168,7 +179,8 @@ export function normalizeWorkTitle(title) {
   }
   s = fixKnownTitlePhrases(s);
   s = lowercaseMetamorphoseWords(s);
-  return s.replace(/\s{2,}/g, ' ').trim();
+  s = s.replace(/\s{2,}/g, ' ').trim();
+  return ensureFirstLetterUpper(s);
 }
 
 /** @deprecated utilisez normalizeWorkTitle */
