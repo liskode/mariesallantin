@@ -8,19 +8,12 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
-import {
-  ROLES,
-  authFromRequest,
-  bootstrapEditorEnv,
-  handleLoginRoute,
-  handleSessionRoute,
-} from './local-api-auth.mjs';
-import { logEditorAction } from './audit-log.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 
 const PORT = Number(process.env.SERIES_EDITOR_PORT || 47833);
+const TOKEN = process.env.CATALOGUE_EDITOR_TOKEN || 'MS75';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -61,8 +54,6 @@ function loadEnvFile(envPath) {
   }
   return out;
 }
-
-bootstrapEditorEnv(root, loadEnvFile);
 
 function serveStatic(res, urlPath) {
   const rel = STATIC_ROUTES[urlPath];
@@ -195,40 +186,9 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === 'POST' && url.pathname === '/api/login') {
-      const body = JSON.parse(await readBody(req));
-      const result = handleLoginRoute(body);
-      if (!result.ok) {
-        sendJson(res, result.status, { ok: false, error: result.error });
-        return;
-      }
-      sendJson(res, 200, {
-        ok: true,
-        token: result.token,
-        role: result.role,
-        expiresAt: result.expiresAt,
-        expiresIn: result.expiresIn,
-      });
-      return;
-    }
-
-    if (req.method === 'GET' && url.pathname === '/api/session') {
-      const result = handleSessionRoute(req, url);
-      if (!result.ok) {
-        sendJson(res, result.status, { ok: false, error: result.error });
-        return;
-      }
-      sendJson(res, 200, {
-        ok: true,
-        role: result.role,
-        expiresAt: result.expiresAt,
-      });
-      return;
-    }
-
     if (req.method === 'GET' && url.pathname === '/api/series') {
-      if (!authFromRequest(req, url, null, ROLES.ARTIST)) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const series = await fetchSeriesWithCounts(createSupabase());
@@ -238,9 +198,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'POST' && url.pathname === '/api/series/create') {
       const body = JSON.parse(await readBody(req));
-      const auth = authFromRequest(req, url, body, ROLES.ARTIST);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const code = String(body.code || '').trim().toUpperCase();
@@ -277,13 +236,6 @@ const server = http.createServer(async (req, res) => {
       };
       const { error } = await supabase.from('series').insert(row);
       if (error) throw error;
-      await logEditorAction(supabase, {
-        editor_role: auth.role,
-        action_type: 'save',
-        entity_type: 'series',
-        entity_key: code,
-        snapshot_before: null,
-      });
       const series = await fetchSeriesWithCounts(supabase);
       sendJson(res, 200, { ok: true, series });
       return;
@@ -291,9 +243,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'POST' && url.pathname === '/api/series/save') {
       const body = JSON.parse(await readBody(req));
-      const auth = authFromRequest(req, url, body, ROLES.ARTIST);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const rows = Array.isArray(body.series) ? body.series : [];
@@ -302,24 +253,13 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       const supabase = createSupabase();
-      for (const r of rows) {
+      const payload = rows.map((r) => {
         const s = normalizeSeriesInput(r);
         if (!s.code) throw new Error('code manquant');
-        const { data: before } = await supabase
-          .from('series')
-          .select('*')
-          .eq('code', s.code)
-          .maybeSingle();
-        const { error } = await supabase.from('series').upsert(s, { onConflict: 'code' });
-        if (error) throw error;
-        await logEditorAction(supabase, {
-          editor_role: auth.role,
-          action_type: 'save',
-          entity_type: 'series',
-          entity_key: s.code,
-          snapshot_before: before || null,
-        });
-      }
+        return s;
+      });
+      const { error } = await supabase.from('series').upsert(payload, { onConflict: 'code' });
+      if (error) throw error;
       const series = await fetchSeriesWithCounts(supabase);
       sendJson(res, 200, { ok: true, series });
       return;
@@ -327,9 +267,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'DELETE' && url.pathname.startsWith('/api/series/')) {
       const code = decodeURIComponent(url.pathname.slice('/api/series/'.length)).trim().toUpperCase();
-      const auth = authFromRequest(req, url, null, ROLES.ADMIN);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'accès réservé aux administrateurs' });
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       if (!code) {
@@ -337,7 +276,6 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       const supabase = createSupabase();
-      const { data: before } = await supabase.from('series').select('*').eq('code', code).maybeSingle();
       const { count: workCount, error: wErr } = await supabase
         .from('work_series')
         .select('work_id', { count: 'exact', head: true })
@@ -358,13 +296,6 @@ const server = http.createServer(async (req, res) => {
       }
       const { error } = await supabase.from('series').delete().eq('code', code);
       if (error) throw error;
-      await logEditorAction(supabase, {
-        editor_role: auth.role,
-        action_type: 'delete',
-        entity_type: 'series',
-        entity_key: code,
-        snapshot_before: before || null,
-      });
       const series = await fetchSeriesWithCounts(supabase);
       sendJson(res, 200, { ok: true, series });
       return;

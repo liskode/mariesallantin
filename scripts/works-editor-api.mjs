@@ -9,19 +9,12 @@ import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 import { sortFormats } from './format-sort.mjs';
-import {
-  ROLES,
-  extractToken,
-  loginResponse,
-  requireAuth,
-  sessionResponse,
-} from './editor-auth.mjs';
-import { logEditorAction } from './audit-log.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 
 const PORT = Number(process.env.WORKS_EDITOR_PORT || 47835);
+const TOKEN = process.env.CATALOGUE_EDITOR_TOKEN || 'MS75';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -62,13 +55,6 @@ function loadEnvFile(envPath) {
   }
   return out;
 }
-
-(function bootstrapEnv() {
-  const env = loadEnvFile(path.join(root, '.env'));
-  for (const [k, v] of Object.entries(env)) {
-    if (!process.env[k]) process.env[k] = v;
-  }
-})();
 
 function serveStatic(res, urlPath) {
   const rel = STATIC_ROUTES[urlPath];
@@ -213,24 +199,6 @@ async function fetchWorksWithSeries(supabase) {
   }));
 }
 
-async function fetchWorkSnapshot(supabase, workId) {
-  const { data: work, error } = await supabase
-    .from('works')
-    .select(
-      'id, title, year, format_code, technique_code, publication_status_code, photo_status_code, collector_code, width_cm, height_cm, sort_order'
-    )
-    .eq('id', workId)
-    .maybeSingle();
-  if (error) throw error;
-  if (!work) return null;
-  const { data: links, error: lErr } = await supabase
-    .from('work_series')
-    .select('series_code')
-    .eq('work_id', workId);
-  if (lErr) throw lErr;
-  return { ...work, series_codes: (links || []).map((l) => l.series_code) };
-}
-
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
@@ -284,43 +252,9 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === 'POST' && url.pathname === '/api/login') {
-      const body = JSON.parse(await readBody(req));
-      const result = loginResponse(body.role, body.password);
-      if (!result.ok) {
-        sendJson(res, result.status, { ok: false, error: result.error });
-        return;
-      }
-      sendJson(res, 200, {
-        ok: true,
-        token: result.token,
-        role: result.role,
-        expiresAt: result.expiresAt,
-        expiresIn: result.expiresIn,
-      });
-      return;
-    }
-
-    if (req.method === 'GET' && url.pathname === '/api/session') {
-      const result = sessionResponse(
-        extractToken({ url, headers: req.headers })
-      );
-      if (!result.ok) {
-        sendJson(res, result.status, { ok: false, error: result.error });
-        return;
-      }
-      sendJson(res, 200, {
-        ok: true,
-        role: result.role,
-        expiresAt: result.expiresAt,
-      });
-      return;
-    }
-
     if (req.method === 'GET' && url.pathname === '/api/works/meta') {
-      const auth = requireAuth(extractToken({ url, headers: req.headers }), ROLES.ARTIST);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const meta = await fetchMeta(createSupabase());
@@ -329,9 +263,8 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'GET' && url.pathname === '/api/works') {
-      const auth = requireAuth(extractToken({ url, headers: req.headers }), ROLES.ARTIST);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const works = await fetchWorksWithSeries(createSupabase());
@@ -341,12 +274,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'POST' && url.pathname === '/api/works/save') {
       const body = JSON.parse(await readBody(req));
-      const auth = requireAuth(
-        extractToken({ url, headers: req.headers, body }),
-        ROLES.ARTIST
-      );
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const rows = Array.isArray(body.works) ? body.works : [];
@@ -357,7 +286,6 @@ const server = http.createServer(async (req, res) => {
       const supabase = createSupabase();
       for (const raw of rows) {
         const { row, series_codes } = normalizeWorkInput(raw);
-        const snapshotBefore = await fetchWorkSnapshot(supabase, row.id);
         const { error } = await supabase.from('works').upsert(row, { onConflict: 'id' });
         if (error) throw error;
         const { error: delErr } = await supabase.from('work_series').delete().eq('work_id', row.id);
@@ -370,13 +298,6 @@ const server = http.createServer(async (req, res) => {
           const { error: insErr } = await supabase.from('work_series').insert(payload);
           if (insErr) throw insErr;
         }
-        await logEditorAction(supabase, {
-          editor_role: auth.role,
-          action_type: 'save',
-          entity_type: 'work',
-          entity_key: row.id,
-          snapshot_before: snapshotBefore,
-        });
       }
       const works = await fetchWorksWithSeries(supabase);
       sendJson(res, 200, { ok: true, works, saved: rows.length });

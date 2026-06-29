@@ -12,6 +12,3 @@ verify_jwt = false
 
 [functions.works-api]
 verify_jwt = false
-
-[functions.audit-log-api]
-verify_jwt = false

@@ -537,7 +537,19 @@
     if (appEl) appEl.hidden = false;
   }
 
-  async function enterApp() {
+  async function tryLogin() {
+    const pass = passEl ? passEl.value : '';
+    const ec = AUTH();
+    if (!ec || !ec.validatePassword(pass)) {
+      if (loginErr) {
+        loginErr.textContent = 'Mot de passe incorrect.';
+        loginErr.hidden = false;
+      }
+      return;
+    }
+    token = pass.trim();
+    ec.setSessionToken(token);
+
     const apiOk = await checkApiHealth();
     if (!apiOk) {
       if (loginErr) {
@@ -559,20 +571,10 @@
     }
   }
 
-  const ec = AUTH();
-  if (ec && ec.bindEditorLogin && loginBtn && passEl) {
-    ec.bindEditorLogin({
-      passEl,
-      loginBtn,
-      loginErr,
-      loginRoot: loginEl,
-      getApiBase: apiBase,
-      requiredTabId: 'collectors',
-      onSuccess: async () => {
-        token = ec.getSessionToken() || '';
-        ec.mountEditorTabs();
-        await enterApp();
-      },
+  if (loginBtn) loginBtn.addEventListener('click', tryLogin);
+  if (passEl) {
+    passEl.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') tryLogin();
     });
   }
   if (saveBtn) {
@@ -609,15 +611,8 @@
 
   updateIntroText();
   checkApiHealth();
-  if (ec && ec.hasSession()) {
-    token = ec.getSessionToken() || '';
-    ec.validateSession(apiBase()).then((valid) => {
-      if (valid && ec.canAccessTab('collectors')) {
-        ec.mountEditorTabs();
-        enterApp();
-      } else {
-        ec.clearSession();
-      }
-    });
+  if (AUTH() && AUTH().hasSession() && passEl) {
+    passEl.value = AUTH().getSessionToken() || '';
+    tryLogin();
   }
 })();

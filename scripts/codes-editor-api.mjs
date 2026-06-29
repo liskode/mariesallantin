@@ -9,19 +9,12 @@ import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 import { sortFormats } from './format-sort.mjs';
-import {
-  ROLES,
-  authFromRequest,
-  bootstrapEditorEnv,
-  handleLoginRoute,
-  handleSessionRoute,
-} from './local-api-auth.mjs';
-import { logEditorAction } from './audit-log.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 
 const PORT = Number(process.env.CODES_EDITOR_PORT || 47834);
+const TOKEN = process.env.CATALOGUE_EDITOR_TOKEN || 'MS75';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -59,8 +52,6 @@ function loadEnvFile(envPath) {
   }
   return out;
 }
-
-bootstrapEditorEnv(root, loadEnvFile);
 
 function serveStatic(res, urlPath) {
   const rel = STATIC_ROUTES[urlPath];
@@ -224,40 +215,9 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === 'POST' && url.pathname === '/api/login') {
-      const body = JSON.parse(await readBody(req));
-      const result = handleLoginRoute(body);
-      if (!result.ok) {
-        sendJson(res, result.status, { ok: false, error: result.error });
-        return;
-      }
-      sendJson(res, 200, {
-        ok: true,
-        token: result.token,
-        role: result.role,
-        expiresAt: result.expiresAt,
-        expiresIn: result.expiresIn,
-      });
-      return;
-    }
-
-    if (req.method === 'GET' && url.pathname === '/api/session') {
-      const result = handleSessionRoute(req, url);
-      if (!result.ok) {
-        sendJson(res, result.status, { ok: false, error: result.error });
-        return;
-      }
-      sendJson(res, 200, {
-        ok: true,
-        role: result.role,
-        expiresAt: result.expiresAt,
-      });
-      return;
-    }
-
     if (req.method === 'GET' && url.pathname === '/api/codes') {
-      if (!authFromRequest(req, url, null, ROLES.ARTIST)) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const supabase = createSupabase();
@@ -268,9 +228,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'POST' && url.pathname === '/api/formats/create') {
       const body = JSON.parse(await readBody(req));
-      const auth = authFromRequest(req, url, body, ROLES.ARTIST);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const code = String(body.code || '').trim().toUpperCase();
@@ -296,13 +255,6 @@ const server = http.createServer(async (req, res) => {
         sort_order: await nextSortOrder(supabase, 'formats'),
       });
       if (error) throw error;
-      await logEditorAction(supabase, {
-        editor_role: auth.role,
-        action_type: 'save',
-        entity_type: 'format',
-        entity_key: code,
-        snapshot_before: null,
-      });
       const lists = await fetchCodesWithCounts(supabase);
       sendJson(res, 200, { ok: true, ...lists, createdCode: code });
       return;
@@ -310,9 +262,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'POST' && url.pathname === '/api/techniques/create') {
       const body = JSON.parse(await readBody(req));
-      const auth = authFromRequest(req, url, body, ROLES.ARTIST);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const code = String(body.code || '').trim().toUpperCase();
@@ -336,13 +287,6 @@ const server = http.createServer(async (req, res) => {
         sort_order: await nextSortOrder(supabase, 'techniques'),
       });
       if (error) throw error;
-      await logEditorAction(supabase, {
-        editor_role: auth.role,
-        action_type: 'save',
-        entity_type: 'technique',
-        entity_key: code,
-        snapshot_before: null,
-      });
       const lists = await fetchCodesWithCounts(supabase);
       sendJson(res, 200, { ok: true, ...lists, createdCode: code });
       return;
@@ -350,9 +294,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'POST' && url.pathname === '/api/codes/save') {
       const body = JSON.parse(await readBody(req));
-      const auth = authFromRequest(req, url, body, ROLES.ARTIST);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const formatRows = Array.isArray(body.formats) ? body.formats : [];
@@ -362,39 +305,15 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       const supabase = createSupabase();
-      for (const r of formatRows) {
-        const row = normalizeFormatInput(r);
-        const { data: before } = await supabase
-          .from('formats')
-          .select('*')
-          .eq('code', row.code)
-          .maybeSingle();
-        const { error } = await supabase.from('formats').upsert(row, { onConflict: 'code' });
+      if (formatRows.length) {
+        const payload = formatRows.map((r) => normalizeFormatInput(r));
+        const { error } = await supabase.from('formats').upsert(payload, { onConflict: 'code' });
         if (error) throw error;
-        await logEditorAction(supabase, {
-          editor_role: auth.role,
-          action_type: 'save',
-          entity_type: 'format',
-          entity_key: row.code,
-          snapshot_before: before || null,
-        });
       }
-      for (const r of techniqueRows) {
-        const row = normalizeTechniqueInput(r);
-        const { data: before } = await supabase
-          .from('techniques')
-          .select('*')
-          .eq('code', row.code)
-          .maybeSingle();
-        const { error } = await supabase.from('techniques').upsert(row, { onConflict: 'code' });
+      if (techniqueRows.length) {
+        const payload = techniqueRows.map((r) => normalizeTechniqueInput(r));
+        const { error } = await supabase.from('techniques').upsert(payload, { onConflict: 'code' });
         if (error) throw error;
-        await logEditorAction(supabase, {
-          editor_role: auth.role,
-          action_type: 'save',
-          entity_type: 'technique',
-          entity_key: row.code,
-          snapshot_before: before || null,
-        });
       }
       const lists = await fetchCodesWithCounts(supabase);
       sendJson(res, 200, { ok: true, ...lists });
@@ -403,9 +322,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'DELETE' && url.pathname.startsWith('/api/formats/')) {
       const code = decodeURIComponent(url.pathname.slice('/api/formats/'.length)).trim().toUpperCase();
-      const auth = authFromRequest(req, url, null, ROLES.ADMIN);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'accès réservé aux administrateurs' });
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       if (!code) {
@@ -413,7 +331,6 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       const supabase = createSupabase();
-      const { data: before } = await supabase.from('formats').select('*').eq('code', code).maybeSingle();
       const { count, error: cErr } = await supabase
         .from('works')
         .select('id', { count: 'exact', head: true })
@@ -428,13 +345,6 @@ const server = http.createServer(async (req, res) => {
       }
       const { error } = await supabase.from('formats').delete().eq('code', code);
       if (error) throw error;
-      await logEditorAction(supabase, {
-        editor_role: auth.role,
-        action_type: 'delete',
-        entity_type: 'format',
-        entity_key: code,
-        snapshot_before: before || null,
-      });
       const lists = await fetchCodesWithCounts(supabase);
       sendJson(res, 200, { ok: true, ...lists });
       return;
@@ -442,9 +352,8 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'DELETE' && url.pathname.startsWith('/api/techniques/')) {
       const code = decodeURIComponent(url.pathname.slice('/api/techniques/'.length)).trim().toUpperCase();
-      const auth = authFromRequest(req, url, null, ROLES.ADMIN);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'accès réservé aux administrateurs' });
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       if (!code) {
@@ -452,7 +361,6 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       const supabase = createSupabase();
-      const { data: before } = await supabase.from('techniques').select('*').eq('code', code).maybeSingle();
       const { count, error: cErr } = await supabase
         .from('works')
         .select('id', { count: 'exact', head: true })
@@ -467,13 +375,6 @@ const server = http.createServer(async (req, res) => {
       }
       const { error } = await supabase.from('techniques').delete().eq('code', code);
       if (error) throw error;
-      await logEditorAction(supabase, {
-        editor_role: auth.role,
-        action_type: 'delete',
-        entity_type: 'technique',
-        entity_key: code,
-        snapshot_before: before || null,
-      });
       const lists = await fetchCodesWithCounts(supabase);
       sendJson(res, 200, { ok: true, ...lists });
       return;

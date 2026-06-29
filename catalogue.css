@@ -45,28 +45,6 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 .editor-tabs-inner {
   padding-top: 0;
   padding-bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.editor-logout-btn {
-  margin-left: auto;
-  padding: 8px 12px;
-  font-size: 0.82rem;
-  font-family: inherit;
-  color: var(--secondary);
-  background: transparent;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.editor-logout-btn:hover {
-  color: var(--accent);
-  border-color: var(--accent);
 }
 
 .editor-tabs-list {
@@ -342,86 +320,6 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   margin: 12px 0 0;
   font-size: 0.85rem;
   color: #b00020;
-}
-
-.catalogue-login-profiles {
-  margin: 0 0 16px;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-}
-
-.catalogue-login-profiles-legend {
-  padding: 0 4px;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--secondary);
-}
-
-.catalogue-login-profile {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 8px;
-  font-size: 0.92rem;
-  cursor: pointer;
-}
-
-.catalogue-login-profile input {
-  accent-color: var(--accent);
-}
-
-.catalogue-login-hint {
-  margin: 0 0 14px;
-  font-size: 0.82rem;
-  color: var(--secondary);
-  line-height: 1.45;
-}
-
-.audit-log-table .audit-log-when {
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-}
-
-.audit-log-table .audit-log-entity {
-  font-family: ui-monospace, monospace;
-  font-size: 0.82rem;
-}
-
-.audit-log-action--delete {
-  color: #b00020;
-  font-weight: 600;
-}
-
-.audit-log-snapshot {
-  margin: 0;
-  max-width: 28rem;
-  max-height: 10rem;
-  overflow: auto;
-  font-size: 0.72rem;
-  line-height: 1.35;
-  background: #f4f5f8;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 8px 10px;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-.audit-log-empty-snapshot {
-  color: var(--secondary);
-  font-style: italic;
-}
-
-.audit-log-empty {
-  text-align: center;
-  color: var(--secondary);
-  padding: 24px;
-}
-
-body[data-editor-role="artist"] .editor-admin-only,
-body[data-editor-role="artist"] .editor-delete-btn {
-  display: none !important;
 }
 
 .catalogue-app[hidden] {

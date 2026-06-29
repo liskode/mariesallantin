@@ -19,19 +19,12 @@ import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 import { nextCollectorCode } from './collector-utils.mjs';
 import { loadWorkMediaById, resolveMediaRelativePath, workImageUrls } from './media-thumb-urls.mjs';
-import {
-  ROLES,
-  authFromRequest,
-  bootstrapEditorEnv,
-  handleLoginRoute,
-  handleSessionRoute,
-} from './local-api-auth.mjs';
-import { logEditorAction } from './audit-log.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 
 const PORT = Number(process.env.COLLECTORS_EDITOR_PORT || 47832);
+const TOKEN = process.env.CATALOGUE_EDITOR_TOKEN || 'MS75';
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',
@@ -77,8 +70,6 @@ function loadEnvFile(envPath) {
   return out;
 }
 
-bootstrapEditorEnv(root, loadEnvFile);
-
 function serveStatic(res, urlPath) {
   const rel = STATIC_ROUTES[urlPath];
   if (!rel) return false;
@@ -111,6 +102,10 @@ function readBody(req) {
     req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
     req.on('error', reject);
   });
+}
+
+function checkToken(token) {
+  return token === TOKEN;
 }
 
 function createSupabase() {
@@ -239,40 +234,10 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    if (req.method === 'POST' && url.pathname === '/api/login') {
-      const body = JSON.parse(await readBody(req));
-      const result = handleLoginRoute(body);
-      if (!result.ok) {
-        sendJson(res, result.status, { ok: false, error: result.error });
-        return;
-      }
-      sendJson(res, 200, {
-        ok: true,
-        token: result.token,
-        role: result.role,
-        expiresAt: result.expiresAt,
-        expiresIn: result.expiresIn,
-      });
-      return;
-    }
-
-    if (req.method === 'GET' && url.pathname === '/api/session') {
-      const result = handleSessionRoute(req, url);
-      if (!result.ok) {
-        sendJson(res, result.status, { ok: false, error: result.error });
-        return;
-      }
-      sendJson(res, 200, {
-        ok: true,
-        role: result.role,
-        expiresAt: result.expiresAt,
-      });
-      return;
-    }
-
     if (req.method === 'GET' && url.pathname === '/api/collectors') {
-      if (!authFromRequest(req, url, null, ROLES.ARTIST)) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      const token = url.searchParams.get('token') || '';
+      if (!checkToken(token)) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const supabase = createSupabase();
@@ -284,9 +249,8 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && url.pathname === '/api/collectors/save') {
       const raw = await readBody(req);
       const body = JSON.parse(raw);
-      const auth = authFromRequest(req, url, body, ROLES.ARTIST);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (!checkToken(body.token)) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       const rows = Array.isArray(body.collectors) ? body.collectors : [];
@@ -296,25 +260,15 @@ const server = http.createServer(async (req, res) => {
       }
 
       const supabase = createSupabase();
-      for (const r of rows) {
+      const payload = rows.map((r) => {
         const c = normalizeCollectorInput(r);
         if (!c.code) throw new Error('code manquant');
         if (!c.name) throw new Error(`nom manquant pour ${c.code}`);
-        const { data: before } = await supabase
-          .from('collectors')
-          .select('*')
-          .eq('code', c.code)
-          .maybeSingle();
-        const { error } = await supabase.from('collectors').upsert(c, { onConflict: 'code' });
-        if (error) throw error;
-        await logEditorAction(supabase, {
-          editor_role: auth.role,
-          action_type: 'save',
-          entity_type: 'collector',
-          entity_key: c.code,
-          snapshot_before: before || null,
-        });
-      }
+        return c;
+      });
+
+      const { error } = await supabase.from('collectors').upsert(payload, { onConflict: 'code' });
+      if (error) throw error;
 
       const collectors = await fetchCollectorsWithCounts(supabase);
       sendJson(res, 200, { ok: true, collectors });
@@ -324,9 +278,8 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'POST' && url.pathname === '/api/collectors/create') {
       const raw = await readBody(req);
       const body = JSON.parse(raw);
-      const auth = authFromRequest(req, url, body, ROLES.ARTIST);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'session invalide ou expirée' });
+      if (!checkToken(body.token)) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
 
@@ -344,13 +297,6 @@ const server = http.createServer(async (req, res) => {
         sendJson(res, 400, { ok: false, error: error.message });
         return;
       }
-      await logEditorAction(supabase, {
-        editor_role: auth.role,
-        action_type: 'save',
-        entity_type: 'collector',
-        entity_key: code,
-        snapshot_before: null,
-      });
 
       const collectors = await fetchCollectorsWithCounts(supabase);
       sendJson(res, 200, { ok: true, collector: row, collectors });
@@ -359,9 +305,9 @@ const server = http.createServer(async (req, res) => {
 
     if (req.method === 'DELETE' && url.pathname.startsWith('/api/collectors/')) {
       const code = decodeURIComponent(url.pathname.slice('/api/collectors/'.length));
-      const auth = authFromRequest(req, url, null, ROLES.ADMIN);
-      if (!auth) {
-        sendJson(res, 403, { ok: false, error: 'accès réservé aux administrateurs' });
+      const token = url.searchParams.get('token') || '';
+      if (!checkToken(token)) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
         return;
       }
       if (!code) {
@@ -370,7 +316,6 @@ const server = http.createServer(async (req, res) => {
       }
 
       const supabase = createSupabase();
-      const { data: before } = await supabase.from('collectors').select('*').eq('code', code).maybeSingle();
       const { count, error: cErr } = await supabase
         .from('works')
         .select('id', { count: 'exact', head: true })
@@ -386,13 +331,6 @@ const server = http.createServer(async (req, res) => {
 
       const { error } = await supabase.from('collectors').delete().eq('code', code);
       if (error) throw error;
-      await logEditorAction(supabase, {
-        editor_role: auth.role,
-        action_type: 'delete',
-        entity_type: 'collector',
-        entity_key: code,
-        snapshot_before: before || null,
-      });
 
       sendJson(res, 200, { ok: true });
       return;
