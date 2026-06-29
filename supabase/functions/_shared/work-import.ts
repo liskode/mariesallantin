@@ -207,17 +207,58 @@ export function parseImportMetadata(
     year,
     techniqueCode: validTechnique,
     formatCode: validFormat,
+    parsedFormatCode: formatCode,
+    parsedTechniqueCode: techniqueCode,
     title,
   };
 }
+
+export function auditImportMetadata(
+  parsed: ReturnType<typeof parseImportMetadata>,
+  catalog: {
+    knownSeries?: Set<string>;
+    knownTechniques?: Set<string>;
+    knownFormats?: Set<string>;
+  } = {}
+): string[] {
+  const { knownSeries, knownTechniques, knownFormats } = catalog;
+  const issues: string[] = [];
+  for (const code of parsed.seriesCodes || []) {
+    if (knownSeries?.size && !knownSeries.has(code)) {
+      issues.push(`série inconnue : ${code}`);
+    }
+  }
+  if (parsed.parsedFormatCode && !parsed.formatCode) {
+    issues.push(`format inconnu : ${parsed.parsedFormatCode}`);
+  }
+  if (parsed.parsedTechniqueCode && !parsed.techniqueCode) {
+    issues.push(`technique inconnue : ${parsed.parsedTechniqueCode}`);
+  }
+  return issues;
+}
+
+type ImportCatalog = {
+  knownSeries?: Set<string> | null;
+  knownTechniques?: Set<string> | null;
+  knownFormats?: Set<string> | null;
+  knownPhotoStatuses?: Set<string> | null;
+  photoStatusCode?: string | null;
+};
 
 export function planWorkImports(
   files: Array<{ originalName: string }>,
   importMode: ImportMode,
   existingIds: Set<string>,
   sequentialStart: number,
-  knownSeries: Set<string> | null = null
+  catalog: ImportCatalog = {}
 ) {
+  const {
+    knownSeries = null,
+    knownTechniques = null,
+    knownFormats = null,
+    knownPhotoStatuses = null,
+    photoStatusCode = null,
+  } = catalog;
   const items: Array<{
     originalName: string;
     workId: string;
@@ -226,8 +267,12 @@ export function planWorkImports(
     effectiveMode: ImportMode;
     warning: string | null;
     error: string | null;
+    issues: string[];
     seriesCodes: string[];
     title: string;
+    formatCode: string | null;
+    techniqueCode: string | null;
+    year: number | null;
   }> = [];
   const batchAddIds = new Set<string>();
   const batchUpdateIds = new Set<string>();
@@ -243,8 +288,12 @@ export function planWorkImports(
       effectiveMode: importMode,
       warning: null as string | null,
       error: null as string | null,
+      issues: [] as string[],
       seriesCodes: [] as string[],
       title: '',
+      formatCode: null as string | null,
+      techniqueCode: null as string | null,
+      year: null as number | null,
     };
 
     if (!originalName) {
@@ -307,10 +356,34 @@ export function planWorkImports(
     if (entry.effectiveMode === 'add') {
       const parsed = parseImportMetadata(stemFromFilename(originalName), {
         knownSeries: knownSeries || undefined,
+        knownTechniques: knownTechniques || undefined,
+        knownFormats: knownFormats || undefined,
         workId: entry.workId,
       });
       entry.seriesCodes = parsed.seriesCodes;
       entry.title = parsed.title;
+      entry.formatCode = parsed.formatCode;
+      entry.techniqueCode = parsed.techniqueCode;
+      entry.year = parsed.year;
+      const issues = auditImportMetadata(parsed, {
+        knownSeries: knownSeries || undefined,
+        knownTechniques: knownTechniques || undefined,
+        knownFormats: knownFormats || undefined,
+      });
+      if (issues.length) {
+        entry.issues = issues;
+        entry.error = issues.join(' ; ');
+      }
+    }
+
+    if (
+      photoStatusCode &&
+      knownPhotoStatuses?.size &&
+      !knownPhotoStatuses.has(photoStatusCode)
+    ) {
+      const msg = `statut photo inconnu : ${photoStatusCode}`;
+      entry.issues = [...(entry.issues || []), msg];
+      entry.error = entry.error ? `${entry.error} ; ${msg}` : msg;
     }
 
     items.push(entry);

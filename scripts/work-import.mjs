@@ -250,8 +250,32 @@ export function parseImportMetadata(stem, opts = {}) {
     year,
     techniqueCode: validTechnique,
     formatCode: validFormat,
+    parsedFormatCode: formatCode,
+    parsedTechniqueCode: techniqueCode,
     title,
   };
+}
+
+/**
+ * @param {ReturnType<typeof parseImportMetadata>} parsed
+ * @param {{ knownSeries?: Set<string>, knownTechniques?: Set<string>, knownFormats?: Set<string> }} catalog
+ * @returns {string[]}
+ */
+export function auditImportMetadata(parsed, catalog = {}) {
+  const { knownSeries, knownTechniques, knownFormats } = catalog;
+  const issues = [];
+  for (const code of parsed.seriesCodes || []) {
+    if (knownSeries?.size && !knownSeries.has(code)) {
+      issues.push(`série inconnue : ${code}`);
+    }
+  }
+  if (parsed.parsedFormatCode && !parsed.formatCode) {
+    issues.push(`format inconnu : ${parsed.parsedFormatCode}`);
+  }
+  if (parsed.parsedTechniqueCode && !parsed.techniqueCode) {
+    issues.push(`technique inconnue : ${parsed.parsedTechniqueCode}`);
+  }
+  return issues;
 }
 
 /**
@@ -259,9 +283,20 @@ export function parseImportMetadata(stem, opts = {}) {
  * @param {ImportMode} importMode
  * @param {Set<string>} existingIds ids déjà en base
  * @param {number} sequentialStart
- * @param {Set<string>} [knownSeries]
+ * @param {Set<string>} [catalog.knownSeries]
+ * @param {Set<string>} [catalog.knownTechniques]
+ * @param {Set<string>} [catalog.knownFormats]
+ * @param {Set<string>} [catalog.knownPhotoStatuses]
+ * @param {string | null} [catalog.photoStatusCode]
  */
-export function planWorkImports(files, importMode, existingIds, sequentialStart, knownSeries = null) {
+export function planWorkImports(files, importMode, existingIds, sequentialStart, catalog = {}) {
+  const {
+    knownSeries = null,
+    knownTechniques = null,
+    knownFormats = null,
+    knownPhotoStatuses = null,
+    photoStatusCode = null,
+  } = catalog;
   const items = [];
   const batchAddIds = new Set();
   const batchUpdateIds = new Set();
@@ -277,8 +312,12 @@ export function planWorkImports(files, importMode, existingIds, sequentialStart,
       effectiveMode: importMode,
       warning: null,
       error: null,
+      issues: [],
       seriesCodes: [],
       title: '',
+      formatCode: null,
+      techniqueCode: null,
+      year: null,
     };
 
     if (!originalName) {
@@ -338,10 +377,34 @@ export function planWorkImports(files, importMode, existingIds, sequentialStart,
     if (entry.effectiveMode === 'add') {
       const parsed = parseImportMetadata(stemFromFilename(originalName), {
         knownSeries,
+        knownTechniques,
+        knownFormats,
         workId: entry.workId,
       });
       entry.seriesCodes = parsed.seriesCodes;
       entry.title = parsed.title;
+      entry.formatCode = parsed.formatCode;
+      entry.techniqueCode = parsed.techniqueCode;
+      entry.year = parsed.year;
+      const issues = auditImportMetadata(parsed, {
+        knownSeries,
+        knownTechniques,
+        knownFormats,
+      });
+      if (issues.length) {
+        entry.issues = issues;
+        entry.error = issues.join(' ; ');
+      }
+    }
+
+    if (
+      photoStatusCode &&
+      knownPhotoStatuses?.size &&
+      !knownPhotoStatuses.has(photoStatusCode)
+    ) {
+      const msg = `statut photo inconnu : ${photoStatusCode}`;
+      entry.issues = [...(entry.issues || []), msg];
+      entry.error = entry.error ? `${entry.error} ; ${msg}` : msg;
     }
 
     items.push(entry);

@@ -228,24 +228,39 @@ async function fetchWorksWithSeries(supabase) {
 
 async function handleImportPlan(body) {
   const importMode = normalizeImportMode(body.import_mode || body.id_mode);
+  const photoStatusCode = String(body.photo_status_code || '').trim().toUpperCase() || null;
   const files = Array.isArray(body.files) ? body.files : [];
   const names = files.map((f) => ({ originalName: String(f.originalName || f.name || '') }));
   const worksJsonPath = path.join(root, 'media', 'works.json');
   const supabase = createSupabase();
   const meta = await fetchMeta(supabase);
-  const knownSeries = new Set((meta.series || []).map((s) => s.code));
+  const catalog = {
+    knownSeries: new Set((meta.series || []).map((s) => s.code)),
+    knownTechniques: new Set((meta.techniques || []).map((t) => t.code)),
+    knownFormats: new Set((meta.formats || []).map((f) => f.code)),
+    knownPhotoStatuses: new Set((meta.photo_statuses || []).map((p) => p.code)),
+    photoStatusCode,
+  };
   const existingIds = await fetchExistingWorkIds(supabase);
   const sequentialStart = await resolveNextSequentialStart(supabase, worksJsonPath);
-  const plan = planWorkImports(names, importMode, existingIds, sequentialStart, knownSeries);
+  const plan = planWorkImports(names, importMode, existingIds, sequentialStart, catalog);
   return {
     ok: true,
     import_mode: importMode,
+    simulation_only: false,
     next_sequential_id: formatWorkId(sequentialStart),
     plan,
   };
 }
 
 async function handleImportWorks(body, { writeFiles }) {
+  if (!writeFiles) {
+    return {
+      ok: false,
+      status: 403,
+      error: 'import réservé à l’API locale — lancez npm run works:api',
+    };
+  }
   const importMode = normalizeImportMode(body.import_mode || body.id_mode);
   const photoStatusCode = String(body.photo_status_code || '').trim().toUpperCase() || null;
   const files = Array.isArray(body.files) ? body.files : [];
@@ -262,6 +277,13 @@ async function handleImportWorks(body, { writeFiles }) {
   const knownFormats = new Set((meta.formats || []).map((f) => f.code));
   const knownTechniques = new Set((meta.techniques || []).map((t) => t.code));
   const knownSeries = new Set((meta.series || []).map((s) => s.code));
+  const catalog = {
+    knownSeries,
+    knownTechniques: new Set((meta.techniques || []).map((t) => t.code)),
+    knownFormats: new Set((meta.formats || []).map((f) => f.code)),
+    knownPhotoStatuses: new Set((meta.photo_statuses || []).map((p) => p.code)),
+    photoStatusCode,
+  };
 
   const existingIds = await fetchExistingWorkIds(supabase);
   const sequentialStart = await resolveNextSequentialStart(supabase, worksJsonPath);
@@ -270,7 +292,7 @@ async function handleImportWorks(body, { writeFiles }) {
     importMode,
     existingIds,
     sequentialStart,
-    knownSeries
+    catalog
   );
 
   const errors = plan.filter((p) => p.error);

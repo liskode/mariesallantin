@@ -1,14 +1,9 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import { sortFormats } from '../_shared/format-sort.ts';
 import {
-  buildWorkImageUpdate,
-  buildWorkRecords,
   fetchExistingWorkIds,
-  fetchNextSortOrder,
   formatWorkId,
   normalizeImportMode,
-  persistWorkImageUpdatesToSupabase,
-  persistWorksToSupabase,
   planWorkImports,
   resolveNextSequentialStart,
 } from '../_shared/work-import.ts';
@@ -205,10 +200,17 @@ Deno.serve(async (req) => {
         return jsonResponse(403, { ok: false, error: 'token incorrect' });
       }
       const importMode = normalizeImportMode(String(body.import_mode || body.id_mode || ''));
+      const photoStatusCode = String(body.photo_status_code || '').trim().toUpperCase() || null;
       const files = Array.isArray(body.files) ? body.files : [];
       const supabase = createSupabase();
       const meta = await fetchMeta(supabase);
-      const knownSeries = new Set((meta.series || []).map((s) => s.code as string));
+      const catalog = {
+        knownSeries: new Set((meta.series || []).map((s) => s.code as string)),
+        knownTechniques: new Set((meta.techniques || []).map((t) => t.code as string)),
+        knownFormats: new Set((meta.formats || []).map((f) => f.code as string)),
+        knownPhotoStatuses: new Set((meta.photo_statuses || []).map((p) => p.code as string)),
+        photoStatusCode,
+      };
       const existingIds = await fetchExistingWorkIds(supabase);
       const sequentialStart = await resolveNextSequentialStart(supabase);
       const plan = planWorkImports(
@@ -218,11 +220,12 @@ Deno.serve(async (req) => {
         importMode,
         existingIds,
         sequentialStart,
-        knownSeries
+        catalog
       );
       return jsonResponse(200, {
         ok: true,
         import_mode: importMode,
+        simulation_only: true,
         next_sequential_id: formatWorkId(sequentialStart),
         plan,
       });
@@ -233,119 +236,10 @@ Deno.serve(async (req) => {
       if (!checkToken(String(body.token || ''))) {
         return jsonResponse(403, { ok: false, error: 'token incorrect' });
       }
-      const importMode = normalizeImportMode(String(body.import_mode || body.id_mode || ''));
-      const photoStatusCode = String(body.photo_status_code || '').trim().toUpperCase() || null;
-      const files = Array.isArray(body.files) ? body.files : [];
-      if (!files.length) {
-        return jsonResponse(400, { ok: false, error: 'aucun fichier à importer' });
-      }
-
-      const supabase = createSupabase();
-      const meta = await fetchMeta(supabase);
-      const knownFormats = new Set((meta.formats || []).map((f) => f.code as string));
-      const knownTechniques = new Set((meta.techniques || []).map((t) => t.code as string));
-      const knownSeries = new Set((meta.series || []).map((s) => s.code as string));
-      const existingIds = await fetchExistingWorkIds(supabase);
-      const sequentialStart = await resolveNextSequentialStart(supabase);
-      const plan = planWorkImports(
-        files.map((f: { originalName?: string; name?: string }) => ({
-          originalName: String(f.originalName || f.name || ''),
-        })),
-        importMode,
-        existingIds,
-        sequentialStart,
-        knownSeries
-      );
-
-      let sortOrder = await fetchNextSortOrder(supabase);
-      const addRecords: Array<{ dbRow: Record<string, unknown>; seriesCodes: string[] }> = [];
-      const imageUpdates: Array<{ workId: string; dbPatch: Record<string, unknown> }> = [];
-      const imported: Array<Record<string, unknown>> = [];
-      const fileByName = new Map(
-        files.map((f: { originalName?: string; name?: string; contentBase64?: string }) => [
-          String(f.originalName || f.name || ''),
-          f,
-        ])
-      );
-
-      for (const item of plan) {
-        if (item.error) {
-          imported.push({ ...item, status: 'error' });
-          continue;
-        }
-        const src = fileByName.get(item.originalName);
-        if (!src?.contentBase64) {
-          imported.push({ ...item, status: 'error', error: 'contenu image manquant' });
-          continue;
-        }
-        const buffer = Uint8Array.from(atob(String(src.contentBase64)), (c) => c.charCodeAt(0));
-
-        if (item.effectiveMode === 'update') {
-          const built = buildWorkImageUpdate({
-            workId: item.workId,
-            originalName: item.originalName,
-            fileSizeBytes: buffer.length,
-          });
-          imageUpdates.push({ workId: item.workId, dbPatch: built.dbPatch });
-          imported.push({
-            workId: item.workId,
-            originalName: item.originalName,
-            catalogueBasename: item.catalogueBasename,
-            media: built.mediaRel,
-            effectiveMode: 'update',
-            warning: item.warning,
-            status: 'ok',
-            files_written: false,
-          });
-          continue;
-        }
-
-        const built = buildWorkRecords({
-          workId: item.workId,
-          originalName: item.originalName,
-          sortOrder,
-          knownFormats,
-          knownTechniques,
-          knownSeries,
-          photoStatusCode,
-        });
-        sortOrder += 1;
-        addRecords.push(built);
-        imported.push({
-          workId: item.workId,
-          originalName: item.originalName,
-          catalogueBasename: item.catalogueBasename,
-          media: built.mediaRel,
-          effectiveMode: 'add',
-          warning: item.warning,
-          seriesCodes: built.seriesCodes,
-          title: built.dbRow.title,
-          status: 'ok',
-          files_written: false,
-        });
-      }
-
-      if (!addRecords.length && !imageUpdates.length) {
-        return jsonResponse(400, {
-          ok: false,
-          error: 'aucune œuvre importée',
-          imported,
-          plan,
-        });
-      }
-
-      if (addRecords.length) await persistWorksToSupabase(supabase, addRecords);
-      if (imageUpdates.length) await persistWorkImageUpdatesToSupabase(supabase, imageUpdates);
-      const works = await fetchWorksWithSeries(supabase);
-      return jsonResponse(200, {
-        ok: true,
-        imported,
-        works,
-        import_mode: importMode,
-        mode: 'database_only',
-        files_written: false,
-        notice:
-          'Fiches créées dans Supabase. Déposez les images dans media/catalogue/ (noms indiqués) ou importez via npm run works:api en local.',
+      return jsonResponse(403, {
+        ok: false,
+        error:
+          'import réservé à l’API locale — lancez npm run works:api puis ouvrez http://127.0.0.1:47835/',
       });
     }
 

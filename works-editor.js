@@ -1244,6 +1244,7 @@
   }
 
   const importDialog = document.getElementById('works-import-dialog');
+  const importDialogTitle = document.getElementById('works-import-dialog-title');
   const importBtn = document.getElementById('works-import-btn');
   const importFilesEl = document.getElementById('works-import-files');
   const importCloseBtn = document.getElementById('works-import-close');
@@ -1269,25 +1270,30 @@
       el.className = 'works-import-env-notice works-import-env-notice--local';
       el.innerHTML =
         '<strong class="works-import-env-title">Import complet (API locale)</strong>' +
-        '<p>Les images sont copiées dans <code>media/catalogue/</code>, les fiches sont enregistrées dans Supabase, ' +
+        '<p>Les images sont copiées dans <code>media/catalogue/</code> sous <code>MS####.ext</code>, les fiches sont enregistrées dans Supabase, ' +
         '<code>media/works.json</code> et les miniatures WebP sont mis à jour.</p>' +
         '<p>Après import, commitez et publiez les fichiers <code>media/</code> pour les rendre visibles sur le site.</p>';
       return;
     }
     el.className = 'works-import-env-notice works-import-env-notice--online';
     el.innerHTML =
-      '<strong class="works-import-env-title">Import en ligne — les images ne sont pas enregistrées sur le site</strong>' +
-      '<p>Depuis <code>mariesallantin.art</code>, seules les <strong>fiches Supabase</strong> sont créées ou mises à jour. ' +
-      'Aucun fichier n’est écrit dans <code>media/catalogue/</code> : les vignettes du catalogue resteront vides ' +
-      'tant que les images ne sont pas ajoutées au dépôt.</p>' +
-      '<p><strong>Pour un import complet (images + base + works.json)&nbsp;:</strong></p>' +
+      '<strong class="works-import-env-title">Simulation d’import — aucune écriture en ligne</strong>' +
+      '<p>Depuis <code>mariesallantin.art</code>, ce bouton sert uniquement à <strong>vérifier</strong> vos fichiers : codes MS attribués, ' +
+      'nom d’image cible (<code>MS####.ext</code>), séries, format, technique, titre et erreurs éventuelles (codes inconnus, etc.).</p>' +
+      '<p><strong>Pour importer réellement</strong> (fichiers + base + <code>works.json</code>)&nbsp;:</p>' +
       '<ol>' +
-      '<li>Ouvrir un terminal dans le dossier du projet</li>' +
-      '<li>Exécuter <code>npm run works:api</code></li>' +
-      '<li>Ouvrir <code>http://127.0.0.1:47835/</code> dans le navigateur</li>' +
-      '<li>Se connecter (mot de passe MS75) et cliquer sur <strong>Importer des œuvres</strong></li>' +
-      '<li>Commiter et publier les fichiers modifiés sous <code>media/</code></li>' +
+      '<li>Exécuter <code>npm run works:api</code> dans le projet</li>' +
+      '<li>Ouvrir <code>http://127.0.0.1:47835/</code></li>' +
+      '<li>Utiliser le même dialogue d’import puis publier <code>media/</code></li>' +
       '</ol>';
+  }
+
+  function updateImportDialogForEnv() {
+    const local = isLocalDevServer();
+    if (importDialogTitle) {
+      importDialogTitle.textContent = local ? 'Importer des œuvres' : 'Simulation d’import';
+    }
+    if (importSubmitBtn) importSubmitBtn.hidden = !local;
   }
 
   async function loadNextSequentialId() {
@@ -1365,24 +1371,42 @@
       if (row.effectiveMode === 'update') {
         tdMeta.textContent = '—';
       } else {
-        const series = (row.seriesCodes || []).join(' ');
+        const parts = [];
+        if ((row.seriesCodes || []).length) parts.push((row.seriesCodes || []).join(' '));
+        if (row.formatCode) parts.push(row.formatCode);
+        if (row.techniqueCode) parts.push(row.techniqueCode);
+        if (row.year) parts.push(String(row.year));
+        const codes = parts.join(' · ');
         const title = row.title || '';
-        tdMeta.textContent = series ? series + (title ? ' · ' + title : '') : title || '—';
+        tdMeta.textContent = codes ? codes + (title ? ' — ' + title : '') : title || '—';
       }
       tr.appendChild(tdMeta);
 
       const tdErr = document.createElement('td');
-      tdErr.textContent = row.warning || row.error || '';
+      const msgs = [];
+      if (row.error) msgs.push(row.error);
+      else if (row.warning) msgs.push(row.warning);
+      tdErr.textContent = msgs.join(' · ');
       tr.appendChild(tdErr);
 
       importPreviewTbody.appendChild(tr);
     }
     importPreviewWrap.hidden = !plan.length;
-    importSubmitBtn.disabled = okCount === 0;
+    if (importSubmitBtn && isLocalDevServer()) {
+      importSubmitBtn.disabled = okCount === 0;
+    }
     if (importStatusEl) {
-      importStatusEl.textContent = plan.length
-        ? okCount + ' œuvre(s) prête(s) sur ' + plan.length
-        : '';
+      if (!plan.length) {
+        importStatusEl.textContent = '';
+      } else {
+        const errCount = plan.filter((r) => r.error).length;
+        const warnCount = plan.filter((r) => r.warning && !r.error).length;
+        let msg = okCount + ' prêt(s) sur ' + plan.length;
+        if (errCount) msg += ' · ' + errCount + ' erreur(s)';
+        if (warnCount) msg += ' · ' + warnCount + ' avertissement(s)';
+        if (!isLocalDevServer()) msg += ' — simulation (aucune écriture)';
+        importStatusEl.textContent = msg;
+      }
       importStatusEl.classList.remove('legend-editor-api-hint--error');
     }
   }
@@ -1393,13 +1417,14 @@
       renderImportPreview([]);
       return;
     }
-    if (importStatusEl) importStatusEl.textContent = 'Préparation de l’aperçu…';
+    if (importStatusEl) importStatusEl.textContent = 'Analyse des fichiers…';
     const files = importSelectedFiles.map((f) => ({ originalName: f.name }));
     const r = await apiFetch('/api/works/import/plan', {
       method: 'POST',
       body: JSON.stringify({
         token,
         import_mode: getImportMode(),
+        photo_status_code: getImportPhotoStatusCode(),
         files,
       }),
     });
@@ -1436,6 +1461,7 @@
     importPlan = [];
     if (importFilesEl) importFilesEl.value = '';
     updateImportModeUi();
+    updateImportDialogForEnv();
     renderImportPhotoStatusSelect();
     updateImportEnvNotice();
     await loadNextSequentialId();
@@ -1448,6 +1474,7 @@
   }
 
   async function runWorksImport() {
+    if (!isLocalDevServer()) return;
     if (!importSelectedFiles.length || !importSubmitBtn) return;
     const importMode = getImportMode();
     const photoStatusCode = getImportPhotoStatusCode();
@@ -1497,10 +1524,6 @@
       if (importDialog) importDialog.close();
 
       let msg = totalOk + ' œuvre(s) importée(s).';
-      if (!isLocalDevServer()) {
-        msg +=
-          ' Les images ne sont pas sur le serveur : lancez npm run works:api en local pour un import fichier complet, puis publiez media/.';
-      }
       setStatus(msg);
     } catch (e) {
       if (importStatusEl) {
@@ -1561,6 +1584,10 @@
           importStatusEl.classList.add('legend-editor-api-hint--error');
         }
       });
+    });
+
+    importPhotoStatusEl?.addEventListener('change', () => {
+      refreshImportPlan().catch(() => {});
     });
 
     document.querySelectorAll('input[name="works-import-mode"]').forEach((el) => {
