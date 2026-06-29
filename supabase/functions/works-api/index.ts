@@ -82,7 +82,9 @@ function normalizeWorkInput(raw: Record<string, unknown>) {
       format_code: String(raw.format_code || '').trim().toUpperCase() || null,
       technique_code: String(raw.technique_code || '').trim().toUpperCase() || null,
       publication_status_code: String(raw.publication_status_code || 'N').trim().toUpperCase(),
-      photo_status_code: String(raw.photo_status_code || 'OK').trim().toUpperCase(),
+      photo_status_code: raw.photo_status_code
+        ? String(raw.photo_status_code).trim().toUpperCase()
+        : null,
       collector_code: String(raw.collector_code || '').trim().toUpperCase() || null,
       width_cm: parseCm(raw.width_cm),
       height_cm: parseCm(raw.height_cm),
@@ -232,6 +234,7 @@ Deno.serve(async (req) => {
         return jsonResponse(403, { ok: false, error: 'token incorrect' });
       }
       const importMode = normalizeImportMode(String(body.import_mode || body.id_mode || ''));
+      const photoStatusCode = String(body.photo_status_code || '').trim().toUpperCase() || null;
       const files = Array.isArray(body.files) ? body.files : [];
       if (!files.length) {
         return jsonResponse(400, { ok: false, error: 'aucun fichier à importer' });
@@ -304,6 +307,7 @@ Deno.serve(async (req) => {
           knownFormats,
           knownTechniques,
           knownSeries,
+          photoStatusCode,
         });
         sortOrder += 1;
         addRecords.push(built);

@@ -63,29 +63,55 @@ export function catalogueBasenameForWorkId(workId: string, originalName: string)
   return `${String(workId).toUpperCase()}.${ext}`;
 }
 
-export function splitImportStem(stem: string) {
-  const s = String(stem || '').trim();
-  const m = s.match(/[a-z]/);
-  if (m && m.index != null) {
-    return {
-      codePart: s.slice(0, m.index).replace(/[-_]+$/, ''),
-      titlePart: s.slice(m.index).replace(/^[-_]+/, ''),
-    };
-  }
-  return { codePart: s, titlePart: '' };
+function tokenizeImportStem(stem: string): string[] {
+  return String(stem || '')
+    .trim()
+    .split(/[-_]+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
 }
 
-function codeTokensFromPart(codePart: string): string[] {
-  return String(codePart || '')
-    .split(/[-_]+/)
-    .map((t) => t.trim().toUpperCase())
-    .filter(Boolean);
+function tokenLooksLikeTitle(tok: string): boolean {
+  if (/[a-zàâäéèêëïîôùûüç]/.test(tok)) return true;
+  if (/\s/.test(tok) && tok.length > 5) return true;
+  return false;
+}
+
+function matchSeriesToken(tok: string): string | null {
+  const u = String(tok || '').trim().toUpperCase();
+  if (!/^[A-Z]{5}$/.test(u)) return null;
+  return u;
+}
+
+function isFormatLikeCode(code: string): boolean {
+  return (
+    /^\d{3}[FP]$/.test(code) ||
+    /^\d{3}C$/.test(code) ||
+    /^HF\d{2}$/.test(code) ||
+    /^HOFO$/.test(code) ||
+    /^0HF0$/.test(code) ||
+    /^0[A-Z0-9]{3}$/.test(code) ||
+    /^\d{4}$/.test(code)
+  );
+}
+
+function matchFormatToken(tok: string, knownFormats: Set<string>): string | null {
+  const u = String(tok || '').trim().toUpperCase();
+  if (knownFormats.has(u)) return u;
+  if (isFormatLikeCode(u)) return u;
+  return null;
+}
+
+function matchTechniqueToken(tok: string): string | null {
+  const u = String(tok || '').trim().toUpperCase();
+  if (!/^[A-Z]{3}$/.test(u)) return null;
+  return u;
 }
 
 function pickFormatCodeFromStem(stem: string): string | null {
   const parts = stem.toUpperCase().split(/[_\s-]+/).filter(Boolean);
   for (const tok of parts) {
-    if (/^\d{3}[FPC]$/.test(tok) || /^HF\d{2}$/.test(tok) || /^HOFO$/.test(tok)) return tok;
+    if (isFormatLikeCode(tok)) return tok;
   }
   return null;
 }
@@ -104,49 +130,77 @@ export function parseImportMetadata(
   const ms = s.match(MS_PREFIX_RE)?.[1]?.toUpperCase();
   if (ms) s = s.slice(ms.length).replace(/^[-_]+/, '');
 
-  const { codePart, titlePart } = splitImportStem(s);
-  const tokens = codeTokensFromPart(codePart);
+  const rawTokens = tokenizeImportStem(s);
   const seriesCodes: string[] = [];
+  let year: number | null = null;
+  let techniqueCode: string | null = null;
+  let formatCode: string | null = null;
   let i = 0;
 
-  while (i < tokens.length) {
-    const tok = tokens[i];
-    if (!/^[A-Z]{5}$/.test(tok)) break;
-    if (knownSeries?.size && !knownSeries.has(tok)) break;
-    if (!seriesCodes.includes(tok)) seriesCodes.push(tok);
+  while (i < rawTokens.length) {
+    const tok = rawTokens[i];
+    if (tokenLooksLikeTitle(tok)) break;
+    const ser = matchSeriesToken(tok);
+    if (!ser) break;
+    if (!seriesCodes.includes(ser)) seriesCodes.push(ser);
     i++;
   }
 
-  let year: number | null = null;
-  if (i < tokens.length && YEAR_RE.test(tokens[i])) {
-    year = parseInt(tokens[i], 10);
-    i++;
-  }
+  while (i < rawTokens.length) {
+    const tok = rawTokens[i];
+    if (tokenLooksLikeTitle(tok)) break;
+    const upper = tok.toUpperCase();
 
-  let technique: string | null = null;
-  if (i < tokens.length && /^[A-Z]{3}$/.test(tokens[i])) {
-    technique = tokens[i];
-    i++;
-  }
-
-  let format: string | null = null;
-  if (i < tokens.length) {
-    const tok = tokens[i];
-    const fromStem = pickFormatCodeFromStem(codePart);
-    if (knownFormats?.has(tok) || tok === fromStem || /^\d{3}[FPC]$/.test(tok)) {
-      format = knownFormats?.has(tok) ? tok : fromStem || tok;
+    if (year == null && YEAR_RE.test(upper)) {
+      year = parseInt(upper, 10);
       i++;
+      continue;
     }
+
+    if (formatCode == null && knownFormats) {
+      const fmt = matchFormatToken(upper, knownFormats);
+      if (fmt) {
+        formatCode = fmt;
+        i++;
+        continue;
+      }
+    }
+
+    if (techniqueCode == null) {
+      const tech = matchTechniqueToken(upper);
+      if (tech) {
+        techniqueCode = tech;
+        i++;
+        continue;
+      }
+    }
+
+    const ser = matchSeriesToken(upper);
+    if (ser && !seriesCodes.includes(ser)) {
+      seriesCodes.push(ser);
+      i++;
+      continue;
+    }
+
+    break;
   }
 
-  let title = titlePart.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
-  if (!title && i < tokens.length) title = tokens.slice(i).join(' ').trim();
+  let title = rawTokens
+    .slice(i)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (!title) title = String(workId || '').toUpperCase() || 'Sans titre';
 
-  const formatCode = format && knownFormats?.has(format) ? format : pickFormatCodeFromStem(codePart);
-  const validFormat = formatCode && knownFormats?.has(formatCode) ? formatCode : null;
+  const validFormat =
+    formatCode && knownFormats?.has(formatCode)
+      ? formatCode
+      : (() => {
+          const picked = pickFormatCodeFromStem(s);
+          return picked && knownFormats?.has(picked) ? picked : null;
+        })();
   const validTechnique =
-    technique && knownTechniques?.has(technique) ? technique : null;
+    techniqueCode && knownTechniques?.has(techniqueCode) ? techniqueCode : null;
 
   return {
     seriesCodes,
@@ -271,8 +325,17 @@ export function buildWorkRecords(opts: {
   knownFormats: Set<string>;
   knownTechniques: Set<string>;
   knownSeries: Set<string>;
+  photoStatusCode?: string | null;
 }) {
-  const { workId, originalName, sortOrder, knownFormats, knownTechniques, knownSeries } = opts;
+  const {
+    workId,
+    originalName,
+    sortOrder,
+    knownFormats,
+    knownTechniques,
+    knownSeries,
+    photoStatusCode,
+  } = opts;
   const catalogueBasename = catalogueBasenameForWorkId(workId, originalName);
   const parsed = parseImportMetadata(stemFromFilename(originalName), {
     knownSeries,
@@ -281,23 +344,28 @@ export function buildWorkRecords(opts: {
     workId,
   });
   const imageExt = extFromFilename(originalName) || 'jpeg';
+  const photoCode = photoStatusCode
+    ? String(photoStatusCode).trim().toUpperCase()
+    : null;
+
+  const dbRow: Record<string, unknown> = {
+    id: workId,
+    title: parsed.title,
+    filename_original: originalName,
+    year: parsed.year,
+    format_code: parsed.formatCode,
+    technique_code: parsed.techniqueCode,
+    publication_status_code: 'M',
+    collector_code: null,
+    width_cm: null,
+    height_cm: null,
+    sort_order: sortOrder,
+    image_ext: imageExt === 'jpg' ? 'jpeg' : imageExt,
+  };
+  if (photoCode) dbRow.photo_status_code = photoCode;
 
   return {
-    dbRow: {
-      id: workId,
-      title: parsed.title,
-      filename_original: originalName,
-      year: parsed.year,
-      format_code: parsed.formatCode,
-      technique_code: parsed.techniqueCode,
-      publication_status_code: 'M',
-      photo_status_code: 'OK',
-      collector_code: null,
-      width_cm: null,
-      height_cm: null,
-      sort_order: sortOrder,
-      image_ext: imageExt === 'jpg' ? 'jpeg' : imageExt,
-    },
+    dbRow,
     seriesCodes: [...parsed.seriesCodes],
     mediaRel: `catalogue/${catalogueBasename}`,
   };

@@ -321,7 +321,7 @@
       case 'publication':
         return String(work.publication_status_code || 'N').trim().toUpperCase();
       case 'photo':
-        return String(work.photo_status_code || 'OK').trim().toUpperCase();
+        return String(work.photo_status_code || '').trim().toUpperCase();
       case 'order':
       default:
         return Number.isFinite(Number(work.sort_order)) ? Number(work.sort_order) : msIdSortKey(work.id);
@@ -1135,11 +1135,10 @@
       tr.appendChild(
         createCodeSelectCell(work, tr, 'photo_status_code', 'photo', meta.photo_statuses, {
           placeholder: '—',
-          allowEmpty: false,
+          allowEmpty: true,
           allowNew: false,
           labelMode: 'code-label',
           closedLabelMode: 'code',
-          defaultValue: 'OK',
           extraClass: 'works-select-compact works-select-photo',
         })
       );
@@ -1178,7 +1177,7 @@
         format_code: w.format_code,
         technique_code: w.technique_code,
         publication_status_code: w.publication_status_code || 'N',
-        photo_status_code: w.photo_status_code || 'OK',
+        photo_status_code: w.photo_status_code || null,
         collector_code: w.collector_code,
         width_cm: w.width_cm,
         height_cm: w.height_cm,
@@ -1256,6 +1255,7 @@
   const importPreviewTbody = document.getElementById('works-import-preview-tbody');
   const importNextIdEl = document.getElementById('works-import-next-id');
   const importNextIdWrap = document.getElementById('works-import-next-id-wrap');
+  const importPhotoStatusEl = document.getElementById('works-import-photo-status');
 
   /** @type {File[]} */
   let importSelectedFiles = [];
@@ -1299,6 +1299,29 @@
     } catch {
       importNextIdEl.textContent = '—';
     }
+  }
+
+  function renderImportPhotoStatusSelect() {
+    if (!importPhotoStatusEl) return;
+    const prev = importPhotoStatusEl.value;
+    importPhotoStatusEl.innerHTML = '';
+    const empty = document.createElement('option');
+    empty.value = '';
+    empty.textContent = '—';
+    importPhotoStatusEl.appendChild(empty);
+    for (const s of meta.photo_statuses || []) {
+      const opt = document.createElement('option');
+      opt.value = s.code;
+      opt.textContent = s.label ? s.code + ' — ' + s.label : s.code;
+      importPhotoStatusEl.appendChild(opt);
+    }
+    importPhotoStatusEl.value = prev || '';
+  }
+
+  function getImportPhotoStatusCode() {
+    if (!importPhotoStatusEl) return null;
+    const code = String(importPhotoStatusEl.value || '').trim().toUpperCase();
+    return code || null;
   }
 
   function getImportMode() {
@@ -1413,6 +1436,7 @@
     importPlan = [];
     if (importFilesEl) importFilesEl.value = '';
     updateImportModeUi();
+    renderImportPhotoStatusSelect();
     updateImportEnvNotice();
     await loadNextSequentialId();
     renderImportPreview([]);
@@ -1426,6 +1450,7 @@
   async function runWorksImport() {
     if (!importSelectedFiles.length || !importSubmitBtn) return;
     const importMode = getImportMode();
+    const photoStatusCode = getImportPhotoStatusCode();
     const batchSize = isLocalDevServer() ? 12 : 2;
     importSubmitBtn.disabled = true;
     if (importStatusEl) {
@@ -1451,6 +1476,7 @@
           body: JSON.stringify({
             token,
             import_mode: importMode,
+            photo_status_code: photoStatusCode,
             files,
           }),
         });

@@ -154,7 +154,9 @@ function normalizeWorkInput(raw) {
       format_code: String(raw.format_code || '').trim().toUpperCase() || null,
       technique_code: String(raw.technique_code || '').trim().toUpperCase() || null,
       publication_status_code: String(raw.publication_status_code || 'N').trim().toUpperCase(),
-      photo_status_code: String(raw.photo_status_code || 'OK').trim().toUpperCase(),
+      photo_status_code: raw.photo_status_code
+        ? String(raw.photo_status_code).trim().toUpperCase()
+        : null,
       collector_code: String(raw.collector_code || '').trim().toUpperCase() || null,
       width_cm: parseCm(raw.width_cm),
       height_cm: parseCm(raw.height_cm),
@@ -245,6 +247,7 @@ async function handleImportPlan(body) {
 
 async function handleImportWorks(body, { writeFiles }) {
   const importMode = normalizeImportMode(body.import_mode || body.id_mode);
+  const photoStatusCode = String(body.photo_status_code || '').trim().toUpperCase() || null;
   const files = Array.isArray(body.files) ? body.files : [];
   if (!files.length) {
     return { ok: false, status: 400, error: 'aucun fichier à importer' };
@@ -361,6 +364,7 @@ async function handleImportWorks(body, { writeFiles }) {
       knownFormats,
       knownTechniques,
       knownSeries,
+      photoStatusCode,
     });
     sortOrder += 1;
 

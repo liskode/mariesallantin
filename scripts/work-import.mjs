@@ -4,7 +4,7 @@
  */
 import fs from 'fs';
 import path from 'path';
-import { pickFormatCodeFromStem } from './parse-format-from-filename.mjs';
+import { isFormatLikeCode, pickFormatCodeFromStem } from './parse-format-from-filename.mjs';
 
 const MS_PREFIX_RE = /^(MS\d{4})/i;
 const YEAR_RE = /^(19|20)\d{2}$/;
@@ -126,29 +126,45 @@ export function catalogueBasenameForWorkId(workId, originalName) {
 }
 
 /**
- * Sépare la partie codes (majuscules) du titre (dès la première minuscule).
+ * Découpe le nom (sans extension) en segments séparés par - ou _.
  */
-export function splitImportStem(stem) {
-  const s = String(stem || '').trim();
-  const m = s.match(/[a-z]/);
-  if (m && m.index != null) {
-    return {
-      codePart: s.slice(0, m.index).replace(/[-_]+$/, ''),
-      titlePart: s.slice(m.index).replace(/^[-_]+/, ''),
-    };
-  }
-  return { codePart: s, titlePart: '' };
+function tokenizeImportStem(stem) {
+  return String(stem || '')
+    .trim()
+    .split(/[-_]+/)
+    .map((t) => t.trim())
+    .filter(Boolean);
 }
 
-function codeTokensFromPart(codePart) {
-  return String(codePart || '')
-    .split(/[-_]+/)
-    .map((t) => t.trim().toUpperCase())
-    .filter(Boolean);
+function tokenLooksLikeTitle(tok) {
+  if (/[a-zàâäéèêëïîôùûüç]/.test(tok)) return true;
+  if (/\s/.test(tok) && tok.length > 5) return true;
+  return false;
+}
+
+function matchSeriesToken(tok) {
+  const u = String(tok || '').trim().toUpperCase();
+  if (!/^[A-Z]{5}$/.test(u)) return null;
+  return u;
+}
+
+function matchFormatToken(tok, knownFormats) {
+  const u = String(tok || '').trim().toUpperCase();
+  if (knownFormats?.has(u)) return u;
+  if (isFormatLikeCode(u)) return u;
+  return null;
+}
+
+function matchTechniqueToken(tok, knownTechniques) {
+  const u = String(tok || '').trim().toUpperCase();
+  if (!/^[A-Z]{3}$/.test(u)) return null;
+  return u;
 }
 
 /**
  * Extrait séries, année, technique, format et titre depuis le nom importé (mode ajout).
+ * Les codes peuvent apparaître dans n'importe quel ordre avant le titre ; le titre
+ * reprend la suite sans répéter les codes (ex. après LICOR_HOFO_1984_AST_…).
  */
 export function parseImportMetadata(stem, opts = {}) {
   const { knownSeries, knownTechniques, knownFormats, workId } = opts;
@@ -156,59 +172,78 @@ export function parseImportMetadata(stem, opts = {}) {
   const ms = extractMsIdFromStem(s);
   if (ms) s = s.slice(ms.length).replace(/^[-_]+/, '');
 
-  const { codePart, titlePart } = splitImportStem(s);
-  const tokens = codeTokensFromPart(codePart);
+  const rawTokens = tokenizeImportStem(s);
   const seriesCodes = [];
+  let year = null;
+  let techniqueCode = null;
+  let formatCode = null;
   let i = 0;
 
-  while (i < tokens.length) {
-    const tok = tokens[i];
-    if (!/^[A-Z]{5}$/.test(tok)) break;
-    if (knownSeries?.size && !knownSeries.has(tok)) break;
-    if (!seriesCodes.includes(tok)) seriesCodes.push(tok);
+  while (i < rawTokens.length) {
+    const tok = rawTokens[i];
+    if (tokenLooksLikeTitle(tok)) break;
+    const ser = matchSeriesToken(tok);
+    if (!ser) break;
+    if (!seriesCodes.includes(ser)) seriesCodes.push(ser);
     i++;
   }
 
-  let year = null;
-  if (i < tokens.length && YEAR_RE.test(tokens[i])) {
-    year = parseInt(tokens[i], 10);
-    i++;
-  }
+  while (i < rawTokens.length) {
+    const tok = rawTokens[i];
+    if (tokenLooksLikeTitle(tok)) break;
 
-  let technique = null;
-  if (i < tokens.length && /^[A-Z]{3}$/.test(tokens[i])) {
-    const tok = tokens[i];
-    if (!knownTechniques?.size || knownTechniques.has(tok)) technique = tok;
-    else technique = tok;
-    i++;
-  }
+    const upper = tok.toUpperCase();
 
-  let format = null;
-  if (i < tokens.length) {
-    const tok = tokens[i];
-    const fromKnown = knownFormats?.has(tok);
-    const fromStem = pickFormatCodeFromStem(codePart);
-    if (fromKnown || tok === fromStem || /^\d{3}[FPC]$/.test(tok) || /^HF\d{2}$/.test(tok)) {
-      format = fromKnown ? tok : fromStem || tok;
+    if (year == null && YEAR_RE.test(upper)) {
+      year = parseInt(upper, 10);
       i++;
+      continue;
     }
+
+    if (formatCode == null) {
+      const fmt = matchFormatToken(upper, knownFormats);
+      if (fmt) {
+        formatCode = fmt;
+        i++;
+        continue;
+      }
+    }
+
+    if (techniqueCode == null) {
+      const tech = matchTechniqueToken(upper, knownTechniques);
+      if (tech) {
+        techniqueCode = tech;
+        i++;
+        continue;
+      }
+    }
+
+    const ser = matchSeriesToken(upper);
+    if (ser && !seriesCodes.includes(ser)) {
+      seriesCodes.push(ser);
+      i++;
+      continue;
+    }
+
+    break;
   }
 
-  let title = titlePart.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
-  if (!title && i < tokens.length) {
-    title = tokens
-      .slice(i)
-      .join(' ')
-      .replace(/_/g, ' ')
-      .trim();
-  }
+  let title = rawTokens
+    .slice(i)
+    .join(' ')
+    .replace(/\s+/g, ' ')
+    .trim();
   if (!title) title = String(workId || '').toUpperCase() || 'Sans titre';
 
-  const formatCode =
-    format && knownFormats?.has(format) ? format : pickFormatCodeFromStem(codePart);
-  const validFormat = formatCode && knownFormats?.has(formatCode) ? formatCode : null;
+  const validFormat =
+    formatCode && knownFormats?.has(formatCode)
+      ? formatCode
+      : (() => {
+          const picked = pickFormatCodeFromStem(s);
+          return picked && knownFormats?.has(picked) ? picked : null;
+        })();
   const validTechnique =
-    technique && knownTechniques?.has(technique) ? technique : null;
+    techniqueCode && knownTechniques?.has(techniqueCode) ? techniqueCode : null;
 
   return {
     seriesCodes,
@@ -326,6 +361,7 @@ export function buildWorkRecords(opts) {
     knownFormats,
     knownTechniques,
     knownSeries,
+    photoStatusCode,
   } = opts;
   const catalogueBasename = catalogueBasenameForWorkId(workId, originalName);
   const parsed = parseImportMetadata(stemFromFilename(originalName), {
@@ -336,6 +372,9 @@ export function buildWorkRecords(opts) {
   });
   const imageExt = extFromFilename(originalName) || 'jpeg';
   const mediaRel = `catalogue/${catalogueBasename}`;
+  const photoCode = photoStatusCode
+    ? String(photoStatusCode).trim().toUpperCase()
+    : null;
 
   const dbRow = {
     id: workId,
@@ -345,22 +384,22 @@ export function buildWorkRecords(opts) {
     format_code: parsed.formatCode,
     technique_code: parsed.techniqueCode,
     publication_status_code: 'M',
-    photo_status_code: 'OK',
     collector_code: null,
     width_cm: null,
     height_cm: null,
     sort_order: sortOrder,
     image_ext: imageExt === 'jpg' ? 'jpeg' : imageExt,
   };
+  if (photoCode) dbRow.photo_status_code = photoCode;
 
   const jsonRow = {
     id: workId,
     media: mediaRel,
     title: parsed.title,
     series: [...parsed.seriesCodes],
-    photo: 'OK',
     publish: 'VAL',
   };
+  if (photoCode) jsonRow.photo = photoCode;
 
   return {
     dbRow,

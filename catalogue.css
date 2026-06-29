@@ -2340,6 +2340,14 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   background: #fff8e1;
 }
 
+.works-import-photo-label {
+  margin-top: 0;
+}
+
+.works-import-photo-select {
+  max-width: 280px;
+}
+
 .works-import-fieldset legend {
   padding: 0 6px;
   font-size: 0.85rem;
