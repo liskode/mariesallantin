@@ -1863,7 +1863,7 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 }
 
 .works-editor-table col.works-col-format {
-  width: calc(9ch + 1.4rem);
+  width: calc(10ch + 1.4rem + 14px);
 }
 
 .works-editor-table col.works-col-technique {
@@ -2012,7 +2012,7 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 
 .works-select-format {
   width: 100%;
-  max-width: 9ch;
+  max-width: 10ch;
 }
 
 .works-format-cell-inner {
