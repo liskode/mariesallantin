@@ -1735,6 +1735,11 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   justify-content: space-between;
 }
 
+.works-editor-edit-tools {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
 .works-editor-toolbar-left {
   display: flex;
   flex-wrap: wrap;
