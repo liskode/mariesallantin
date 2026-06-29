@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250630-5" />
+  <link rel="stylesheet" href="catalogue.css?v=20250630-7" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -84,13 +84,21 @@
                   </select>
                 </label>
               </div>
+              <div class="catalogue-edit-tools works-editor-main-tools">
+                <button type="button" class="legend-editor-btn legend-editor-btn--save legend-editor-btn--save-clean" id="works-save-btn" disabled>
+                  Modifications enregistrées
+                </button>
+                <button type="button" class="legend-editor-btn legend-editor-btn--with-picto" id="works-reload-btn">
+                  <img src="images/reload.png" alt="" class="legend-editor-btn-picto" width="18" height="18" />
+                  <span>Recharger</span>
+                </button>
+              </div>
             </div>
-            <div class="catalogue-edit-tools works-editor-edit-tools">
-              <button type="button" class="legend-editor-btn legend-editor-btn--save legend-editor-btn--save-clean" id="works-save-btn" disabled>
-                Modifications enregistrées
+            <div class="catalogue-edit-tools works-editor-import-tools">
+              <button type="button" class="legend-editor-btn legend-editor-btn--primary legend-editor-btn--with-picto works-import-toolbar-btn" id="works-import-btn">
+                <img src="images/import.png" alt="" class="legend-editor-btn-picto" width="18" height="18" />
+                <span>Importer des œuvres</span>
               </button>
-              <button type="button" class="legend-editor-btn" id="works-reload-btn">Recharger</button>
-              <button type="button" class="legend-editor-btn legend-editor-btn--primary works-import-toolbar-btn" id="works-import-btn">Importer des œuvres</button>
             </div>
           </div>
         </div>
@@ -201,9 +209,7 @@
         <h2 class="works-import-dialog-title">Importer des œuvres</h2>
         <button type="button" class="works-import-dialog-close" id="works-import-close" aria-label="Fermer">×</button>
       </header>
-      <p class="works-import-dialog-hint" id="works-import-hint">
-        Chargez des images JPEG/PNG/WebP. Les fiches sont créées dans Supabase avec les séries choisies.
-      </p>
+      <div id="works-import-env-notice" class="works-import-env-notice" role="status" aria-live="polite"></div>
       <div class="works-import-form">
         <label class="works-import-label">
           Images
@@ -248,7 +254,7 @@
     </div>
   </dialog>
 
-  <script src="editor-common.js?v=20250630-5"></script>
-  <script src="works-editor.js?v=20250630-5"></script>
+  <script src="editor-common.js?v=20250630-7"></script>
+  <script src="works-editor.js?v=20250630-7"></script>
 </body>
 </html>

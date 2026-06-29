@@ -1251,7 +1251,7 @@
   const importCancelBtn = document.getElementById('works-import-cancel');
   const importSubmitBtn = document.getElementById('works-import-submit');
   const importStatusEl = document.getElementById('works-import-status');
-  const importHintEl = document.getElementById('works-import-hint');
+  const importEnvNoticeEl = document.getElementById('works-import-env-notice');
   const importPreviewWrap = document.getElementById('works-import-preview-wrap');
   const importPreviewTbody = document.getElementById('works-import-preview-tbody');
   const importNextIdEl = document.getElementById('works-import-next-id');
@@ -1261,11 +1261,32 @@
   /** @type {Array<object>} */
   let importPlan = [];
 
-  function updateImportHint() {
-    if (!importHintEl) return;
-    importHintEl.textContent = isLocalDevServer()
-      ? 'Import complet : images dans media/catalogue/, fiches Supabase, works.json et miniatures WebP.'
-      : 'En ligne : fiches Supabase uniquement. Pour enregistrer les images sur le site, utilisez npm run works:api en local ou déposez les fichiers dans media/catalogue/ (noms indiqués après import).';
+  function updateImportEnvNotice() {
+    const el = importEnvNoticeEl;
+    if (!el) return;
+    if (isLocalDevServer()) {
+      el.className = 'works-import-env-notice works-import-env-notice--local';
+      el.innerHTML =
+        '<strong class="works-import-env-title">Import complet (API locale)</strong>' +
+        '<p>Les images sont copiées dans <code>media/catalogue/</code>, les fiches sont enregistrées dans Supabase, ' +
+        '<code>media/works.json</code> et les miniatures WebP sont mis à jour.</p>' +
+        '<p>Après import, commitez et publiez les fichiers <code>media/</code> pour les rendre visibles sur le site.</p>';
+      return;
+    }
+    el.className = 'works-import-env-notice works-import-env-notice--online';
+    el.innerHTML =
+      '<strong class="works-import-env-title">Import en ligne — les images ne sont pas enregistrées sur le site</strong>' +
+      '<p>Depuis <code>mariesallantin.art</code>, seules les <strong>fiches Supabase</strong> sont créées ou mises à jour. ' +
+      'Aucun fichier n’est écrit dans <code>media/catalogue/</code> : les vignettes du catalogue resteront vides ' +
+      'tant que les images ne sont pas ajoutées au dépôt.</p>' +
+      '<p><strong>Pour un import complet (images + base + works.json)&nbsp;:</strong></p>' +
+      '<ol>' +
+      '<li>Ouvrir un terminal dans le dossier du projet</li>' +
+      '<li>Exécuter <code>npm run works:api</code></li>' +
+      '<li>Ouvrir <code>http://127.0.0.1:47835/</code> dans le navigateur</li>' +
+      '<li>Se connecter (mot de passe MS75) et cliquer sur <strong>Importer des œuvres</strong></li>' +
+      '<li>Commiter et publier les fichiers modifiés sous <code>media/</code></li>' +
+      '</ol>';
   }
 
   async function loadNextSequentialId() {
@@ -1402,7 +1423,7 @@
     importPlan = [];
     if (importFilesEl) importFilesEl.value = '';
     renderImportSeriesCheckboxes();
-    updateImportHint();
+    updateImportEnvNotice();
     await loadNextSequentialId();
     renderImportPreview([]);
     if (importStatusEl) {
@@ -1425,7 +1446,6 @@
 
     let lastWorks = worksList;
     let totalOk = 0;
-    const notices = [];
 
     try {
       for (let i = 0; i < importSelectedFiles.length; i += batchSize) {
@@ -1452,7 +1472,6 @@
         }
         lastWorks = j.works || lastWorks;
         totalOk += (j.imported || []).filter((row) => row.status === 'ok').length;
-        if (j.notice) notices.push(j.notice);
       }
 
       worksList = lastWorks;
@@ -1464,8 +1483,9 @@
       if (importDialog) importDialog.close();
 
       let msg = totalOk + ' œuvre(s) importée(s).';
-      if (!isLocalDevServer() && notices.length) {
-        msg += ' ' + notices[0];
+      if (!isLocalDevServer()) {
+        msg +=
+          ' Les images ne sont pas sur le serveur : lancez npm run works:api en local pour un import fichier complet, puis publiez media/.';
       }
       setStatus(msg);
     } catch (e) {

@@ -1735,9 +1735,30 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   justify-content: space-between;
 }
 
-.works-editor-edit-tools {
+.works-editor-main-tools {
+  flex-shrink: 0;
+}
+
+.works-editor-import-tools {
   margin-left: auto;
   flex-shrink: 0;
+}
+
+.legend-editor-btn--with-picto {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-editor-btn-picto {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.works-import-toolbar-btn .legend-editor-btn-picto {
+  filter: brightness(0) invert(1);
 }
 
 .works-editor-toolbar-left {
@@ -2219,6 +2240,53 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   cursor: pointer;
   color: var(--secondary);
   padding: 0 4px;
+}
+
+.works-import-env-notice {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.works-import-env-notice p {
+  margin: 0 0 8px;
+}
+
+.works-import-env-notice p:last-child {
+  margin-bottom: 0;
+}
+
+.works-import-env-notice--local {
+  background: #e8f5e9;
+  border: 1px solid #a5d6a7;
+  color: #1b5e20;
+}
+
+.works-import-env-notice--online {
+  background: #fff8e1;
+  border: 1px solid #ffe082;
+  color: #4e342e;
+}
+
+.works-import-env-notice strong.works-import-env-title {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.92rem;
+}
+
+.works-import-env-notice ol {
+  margin: 6px 0 0;
+  padding-left: 1.3rem;
+}
+
+.works-import-env-notice li {
+  margin: 4px 0;
+}
+
+.works-import-env-notice code {
+  font-size: 0.92em;
 }
 
 .works-import-dialog-hint {
