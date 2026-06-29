@@ -14,6 +14,9 @@
   const PRODUCTION_SERIES_API =
     'https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/series-api';
   const NEW_OPTION_VALUE = '__new__';
+  /** Écart relatif H/L (hauteur ÷ largeur) : vert < 5 %, orange 5–10 %, rouge > 10 %. */
+  const FORMAT_RATIO_OK = 0.05;
+  const FORMAT_RATIO_WARN = 0.10;
   const RASTER_EXT = new Set([
     '.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tif', '.tiff', '.avif',
   ]);
@@ -22,6 +25,8 @@
   let resolvedApiBase = '';
   /** @type {Map<string, string> | null} */
   let workMediaById = null;
+  /** @type {Map<string, { w: number, h: number } | null> | null} */
+  let workImageDimensionsById = null;
   /** @type {Array<object>} */
   let worksList = [];
   /** @type {object} */
@@ -271,16 +276,201 @@
   async function loadWorksCatalog() {
     if (workMediaById) return;
     workMediaById = new Map();
+    workImageDimensionsById = new Map();
     try {
       const r = await fetch(MEDIA_BASE + 'works.json');
       if (r.ok) {
         const j = await r.json();
         for (const w of j.works || []) {
           if (w.id && w.media) workMediaById.set(w.id, String(w.media));
+          const dim = parseDimensionsPx(w.dimensions);
+          if (w.id && dim) workImageDimensionsById.set(w.id, dim);
         }
       }
     } catch {
       /* optionnel */
+    }
+  }
+
+  function parseDimensionsPx(str) {
+    const s = String(str || '').trim();
+    const m = s.match(/(\d+)\s*[×x]\s*(\d+)/i);
+    if (!m) return null;
+    const w = parseInt(m[1], 10);
+    const h = parseInt(m[2], 10);
+    if (w > 0 && h > 0) return { w, h };
+    return null;
+  }
+
+  /** @returns {Promise<{ w: number, h: number } | null>} */
+  function probeImageNaturalSize(url) {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.onload = () => {
+        const w = img.naturalWidth;
+        const h = img.naturalHeight;
+        if (w > 0 && h > 0) resolve({ w, h });
+        else resolve(null);
+      };
+      img.onerror = () => resolve(null);
+      img.src = url;
+    });
+  }
+
+  function relativeFormatHeightWidthDelta(imgW, imgH, fmtWcm, fmtHcm) {
+    const imgHl = imgH / imgW;
+    const fmtHl = fmtHcm / fmtWcm;
+    return Math.abs(imgHl - fmtHl) / fmtHl;
+  }
+
+  function formatRatioLevel(delta) {
+    if (delta < FORMAT_RATIO_OK) return 'ok';
+    if (delta <= FORMAT_RATIO_WARN) return 'warn';
+    return 'bad';
+  }
+
+  function checkFormatImageRatio(formatCode, imgW, imgH) {
+    const code = String(formatCode || '').trim().toUpperCase();
+    if (!code || !imgW || !imgH) return null;
+    const fmt = formatByCode(code);
+    if (!fmt || fmt.width_cm == null || fmt.height_cm == null) return null;
+    const fmtW = Number(fmt.width_cm);
+    const fmtH = Number(fmt.height_cm);
+    if (!(fmtW > 0 && fmtH > 0)) return null;
+    const imgRatio = imgH / imgW;
+    const fmtRatio = fmtH / fmtW;
+    const delta = relativeFormatHeightWidthDelta(imgW, imgH, fmtW, fmtH);
+    return {
+      level: formatRatioLevel(delta),
+      delta,
+      fmtW,
+      fmtH,
+      imgW,
+      imgH,
+      imgRatio,
+      fmtRatio,
+      formatCode: code,
+    };
+  }
+
+  function formatRatioTooltip(result) {
+    if (!result) return '';
+    const pct = Math.round(result.delta * 100);
+    const imgHl = result.imgRatio.toFixed(3);
+    const fmtHl = result.fmtRatio.toFixed(3);
+    const status =
+      result.level === 'ok'
+        ? 'cohérent'
+        : result.level === 'warn'
+          ? 'écart modéré'
+          : 'incohérent';
+    return (
+      result.formatCode +
+      ' : H/L format ' +
+      fmtHl +
+      ' (' +
+      result.fmtH +
+      '×' +
+      result.fmtW +
+      ' cm) · image ' +
+      imgHl +
+      ' (' +
+      result.imgH +
+      '×' +
+      result.imgW +
+      ' px) · ' +
+      status +
+      ' (écart ' +
+      pct +
+      ' %)'
+    );
+  }
+
+  function formatRatioImportMessage(result) {
+    if (!result || result.level === 'ok') return '';
+    return formatRatioTooltip(result);
+  }
+
+  function applyFormatRatioUi(work, select, dot) {
+    if (!dot || !work) return;
+    dot.hidden = true;
+    dot.className = 'works-format-ratio-dot';
+    dot.removeAttribute('title');
+    if (select) select.removeAttribute('title');
+    if (!work.format_code) return;
+    const dims = workImageDimensionsById && workImageDimensionsById.get(work.id);
+    if (!dims || !dims.w || !dims.h) {
+      dot.className = 'works-format-ratio-dot works-format-ratio-dot--pending';
+      dot.hidden = false;
+      dot.title = 'Lecture des dimensions image…';
+      return;
+    }
+    const result = checkFormatImageRatio(work.format_code, dims.w, dims.h);
+    if (!result) return;
+    dot.hidden = false;
+    dot.className = 'works-format-ratio-dot works-format-ratio-dot--' + result.level;
+    const tip = formatRatioTooltip(result);
+    dot.title = tip;
+    if (select) select.title = tip;
+  }
+
+  async function probeWorkImageDimensions(work) {
+    if (!workImageDimensionsById) workImageDimensionsById = new Map();
+    if (workImageDimensionsById.has(work.id)) return;
+    const url = thumbUrlForWork(work);
+    if (!url) {
+      workImageDimensionsById.set(work.id, null);
+      return;
+    }
+    const dim = await probeImageNaturalSize(url);
+    workImageDimensionsById.set(work.id, dim);
+  }
+
+  function updateFormatMismatchInDom(workId) {
+    if (!tbody) return;
+    const tr = tbody.querySelector('tr[data-work-id="' + workId + '"]');
+    if (!tr) return;
+    const work = worksList.find((w) => w.id === workId);
+    if (!work) return;
+    const td = tr.querySelector('.works-format-cell');
+    const select = td && td.querySelector('select');
+    const dot = td && td.querySelector('.works-format-ratio-dot');
+    if (select && dot) applyFormatRatioUi(work, select, dot);
+  }
+
+  function scheduleFormatRatioProbes(pageItems) {
+    if (!workImageDimensionsById) workImageDimensionsById = new Map();
+    for (const work of pageItems) {
+      if (!work.format_code) continue;
+      if (workImageDimensionsById.has(work.id)) {
+        updateFormatMismatchInDom(work.id);
+        continue;
+      }
+      probeWorkImageDimensions(work).then(() => updateFormatMismatchInDom(work.id));
+    }
+  }
+
+  async function probeImportFormatRatios(plan) {
+    if (!importPreviewTbody) return;
+    const rows = importPreviewTbody.querySelectorAll('tr[data-import-format]');
+    for (const tr of rows) {
+      const formatCode = tr.dataset.importFormat;
+      const previewUrl = tr.dataset.importPreviewUrl;
+      if (!formatCode || !previewUrl) continue;
+      const dim = await probeImageNaturalSize(previewUrl);
+      if (!dim) continue;
+      const check = checkFormatImageRatio(formatCode, dim.w, dim.h);
+      if (!check || check.level === 'ok') continue;
+      const tdErr = tr.querySelector('.works-import-format-ratio-cell');
+      const tdMeta = tr.querySelector('.works-import-meta-cell');
+      const msg = formatRatioImportMessage(check);
+      if (tdErr && msg && !tdErr.textContent.includes('H/L format')) {
+        tdErr.textContent = tdErr.textContent ? tdErr.textContent + ' · ' + msg : msg;
+        tdErr.classList.add('works-import-format-ratio--' + check.level);
+      }
+      if (tdMeta && check.level === 'bad') {
+        tdMeta.classList.add('works-import-meta-cell--format-mismatch');
+      }
     }
   }
 
@@ -903,7 +1093,7 @@
 
   function createCodeSelectCell(work, tr, field, kind, options, cfg) {
     const td = document.createElement('td');
-    td.className = 'works-select-cell';
+    td.className = 'works-select-cell' + (kind === 'format' ? ' works-format-cell' : '');
     const select = document.createElement('select');
     select.className = 'legend-select works-row-select' + (cfg.extraClass ? ' ' + cfg.extraClass : '');
 
@@ -953,11 +1143,28 @@
 
       const v = String(select.value || '').trim().toUpperCase();
       work[field] = v && v !== NEW_OPTION_VALUE ? v : null;
-      if (kind === 'format') applyFormatDimensionsToWork(work, work[field]);
+      if (kind === 'format') {
+        applyFormatDimensionsToWork(work, work[field]);
+        const dot = td.querySelector('.works-format-ratio-dot');
+        applyFormatRatioUi(work, select, dot);
+      }
       markDirty(work.id, tr);
     });
 
-    td.appendChild(select);
+    if (kind === 'format') {
+      const wrap = document.createElement('div');
+      wrap.className = 'works-format-cell-inner';
+      const dot = document.createElement('span');
+      dot.className = 'works-format-ratio-dot';
+      dot.hidden = true;
+      dot.setAttribute('aria-hidden', 'true');
+      wrap.appendChild(select);
+      wrap.appendChild(dot);
+      td.appendChild(wrap);
+      applyFormatRatioUi(work, select, dot);
+    } else {
+      td.appendChild(select);
+    }
     return td;
   }
 
@@ -1076,6 +1283,7 @@
 
     for (const work of pageItems) {
       const tr = document.createElement('tr');
+      tr.dataset.workId = work.id;
       if (dirtyIds.has(work.id)) tr.classList.add('legend-editor-row--dirty');
 
       const tdThumb = document.createElement('td');
@@ -1158,6 +1366,7 @@
 
       tbody.appendChild(tr);
     }
+    scheduleFormatRatioProbes(pageItems);
   }
 
   async function loadMeta() {
@@ -1418,6 +1627,7 @@
       tr.appendChild(tdImage);
 
       const tdMeta = document.createElement('td');
+      tdMeta.className = 'works-import-meta-cell';
       if (row.effectiveMode === 'update') {
         tdMeta.textContent = '—';
       } else {
@@ -1433,15 +1643,22 @@
       tr.appendChild(tdMeta);
 
       const tdErr = document.createElement('td');
+      tdErr.className = 'works-import-format-ratio-cell';
       const msgs = [];
       if (row.error) msgs.push(row.error);
       else if (row.warning) msgs.push(row.warning);
       tdErr.textContent = msgs.join(' · ');
       tr.appendChild(tdErr);
 
+      if (row.formatCode && previewUrl && row.effectiveMode !== 'update') {
+        tr.dataset.importFormat = row.formatCode;
+        tr.dataset.importPreviewUrl = previewUrl;
+      }
+
       importPreviewTbody.appendChild(tr);
     }
     importPreviewWrap.hidden = !plan.length;
+    probeImportFormatRatios(plan);
     if (importSubmitBtn && isLocalDevServer()) {
       importSubmitBtn.disabled = okCount === 0;
     }
@@ -1577,6 +1794,7 @@
       worksList = lastWorks;
       dirtyIds.clear();
       workMediaById = null;
+      workImageDimensionsById = null;
       await loadWorksCatalog();
       updateSaveBtn();
       renderTable();
@@ -1619,6 +1837,7 @@
       setStatus('Rechargement…');
       try {
         workMediaById = null;
+        workImageDimensionsById = null;
         await loadWorksCatalog();
         await loadMeta();
         await loadWorks();

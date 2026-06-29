@@ -2015,6 +2015,54 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   max-width: 9ch;
 }
 
+.works-format-cell-inner {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.works-format-cell-inner .works-select-format {
+  flex: 1;
+  min-width: 0;
+}
+
+.works-format-ratio-dot {
+  flex-shrink: 0;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #94a3b8;
+}
+
+.works-format-ratio-dot--pending {
+  background: #cbd5e1;
+  opacity: 0.7;
+}
+
+.works-format-ratio-dot--ok {
+  background: #16a34a;
+}
+
+.works-format-ratio-dot--warn {
+  background: #ea580c;
+}
+
+.works-format-ratio-dot--bad {
+  background: #dc2626;
+}
+
+.works-import-format-ratio--warn {
+  color: #c2410c;
+}
+
+.works-import-format-ratio--bad {
+  color: #b42318;
+}
+
+.works-import-meta-cell--format-mismatch {
+  color: #b42318;
+}
+
 .works-select-technique {
   width: 100%;
   max-width: 4.8rem;
