@@ -1,8 +1,17 @@
 /** Logique d'import œuvres (plan + enregistrement Supabase, sans écriture fichiers). */
 
+import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+
 const MS_PREFIX_RE = /^(MS\d{4})/i;
 const YEAR_RE = /^(19|20)\d{2}$/;
 const RASTER_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tif', '.tiff', '.avif']);
+
+export type ImportMode = 'add' | 'update';
+
+export function normalizeImportMode(raw: string): ImportMode {
+  if (raw === 'update' || raw === 'from_filename') return 'update';
+  return 'add';
+}
 
 export function extractMsIdFromFilename(filename: string): string | null {
   const name = String(filename || '').trim();
@@ -49,97 +58,28 @@ function extFromFilename(filename: string): string {
   return lastDot === -1 ? '' : name.slice(lastDot + 1).toLowerCase();
 }
 
-export function resolveCatalogueBasename(
-  originalName: string,
-  workId: string,
-  idMode: 'sequential' | 'from_filename'
-): string {
-  const name = String(originalName || '').trim();
-  const lastDot = name.lastIndexOf('.');
-  const stem = lastDot === -1 ? name : name.slice(0, lastDot);
-  const ext = lastDot === -1 ? 'jpeg' : name.slice(lastDot + 1);
-  if (idMode === 'from_filename') return name;
-  const id = String(workId).toUpperCase();
-  const existingMs = stem.match(MS_PREFIX_RE)?.[1]?.toUpperCase();
-  let newStem = stem;
-  if (existingMs) newStem = id + stem.slice(existingMs.length);
-  else if (!stem.toUpperCase().startsWith(id)) newStem = stem ? `${id}_${stem}` : id;
-  return `${newStem}.${ext}`;
+export function catalogueBasenameForWorkId(workId: string, originalName: string): string {
+  const ext = extFromFilename(originalName) || 'jpeg';
+  return `${String(workId).toUpperCase()}.${ext}`;
 }
 
-export function planWorkImports(
-  files: Array<{ originalName: string }>,
-  idMode: 'sequential' | 'from_filename',
-  reservedIds: Set<string>,
-  sequentialStart: number
-) {
-  const items: Array<{
-    originalName: string;
-    workId: string;
-    catalogueBasename: string;
-    error: string | null;
-  }> = [];
-  const usedInPlan = new Set(reservedIds);
-  let nextSeq = sequentialStart;
-
-  for (const file of files) {
-    const originalName = String(file.originalName || '').trim();
-    const entry = { originalName, workId: '', catalogueBasename: '', error: null as string | null };
-    if (!originalName) {
-      entry.error = 'nom de fichier manquant';
-      items.push(entry);
-      continue;
-    }
-    if (!isRasterFilename(originalName)) {
-      entry.error = 'format image non pris en charge';
-      items.push(entry);
-      continue;
-    }
-    let workId: string | null = null;
-    if (idMode === 'from_filename') {
-      workId = extractMsIdFromFilename(originalName);
-      if (!workId) entry.error = 'aucun code MS#### au début du nom de fichier';
-    } else {
-      while (usedInPlan.has(formatWorkId(nextSeq))) nextSeq++;
-      workId = formatWorkId(nextSeq);
-      nextSeq++;
-    }
-    if (entry.error) {
-      items.push(entry);
-      continue;
-    }
-    if (!workId || usedInPlan.has(workId)) {
-      entry.error = `code ${workId || '?'} déjà utilisé`;
-      items.push(entry);
-      continue;
-    }
-    usedInPlan.add(workId);
-    entry.workId = workId;
-    entry.catalogueBasename = resolveCatalogueBasename(originalName, workId, idMode);
-    items.push(entry);
+export function splitImportStem(stem: string) {
+  const s = String(stem || '').trim();
+  const m = s.match(/[a-z]/);
+  if (m && m.index != null) {
+    return {
+      codePart: s.slice(0, m.index).replace(/[-_]+$/, ''),
+      titlePart: s.slice(m.index).replace(/^[-_]+/, ''),
+    };
   }
-  return items;
+  return { codePart: s, titlePart: '' };
 }
 
-function parseYearFromStem(stem: string): number | null {
-  for (const tok of stem.toUpperCase().split(/[_\s-]+/).filter(Boolean)) {
-    if (YEAR_RE.test(tok)) {
-      const y = parseInt(tok, 10);
-      if (y >= 1000 && y <= 9999) return y;
-    }
-  }
-  return null;
-}
-
-function parseTechniqueFromStem(stem: string, knownTechniques: Set<string>): string | null {
-  const parts = stem.toUpperCase().split(/[_\s-]+/).filter(Boolean);
-  for (const tok of parts) {
-    if (/^[A-Z]{3}$/.test(tok) && knownTechniques.has(tok)) return tok;
-  }
-  for (const tok of parts) {
-    if (/^[A-Z]{3}$/.test(tok)) return tok;
-  }
-  return null;
+function codeTokensFromPart(codePart: string): string[] {
+  return String(codePart || '')
+    .split(/[-_]+/)
+    .map((t) => t.trim().toUpperCase())
+    .filter(Boolean);
 }
 
 function pickFormatCodeFromStem(stem: string): string | null {
@@ -150,43 +90,206 @@ function pickFormatCodeFromStem(stem: string): string | null {
   return null;
 }
 
-export function titleFromStem(stem: string, workId: string): string {
-  let t = String(stem || '').trim();
-  const id = String(workId || '').toUpperCase();
-  if (id && t.toUpperCase().startsWith(id)) t = t.slice(id.length).replace(/^[_\s.-]+/, '');
-  t = t.replace(/_/g, ' ').replace(/\s+/g, ' ').trim();
-  return t || id || 'Sans titre';
+export function parseImportMetadata(
+  stem: string,
+  opts: {
+    knownSeries?: Set<string>;
+    knownTechniques?: Set<string>;
+    knownFormats?: Set<string>;
+    workId?: string;
+  } = {}
+) {
+  const { knownSeries, knownTechniques, knownFormats, workId } = opts;
+  let s = String(stem || '').trim();
+  const ms = s.match(MS_PREFIX_RE)?.[1]?.toUpperCase();
+  if (ms) s = s.slice(ms.length).replace(/^[-_]+/, '');
+
+  const { codePart, titlePart } = splitImportStem(s);
+  const tokens = codeTokensFromPart(codePart);
+  const seriesCodes: string[] = [];
+  let i = 0;
+
+  while (i < tokens.length) {
+    const tok = tokens[i];
+    if (!/^[A-Z]{5}$/.test(tok)) break;
+    if (knownSeries?.size && !knownSeries.has(tok)) break;
+    if (!seriesCodes.includes(tok)) seriesCodes.push(tok);
+    i++;
+  }
+
+  let year: number | null = null;
+  if (i < tokens.length && YEAR_RE.test(tokens[i])) {
+    year = parseInt(tokens[i], 10);
+    i++;
+  }
+
+  let technique: string | null = null;
+  if (i < tokens.length && /^[A-Z]{3}$/.test(tokens[i])) {
+    technique = tokens[i];
+    i++;
+  }
+
+  let format: string | null = null;
+  if (i < tokens.length) {
+    const tok = tokens[i];
+    const fromStem = pickFormatCodeFromStem(codePart);
+    if (knownFormats?.has(tok) || tok === fromStem || /^\d{3}[FPC]$/.test(tok)) {
+      format = knownFormats?.has(tok) ? tok : fromStem || tok;
+      i++;
+    }
+  }
+
+  let title = titlePart.replace(/[-_]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!title && i < tokens.length) title = tokens.slice(i).join(' ').trim();
+  if (!title) title = String(workId || '').toUpperCase() || 'Sans titre';
+
+  const formatCode = format && knownFormats?.has(format) ? format : pickFormatCodeFromStem(codePart);
+  const validFormat = formatCode && knownFormats?.has(formatCode) ? formatCode : null;
+  const validTechnique =
+    technique && knownTechniques?.has(technique) ? technique : null;
+
+  return {
+    seriesCodes,
+    year,
+    techniqueCode: validTechnique,
+    formatCode: validFormat,
+    title,
+  };
+}
+
+export function planWorkImports(
+  files: Array<{ originalName: string }>,
+  importMode: ImportMode,
+  existingIds: Set<string>,
+  sequentialStart: number,
+  knownSeries: Set<string> | null = null
+) {
+  const items: Array<{
+    originalName: string;
+    workId: string;
+    catalogueBasename: string;
+    importMode: ImportMode;
+    effectiveMode: ImportMode;
+    warning: string | null;
+    error: string | null;
+    seriesCodes: string[];
+    title: string;
+  }> = [];
+  const batchAddIds = new Set<string>();
+  const batchUpdateIds = new Set<string>();
+  let nextSeq = sequentialStart;
+
+  for (const file of files) {
+    const originalName = String(file.originalName || '').trim();
+    const entry = {
+      originalName,
+      workId: '',
+      catalogueBasename: '',
+      importMode,
+      effectiveMode: importMode,
+      warning: null as string | null,
+      error: null as string | null,
+      seriesCodes: [] as string[],
+      title: '',
+    };
+
+    if (!originalName) {
+      entry.error = 'nom de fichier manquant';
+      items.push(entry);
+      continue;
+    }
+    if (!isRasterFilename(originalName)) {
+      entry.error = 'format image non pris en charge';
+      items.push(entry);
+      continue;
+    }
+
+    if (importMode === 'update') {
+      const workId = extractMsIdFromFilename(originalName);
+      if (!workId) {
+        entry.error = 'le nom doit commencer par MS#### (ex. MS0300.jpeg)';
+        items.push(entry);
+        continue;
+      }
+      if (!existingIds.has(workId)) {
+        entry.warning = `${workId} inconnu — sera traité en ajout`;
+        entry.effectiveMode = 'add';
+        while (
+          existingIds.has(formatWorkId(nextSeq)) ||
+          batchAddIds.has(formatWorkId(nextSeq))
+        ) {
+          nextSeq++;
+        }
+        entry.workId = formatWorkId(nextSeq);
+        nextSeq++;
+      } else {
+        entry.workId = workId;
+        if (batchUpdateIds.has(workId)) {
+          entry.error = `code ${workId} en double dans ce lot`;
+          items.push(entry);
+          continue;
+        }
+        batchUpdateIds.add(workId);
+      }
+    } else {
+      while (existingIds.has(formatWorkId(nextSeq)) || batchAddIds.has(formatWorkId(nextSeq))) {
+        nextSeq++;
+      }
+      entry.workId = formatWorkId(nextSeq);
+      nextSeq++;
+    }
+
+    if (entry.effectiveMode === 'add') {
+      if (batchAddIds.has(entry.workId)) {
+        entry.error = `code ${entry.workId} en double dans ce lot`;
+        items.push(entry);
+        continue;
+      }
+      batchAddIds.add(entry.workId);
+    }
+
+    entry.catalogueBasename = catalogueBasenameForWorkId(entry.workId, originalName);
+
+    if (entry.effectiveMode === 'add') {
+      const parsed = parseImportMetadata(stemFromFilename(originalName), {
+        knownSeries: knownSeries || undefined,
+        workId: entry.workId,
+      });
+      entry.seriesCodes = parsed.seriesCodes;
+      entry.title = parsed.title;
+    }
+
+    items.push(entry);
+  }
+  return items;
 }
 
 export function buildWorkRecords(opts: {
   workId: string;
-  catalogueBasename: string;
-  seriesCodes: string[];
+  originalName: string;
   sortOrder: number;
   knownFormats: Set<string>;
   knownTechniques: Set<string>;
+  knownSeries: Set<string>;
 }) {
-  const { workId, catalogueBasename, seriesCodes, sortOrder, knownFormats, knownTechniques } =
-    opts;
-  const stem = stemFromFilename(catalogueBasename);
-  const formatCandidate = pickFormatCodeFromStem(stem);
-  const formatCode =
-    formatCandidate && knownFormats.has(formatCandidate) ? formatCandidate : null;
-  const techniqueCandidate = parseTechniqueFromStem(stem, knownTechniques);
-  const techniqueCode =
-    techniqueCandidate && knownTechniques.has(techniqueCandidate) ? techniqueCandidate : null;
-  const year = parseYearFromStem(stem);
-  const title = titleFromStem(stem, workId);
-  const imageExt = extFromFilename(catalogueBasename) || 'jpeg';
+  const { workId, originalName, sortOrder, knownFormats, knownTechniques, knownSeries } = opts;
+  const catalogueBasename = catalogueBasenameForWorkId(workId, originalName);
+  const parsed = parseImportMetadata(stemFromFilename(originalName), {
+    knownSeries,
+    knownTechniques,
+    knownFormats,
+    workId,
+  });
+  const imageExt = extFromFilename(originalName) || 'jpeg';
 
   return {
     dbRow: {
       id: workId,
-      title,
-      filename_original: catalogueBasename,
-      year,
-      format_code: formatCode,
-      technique_code: techniqueCode,
+      title: parsed.title,
+      filename_original: originalName,
+      year: parsed.year,
+      format_code: parsed.formatCode,
+      technique_code: parsed.techniqueCode,
       publication_status_code: 'M',
       photo_status_code: 'OK',
       collector_code: null,
@@ -195,12 +298,29 @@ export function buildWorkRecords(opts: {
       sort_order: sortOrder,
       image_ext: imageExt === 'jpg' ? 'jpeg' : imageExt,
     },
-    seriesCodes: [...seriesCodes],
+    seriesCodes: [...parsed.seriesCodes],
     mediaRel: `catalogue/${catalogueBasename}`,
   };
 }
 
-import type { SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+export function buildWorkImageUpdate(opts: {
+  workId: string;
+  originalName: string;
+  fileSizeBytes?: number | null;
+}) {
+  const { workId, originalName, fileSizeBytes } = opts;
+  const catalogueBasename = catalogueBasenameForWorkId(workId, originalName);
+  const imageExt = extFromFilename(originalName) || 'jpeg';
+  return {
+    dbPatch: {
+      image_ext: imageExt === 'jpg' ? 'jpeg' : imageExt,
+      file_size_bytes: fileSizeBytes ?? null,
+      updated_at: new Date().toISOString(),
+    },
+    catalogueBasename,
+    mediaRel: `catalogue/${catalogueBasename}`,
+  };
+}
 
 export async function fetchExistingWorkIds(supabase: SupabaseClient): Promise<Set<string>> {
   const { data, error } = await supabase.from('works').select('id');
@@ -238,5 +358,15 @@ export async function persistWorksToSupabase(
       const { error: insErr } = await supabase.from('work_series').insert(payload);
       if (insErr) throw insErr;
     }
+  }
+}
+
+export async function persistWorkImageUpdatesToSupabase(
+  supabase: SupabaseClient,
+  updates: Array<{ workId: string; dbPatch: Record<string, unknown> }>
+) {
+  for (const { workId, dbPatch } of updates) {
+    const { error } = await supabase.from('works').update(dbPatch).eq('id', workId);
+    if (error) throw error;
   }
 }

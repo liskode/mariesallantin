@@ -2324,6 +2324,22 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   border-radius: 8px;
 }
 
+.works-import-radio-detail {
+  font-weight: 400;
+  color: var(--secondary);
+  font-size: 0.86rem;
+}
+
+.works-import-next-id-hint {
+  margin: 8px 0 0;
+  font-size: 0.86rem;
+  color: var(--secondary);
+}
+
+.works-import-preview-row--warn td {
+  background: #fff8e1;
+}
+
 .works-import-fieldset legend {
   padding: 0 6px;
   font-size: 0.85rem;

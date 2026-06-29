@@ -1,10 +1,13 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import { sortFormats } from '../_shared/format-sort.ts';
 import {
+  buildWorkImageUpdate,
   buildWorkRecords,
   fetchExistingWorkIds,
   fetchNextSortOrder,
   formatWorkId,
+  normalizeImportMode,
+  persistWorkImageUpdatesToSupabase,
   persistWorksToSupabase,
   planWorkImports,
   resolveNextSequentialStart,
@@ -199,22 +202,25 @@ Deno.serve(async (req) => {
       if (!checkToken(String(body.token || ''))) {
         return jsonResponse(403, { ok: false, error: 'token incorrect' });
       }
-      const idMode = body.id_mode === 'from_filename' ? 'from_filename' : 'sequential';
+      const importMode = normalizeImportMode(String(body.import_mode || body.id_mode || ''));
       const files = Array.isArray(body.files) ? body.files : [];
       const supabase = createSupabase();
-      const reserved = await fetchExistingWorkIds(supabase);
+      const meta = await fetchMeta(supabase);
+      const knownSeries = new Set((meta.series || []).map((s) => s.code as string));
+      const existingIds = await fetchExistingWorkIds(supabase);
       const sequentialStart = await resolveNextSequentialStart(supabase);
       const plan = planWorkImports(
         files.map((f: { originalName?: string; name?: string }) => ({
           originalName: String(f.originalName || f.name || ''),
         })),
-        idMode,
-        reserved,
-        sequentialStart
+        importMode,
+        existingIds,
+        sequentialStart,
+        knownSeries
       );
       return jsonResponse(200, {
         ok: true,
-        id_mode: idMode,
+        import_mode: importMode,
         next_sequential_id: formatWorkId(sequentialStart),
         plan,
       });
@@ -225,14 +231,7 @@ Deno.serve(async (req) => {
       if (!checkToken(String(body.token || ''))) {
         return jsonResponse(403, { ok: false, error: 'token incorrect' });
       }
-      const idMode = body.id_mode === 'from_filename' ? 'from_filename' : 'sequential';
-      const seriesCodes = [
-        ...new Set(
-          (Array.isArray(body.series_codes) ? body.series_codes : [])
-            .map((c: string) => String(c || '').trim().toUpperCase())
-            .filter(Boolean)
-        ),
-      ];
+      const importMode = normalizeImportMode(String(body.import_mode || body.id_mode || ''));
       const files = Array.isArray(body.files) ? body.files : [];
       if (!files.length) {
         return jsonResponse(400, { ok: false, error: 'aucun fichier à importer' });
@@ -242,19 +241,22 @@ Deno.serve(async (req) => {
       const meta = await fetchMeta(supabase);
       const knownFormats = new Set((meta.formats || []).map((f) => f.code as string));
       const knownTechniques = new Set((meta.techniques || []).map((t) => t.code as string));
-      const reserved = await fetchExistingWorkIds(supabase);
+      const knownSeries = new Set((meta.series || []).map((s) => s.code as string));
+      const existingIds = await fetchExistingWorkIds(supabase);
       const sequentialStart = await resolveNextSequentialStart(supabase);
       const plan = planWorkImports(
         files.map((f: { originalName?: string; name?: string }) => ({
           originalName: String(f.originalName || f.name || ''),
         })),
-        idMode,
-        reserved,
-        sequentialStart
+        importMode,
+        existingIds,
+        sequentialStart,
+        knownSeries
       );
 
       let sortOrder = await fetchNextSortOrder(supabase);
-      const dbRecords: Array<{ dbRow: Record<string, unknown>; seriesCodes: string[] }> = [];
+      const addRecords: Array<{ dbRow: Record<string, unknown>; seriesCodes: string[] }> = [];
+      const imageUpdates: Array<{ workId: string; dbPatch: Record<string, unknown> }> = [];
       const imported: Array<Record<string, unknown>> = [];
       const fileByName = new Map(
         files.map((f: { originalName?: string; name?: string; contentBase64?: string }) => [
@@ -273,27 +275,53 @@ Deno.serve(async (req) => {
           imported.push({ ...item, status: 'error', error: 'contenu image manquant' });
           continue;
         }
+        const buffer = Uint8Array.from(atob(String(src.contentBase64)), (c) => c.charCodeAt(0));
+
+        if (item.effectiveMode === 'update') {
+          const built = buildWorkImageUpdate({
+            workId: item.workId,
+            originalName: item.originalName,
+            fileSizeBytes: buffer.length,
+          });
+          imageUpdates.push({ workId: item.workId, dbPatch: built.dbPatch });
+          imported.push({
+            workId: item.workId,
+            originalName: item.originalName,
+            catalogueBasename: item.catalogueBasename,
+            media: built.mediaRel,
+            effectiveMode: 'update',
+            warning: item.warning,
+            status: 'ok',
+            files_written: false,
+          });
+          continue;
+        }
+
         const built = buildWorkRecords({
           workId: item.workId,
-          catalogueBasename: item.catalogueBasename,
-          seriesCodes,
+          originalName: item.originalName,
           sortOrder,
           knownFormats,
           knownTechniques,
+          knownSeries,
         });
         sortOrder += 1;
-        dbRecords.push(built);
+        addRecords.push(built);
         imported.push({
           workId: item.workId,
           originalName: item.originalName,
           catalogueBasename: item.catalogueBasename,
           media: built.mediaRel,
+          effectiveMode: 'add',
+          warning: item.warning,
+          seriesCodes: built.seriesCodes,
+          title: built.dbRow.title,
           status: 'ok',
           files_written: false,
         });
       }
 
-      if (!dbRecords.length) {
+      if (!addRecords.length && !imageUpdates.length) {
         return jsonResponse(400, {
           ok: false,
           error: 'aucune œuvre importée',
@@ -302,13 +330,14 @@ Deno.serve(async (req) => {
         });
       }
 
-      await persistWorksToSupabase(supabase, dbRecords);
+      if (addRecords.length) await persistWorksToSupabase(supabase, addRecords);
+      if (imageUpdates.length) await persistWorkImageUpdatesToSupabase(supabase, imageUpdates);
       const works = await fetchWorksWithSeries(supabase);
       return jsonResponse(200, {
         ok: true,
         imported,
         works,
-        series_codes: seriesCodes,
+        import_mode: importMode,
         mode: 'database_only',
         files_written: false,
         notice:

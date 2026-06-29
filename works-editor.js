@@ -1116,7 +1116,7 @@
       tr.appendChild(createSeriesPickerCell(work, tr));
       tr.appendChild(
         createCodeSelectCell(work, tr, 'collector_code', 'collector', meta.collectors, {
-          placeholder: 'Aucun',
+          placeholder: '—',
           labelMode: 'name',
           extraClass: 'works-collector-select',
         })
@@ -1255,6 +1255,7 @@
   const importPreviewWrap = document.getElementById('works-import-preview-wrap');
   const importPreviewTbody = document.getElementById('works-import-preview-tbody');
   const importNextIdEl = document.getElementById('works-import-next-id');
+  const importNextIdWrap = document.getElementById('works-import-next-id-wrap');
 
   /** @type {File[]} */
   let importSelectedFiles = [];
@@ -1300,41 +1301,14 @@
     }
   }
 
-  function renderImportSeriesCheckboxes() {
-    const root = document.getElementById('works-import-series-list');
-    if (!root) return;
-    root.innerHTML = '';
-    const list = meta.series || [];
-    if (!list.length) {
-      root.textContent = 'Aucune série chargée.';
-      return;
-    }
-    for (const s of list) {
-      const label = document.createElement('label');
-      label.className = 'works-import-series-item';
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.value = s.code;
-      label.appendChild(cb);
-      const text = document.createTextNode(
-        ' ' + s.code + (s.label ? ' — ' + s.label : '')
-      );
-      label.appendChild(text);
-      root.appendChild(label);
-    }
+  function getImportMode() {
+    const checked = document.querySelector('input[name="works-import-mode"]:checked');
+    return checked && checked.value === 'update' ? 'update' : 'add';
   }
 
-  function getImportSeriesCodes() {
-    const root = document.getElementById('works-import-series-list');
-    if (!root) return [];
-    return [...root.querySelectorAll('input[type="checkbox"]:checked')].map((el) =>
-      String(el.value || '').trim().toUpperCase()
-    );
-  }
-
-  function getImportIdMode() {
-    const checked = document.querySelector('input[name="works-import-id-mode"]:checked');
-    return checked && checked.value === 'from_filename' ? 'from_filename' : 'sequential';
+  function updateImportModeUi() {
+    const mode = getImportMode();
+    if (importNextIdWrap) importNextIdWrap.hidden = mode === 'update';
   }
 
   function renderImportPreview(plan) {
@@ -1344,6 +1318,7 @@
     for (const row of plan) {
       const tr = document.createElement('tr');
       if (row.error) tr.className = 'works-import-preview-row--error';
+      else if (row.warning) tr.className = 'works-import-preview-row--warn';
       else okCount += 1;
 
       const tdFile = document.createElement('td');
@@ -1352,14 +1327,29 @@
 
       const tdCode = document.createElement('td');
       tdCode.textContent = row.workId || '—';
+      if (row.effectiveMode === 'update') {
+        tdCode.textContent += ' (maj image)';
+      } else if (row.effectiveMode === 'add' && row.importMode === 'update') {
+        tdCode.textContent += ' (ajout)';
+      }
       tr.appendChild(tdCode);
 
-      const tdName = document.createElement('td');
-      tdName.textContent = row.catalogueBasename || '—';
-      tr.appendChild(tdName);
+      const tdImage = document.createElement('td');
+      tdImage.textContent = row.catalogueBasename || '—';
+      tr.appendChild(tdImage);
+
+      const tdMeta = document.createElement('td');
+      if (row.effectiveMode === 'update') {
+        tdMeta.textContent = '—';
+      } else {
+        const series = (row.seriesCodes || []).join(' ');
+        const title = row.title || '';
+        tdMeta.textContent = series ? series + (title ? ' · ' + title : '') : title || '—';
+      }
+      tr.appendChild(tdMeta);
 
       const tdErr = document.createElement('td');
-      tdErr.textContent = row.error || '';
+      tdErr.textContent = row.warning || row.error || '';
       tr.appendChild(tdErr);
 
       importPreviewTbody.appendChild(tr);
@@ -1386,7 +1376,7 @@
       method: 'POST',
       body: JSON.stringify({
         token,
-        id_mode: getImportIdMode(),
+        import_mode: getImportMode(),
         files,
       }),
     });
@@ -1422,7 +1412,7 @@
     importSelectedFiles = [];
     importPlan = [];
     if (importFilesEl) importFilesEl.value = '';
-    renderImportSeriesCheckboxes();
+    updateImportModeUi();
     updateImportEnvNotice();
     await loadNextSequentialId();
     renderImportPreview([]);
@@ -1435,8 +1425,7 @@
 
   async function runWorksImport() {
     if (!importSelectedFiles.length || !importSubmitBtn) return;
-    const seriesCodes = getImportSeriesCodes();
-    const idMode = getImportIdMode();
+    const importMode = getImportMode();
     const batchSize = isLocalDevServer() ? 12 : 2;
     importSubmitBtn.disabled = true;
     if (importStatusEl) {
@@ -1461,8 +1450,7 @@
           method: 'POST',
           body: JSON.stringify({
             token,
-            id_mode: idMode,
-            series_codes: seriesCodes,
+            import_mode: importMode,
             files,
           }),
         });
@@ -1549,8 +1537,9 @@
       });
     });
 
-    document.querySelectorAll('input[name="works-import-id-mode"]').forEach((el) => {
+    document.querySelectorAll('input[name="works-import-mode"]').forEach((el) => {
       el.addEventListener('change', () => {
+        updateImportModeUi();
         refreshImportPlan().catch(() => {});
       });
     });

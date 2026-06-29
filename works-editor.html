@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250630-8" />
+  <link rel="stylesheet" href="catalogue.css?v=20250630-10" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -215,19 +215,20 @@
           <input type="file" id="works-import-files" accept="image/jpeg,image/png,image/webp,image/gif" multiple />
         </label>
         <fieldset class="works-import-fieldset">
-          <legend>Code œuvre (MS####)</legend>
+          <legend>Mode d'import</legend>
           <label class="works-import-radio">
-            <input type="radio" name="works-import-id-mode" value="sequential" checked />
-            Numéro séquentiel (<span id="works-import-next-id">…</span>)
+            <input type="radio" name="works-import-mode" value="add" checked />
+            Ajout d'œuvres
+            <span class="works-import-radio-detail">— nouveaux numéros MS#### ; séries, année, technique et titre extraits du nom de fichier</span>
           </label>
           <label class="works-import-radio">
-            <input type="radio" name="works-import-id-mode" value="from_filename" />
-            Code MS du nom de fichier (ex. <code>MS0300_…</code>.jpeg)
+            <input type="radio" name="works-import-mode" value="update" />
+            Mise à jour de l'image
+            <span class="works-import-radio-detail">— remplacement du fichier image à partir du numéro MS#### dans le nom (ex. <code>MS0300.jpeg</code>)</span>
           </label>
-        </fieldset>
-        <fieldset class="works-import-fieldset works-import-series-fieldset">
-          <legend>Séries à attribuer à toutes les œuvres importées</legend>
-          <div id="works-import-series-list" class="works-import-series-list"></div>
+          <p class="works-import-next-id-hint" id="works-import-next-id-wrap">
+            Prochain numéro en ajout : <strong id="works-import-next-id">…</strong>
+          </p>
         </fieldset>
       </div>
       <div class="works-import-preview-wrap" id="works-import-preview-wrap" hidden>
@@ -236,7 +237,8 @@
             <tr>
               <th>Fichier</th>
               <th>Code</th>
-              <th>Nom enregistré</th>
+              <th>Image</th>
+              <th>Séries / titre</th>
               <th></th>
             </tr>
           </thead>
@@ -253,7 +255,7 @@
     </div>
   </dialog>
 
-  <script src="editor-common.js?v=20250630-8"></script>
-  <script src="works-editor.js?v=20250630-8"></script>
+  <script src="editor-common.js?v=20250630-10"></script>
+  <script src="works-editor.js?v=20250630-10"></script>
 </body>
 </html>

@@ -11,11 +11,15 @@ import { createClient } from '@supabase/supabase-js';
 import { sortFormats } from './format-sort.mjs';
 import {
   appendWorksJsonEntries,
+  archiveExistingCatalogueFile,
+  buildWorkImageUpdate,
   buildWorkRecords,
   fetchExistingWorkIds,
   fetchNextSortOrder,
   formatWorkId,
   generateThumbnailForMedia,
+  normalizeImportMode,
+  persistWorkImageUpdatesToSupabase,
   persistWorksToSupabase,
   planWorkImports,
   resolveNextSequentialStart,
@@ -221,31 +225,26 @@ async function fetchWorksWithSeries(supabase) {
 }
 
 async function handleImportPlan(body) {
-  const idMode = body.id_mode === 'from_filename' ? 'from_filename' : 'sequential';
+  const importMode = normalizeImportMode(body.import_mode || body.id_mode);
   const files = Array.isArray(body.files) ? body.files : [];
   const names = files.map((f) => ({ originalName: String(f.originalName || f.name || '') }));
   const worksJsonPath = path.join(root, 'media', 'works.json');
   const supabase = createSupabase();
-  const reserved = await fetchExistingWorkIds(supabase);
+  const meta = await fetchMeta(supabase);
+  const knownSeries = new Set((meta.series || []).map((s) => s.code));
+  const existingIds = await fetchExistingWorkIds(supabase);
   const sequentialStart = await resolveNextSequentialStart(supabase, worksJsonPath);
-  const plan = planWorkImports(names, idMode, reserved, sequentialStart);
+  const plan = planWorkImports(names, importMode, existingIds, sequentialStart, knownSeries);
   return {
     ok: true,
-    id_mode: idMode,
+    import_mode: importMode,
     next_sequential_id: formatWorkId(sequentialStart),
     plan,
   };
 }
 
 async function handleImportWorks(body, { writeFiles }) {
-  const idMode = body.id_mode === 'from_filename' ? 'from_filename' : 'sequential';
-  const seriesCodes = [
-    ...new Set(
-      (Array.isArray(body.series_codes) ? body.series_codes : [])
-        .map((c) => String(c || '').trim().toUpperCase())
-        .filter(Boolean)
-    ),
-  ];
+  const importMode = normalizeImportMode(body.import_mode || body.id_mode);
   const files = Array.isArray(body.files) ? body.files : [];
   if (!files.length) {
     return { ok: false, status: 400, error: 'aucun fichier à importer' };
@@ -253,19 +252,22 @@ async function handleImportWorks(body, { writeFiles }) {
 
   const worksJsonPath = path.join(root, 'media', 'works.json');
   const catalogueDir = path.join(root, 'media', 'catalogue');
+  const archiveDir = path.join(root, 'media', 'Archive');
   const mediaRoot = path.join(root, 'media');
   const supabase = createSupabase();
   const meta = await fetchMeta(supabase);
   const knownFormats = new Set((meta.formats || []).map((f) => f.code));
   const knownTechniques = new Set((meta.techniques || []).map((t) => t.code));
+  const knownSeries = new Set((meta.series || []).map((s) => s.code));
 
-  const reserved = await fetchExistingWorkIds(supabase);
+  const existingIds = await fetchExistingWorkIds(supabase);
   const sequentialStart = await resolveNextSequentialStart(supabase, worksJsonPath);
   const plan = planWorkImports(
     files.map((f) => ({ originalName: String(f.originalName || f.name || '') })),
-    idMode,
-    reserved,
-    sequentialStart
+    importMode,
+    existingIds,
+    sequentialStart,
+    knownSeries
   );
 
   const errors = plan.filter((p) => p.error);
@@ -279,7 +281,8 @@ async function handleImportWorks(body, { writeFiles }) {
   }
 
   let sortOrder = await fetchNextSortOrder(supabase);
-  const dbRecords = [];
+  const addRecords = [];
+  const imageUpdates = [];
   const jsonEntries = [];
   const imported = [];
   const fileByName = new Map(
@@ -305,28 +308,63 @@ async function handleImportWorks(body, { writeFiles }) {
       continue;
     }
 
-    const destPath = path.join(catalogueDir, item.catalogueBasename);
-    if (fs.existsSync(destPath)) {
+    const isUpdate = item.effectiveMode === 'update';
+
+    if (writeFiles) {
+      if (isUpdate) {
+        await archiveExistingCatalogueFile(catalogueDir, archiveDir, item.catalogueBasename);
+      } else {
+        const destPath = path.join(catalogueDir, item.catalogueBasename);
+        if (fs.existsSync(destPath)) {
+          imported.push({
+            ...item,
+            status: 'error',
+            error: `fichier déjà présent : ${item.catalogueBasename}`,
+          });
+          continue;
+        }
+      }
+      await writeCatalogueFile(catalogueDir, item.catalogueBasename, buffer);
+    }
+
+    if (isUpdate) {
+      const built = buildWorkImageUpdate({
+        workId: item.workId,
+        originalName: item.originalName,
+        fileSizeBytes: buffer.length,
+      });
+      if (writeFiles) {
+        try {
+          await generateThumbnailForMedia(mediaRoot, built.mediaRel);
+        } catch (e) {
+          console.warn('[thumb]', item.workId, e?.message || e);
+        }
+      }
+      imageUpdates.push({ workId: item.workId, dbPatch: built.dbPatch, mediaRel: built.mediaRel });
       imported.push({
-        ...item,
-        status: 'error',
-        error: `fichier déjà présent : ${item.catalogueBasename}`,
+        workId: item.workId,
+        originalName: item.originalName,
+        catalogueBasename: item.catalogueBasename,
+        media: built.mediaRel,
+        effectiveMode: 'update',
+        warning: item.warning,
+        status: 'ok',
+        files_written: writeFiles,
       });
       continue;
     }
 
     const built = buildWorkRecords({
       workId: item.workId,
-      catalogueBasename: item.catalogueBasename,
-      seriesCodes,
+      originalName: item.originalName,
       sortOrder,
       knownFormats,
       knownTechniques,
+      knownSeries,
     });
     sortOrder += 1;
 
     if (writeFiles) {
-      await writeCatalogueFile(catalogueDir, item.catalogueBasename, buffer);
       try {
         await generateThumbnailForMedia(mediaRoot, built.mediaRel);
       } catch (e) {
@@ -334,20 +372,23 @@ async function handleImportWorks(body, { writeFiles }) {
       }
     }
 
-    dbRecords.push(built);
+    addRecords.push(built);
     jsonEntries.push(built.jsonRow);
     imported.push({
       workId: item.workId,
       originalName: item.originalName,
       catalogueBasename: item.catalogueBasename,
       media: built.mediaRel,
+      effectiveMode: 'add',
+      warning: item.warning,
+      seriesCodes: built.seriesCodes,
+      title: built.dbRow.title,
       status: 'ok',
       files_written: writeFiles,
     });
   }
 
-  const okRecords = dbRecords.filter((r) => r.dbRow?.id);
-  if (!okRecords.length) {
+  if (!addRecords.length && !imageUpdates.length) {
     return {
       ok: false,
       status: 400,
@@ -357,7 +398,8 @@ async function handleImportWorks(body, { writeFiles }) {
     };
   }
 
-  await persistWorksToSupabase(supabase, okRecords);
+  if (addRecords.length) await persistWorksToSupabase(supabase, addRecords);
+  if (imageUpdates.length) await persistWorkImageUpdatesToSupabase(supabase, imageUpdates);
   if (writeFiles && jsonEntries.length) {
     appendWorksJsonEntries(worksJsonPath, jsonEntries);
   }
@@ -368,7 +410,7 @@ async function handleImportWorks(body, { writeFiles }) {
     status: 200,
     imported,
     works,
-    series_codes: seriesCodes,
+    import_mode: importMode,
     mode: writeFiles ? 'full' : 'database_only',
     files_written: writeFiles,
   };
