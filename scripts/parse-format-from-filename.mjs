@@ -3,6 +3,7 @@
  * Règle : token alphanumérique 4 caractères encadré par « _ » (hors années 19xx/20xx).
  */
 import { stripAccents } from '../legend-filename.mjs';
+import { normalizeSquareFormatCode } from './square-format-codes.mjs';
 
 const YEAR_RE = /^(19|20)\d{2}$/;
 
@@ -54,6 +55,7 @@ export function formatCodeBeforeYear(stem) {
 export function isFormatLikeCode(code) {
   return (
     /^\d{3}[FP]$/.test(code) ||
+    /^\d{3}C$/.test(code) ||
     /^HF\d{2}$/.test(code) ||
     /^HOFO$/.test(code) ||
     /^0HF0$/.test(code) ||
@@ -68,21 +70,23 @@ export function isFormatLikeCode(code) {
  */
 export function pickFormatCodeFromStem(stem) {
   const beforeYear = formatCodeBeforeYear(stem);
-  if (beforeYear) return beforeYear;
+  if (beforeYear) return normalizeSquareFormatCode(beforeYear);
 
   const hits = extractFormatCodeCandidates(stem);
   if (hits.length === 0) return null;
   if (hits.length === 1) {
-    return NON_FORMAT_CODES.has(hits[0]) ? null : hits[0];
+    const code = NON_FORMAT_CODES.has(hits[0]) ? null : hits[0];
+    return code ? normalizeSquareFormatCode(code) : null;
   }
 
   const formatLike = hits.filter(isFormatLikeCode);
-  if (formatLike.length === 1) return formatLike[0];
+  if (formatLike.length === 1) return normalizeSquareFormatCode(formatLike[0]);
 
   const filtered = hits.filter((h) => !NON_FORMAT_CODES.has(h));
-  if (filtered.length === 1) return filtered[0];
+  if (filtered.length === 1) return normalizeSquareFormatCode(filtered[0]);
 
-  return formatLike[0] || filtered[0] || hits[hits.length - 1];
+  const picked = formatLike[0] || filtered[0] || hits[hits.length - 1];
+  return picked ? normalizeSquareFormatCode(picked) : null;
 }
 
 /**

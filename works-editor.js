@@ -431,8 +431,13 @@
     );
   }
 
+  function sortFormatsList(list) {
+    const ec = AUTH();
+    return ec && ec.sortFormats ? ec.sortFormats(list) : sortByCode(list);
+  }
+
   function sortMetaLists() {
-    meta.formats = sortByCode(meta.formats);
+    meta.formats = sortFormatsList(meta.formats);
     meta.techniques = sortByCode(meta.techniques);
     meta.series = sortByCode(meta.series);
     meta.publication_statuses = sortByCode(meta.publication_statuses);
@@ -545,12 +550,12 @@
     return used;
   }
 
-  function appendSelectSeparator(selectEl) {
+  function appendSelectSeparator(selectEl, label) {
     const sep = document.createElement('option');
     sep.disabled = true;
     sep.value = '';
-    sep.textContent = '────────';
-    sep.className = 'works-select-separator';
+    sep.textContent = label ? `— ${label} —` : '────────';
+    sep.className = label ? 'works-select-group-label' : 'works-select-separator';
     selectEl.appendChild(sep);
   }
 
@@ -564,7 +569,7 @@
   /**
    * @param {HTMLSelectElement} selectEl
    * @param {Array<{code:string,label?:string}>} options
-   * @param {{ placeholder?: string, allowEmpty?: boolean, allowNew?: boolean, labelMode?: string, currentValue?: string, groupUsedFirst?: boolean, usedCodesSet?: Set<string> }} cfg
+   * @param {{ placeholder?: string, allowEmpty?: boolean, allowNew?: boolean, labelMode?: string, currentValue?: string, groupUsedFirst?: boolean, usedCodesSet?: Set<string>, groupFormatsByFamily?: boolean }} cfg
    */
   function fillSelectOptions(selectEl, options, cfg) {
     const {
@@ -575,6 +580,7 @@
       currentValue = '',
       groupUsedFirst = false,
       usedCodesSet = null,
+      groupFormatsByFamily = false,
     } = cfg || {};
 
     selectEl.innerHTML = '';
@@ -585,20 +591,49 @@
       selectEl.appendChild(optEmpty);
     }
 
-    const sorted = sortByCode(options);
-    if (groupUsedFirst && usedCodesSet) {
-      const used = sorted.filter((x) => usedCodesSet.has(x.code));
-      const other = sorted.filter((x) => !usedCodesSet.has(x.code));
-      used.forEach((x) => appendSelectOption(selectEl, x, labelMode));
-      if (used.length && other.length) appendSelectSeparator(selectEl);
-      other.forEach((x) => appendSelectOption(selectEl, x, labelMode));
-      if (allowNew && (used.length || other.length)) appendSelectSeparator(selectEl);
+    const appendItems = (items) => {
+      if (groupUsedFirst && usedCodesSet) {
+        const used = items.filter((x) => usedCodesSet.has(x.code));
+        const other = items.filter((x) => !usedCodesSet.has(x.code));
+        used.forEach((x) => appendSelectOption(selectEl, x, labelMode));
+        if (used.length && other.length) appendSelectSeparator(selectEl);
+        other.forEach((x) => appendSelectOption(selectEl, x, labelMode));
+      } else {
+        items.forEach((x) => appendSelectOption(selectEl, x, labelMode));
+      }
+    };
+
+    if (groupFormatsByFamily) {
+      const ec = AUTH();
+      const groups = ec && ec.groupFormatsByFamily ? ec.groupFormatsByFamily(options) : [];
+      if (groups.length) {
+        groups.forEach((g, idx) => {
+          if (g.label) appendSelectSeparator(selectEl, g.label);
+          appendItems(g.items);
+          if (idx < groups.length - 1 && !g.label && groups[idx + 1]?.label) {
+            appendSelectSeparator(selectEl);
+          }
+        });
+      } else {
+        appendItems(sortFormatsList(options));
+      }
     } else {
-      sorted.forEach((x) => appendSelectOption(selectEl, x, labelMode));
-      if (allowNew && sorted.length) appendSelectSeparator(selectEl);
+      const sorted = sortByCode(options);
+      if (groupUsedFirst && usedCodesSet) {
+        const used = sorted.filter((x) => usedCodesSet.has(x.code));
+        const other = sorted.filter((x) => !usedCodesSet.has(x.code));
+        used.forEach((x) => appendSelectOption(selectEl, x, labelMode));
+        if (used.length && other.length) appendSelectSeparator(selectEl);
+        other.forEach((x) => appendSelectOption(selectEl, x, labelMode));
+        if (allowNew && (used.length || other.length)) appendSelectSeparator(selectEl);
+      } else {
+        sorted.forEach((x) => appendSelectOption(selectEl, x, labelMode));
+        if (allowNew && sorted.length) appendSelectSeparator(selectEl);
+      }
     }
 
-    if (allowNew) {
+    if (allowNew && (!groupFormatsByFamily || options.length)) {
+      if (groupFormatsByFamily && options.length) appendSelectSeparator(selectEl);
       const optNew = document.createElement('option');
       optNew.value = NEW_OPTION_VALUE;
       optNew.textContent = '— Nouveau —';
@@ -885,6 +920,7 @@
       labelMode: cfg.labelMode || 'code-label',
       currentValue: work[field] || cfg.defaultValue || '',
       groupUsedFirst: kind === 'format' || kind === 'technique',
+      groupFormatsByFamily: kind === 'format',
       usedCodesSet:
         kind === 'format'
           ? usedFormatCodes()

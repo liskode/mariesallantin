@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
+import { sortFormats } from './format-sort.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -163,7 +164,7 @@ async function fetchCodesWithCounts(supabase) {
   }
 
   return {
-    formats: formats.map((f) => ({ ...f, work_count: formatCounts.get(f.code) || 0 })),
+    formats: sortFormats(formats).map((f) => ({ ...f, work_count: formatCounts.get(f.code) || 0 })),
     techniques: techniques.map((t) => ({ ...t, work_count: techniqueCounts.get(t.code) || 0 })),
   };
 }

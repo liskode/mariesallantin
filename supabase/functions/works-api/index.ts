@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { sortFormats } from '../_shared/format-sort.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -100,7 +101,7 @@ async function fetchMeta(supabase: SupabaseClient) {
     if (r.error) throw r.error;
   }
   return {
-    formats: formats.data || [],
+    formats: sortFormats(formats.data || []),
     techniques: techniques.data || [],
     series: series.data || [],
     collectors: (collectors.data || []).map((c) => ({

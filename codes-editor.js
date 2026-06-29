@@ -214,14 +214,33 @@
   }
 
   function sortCodeLists() {
-    formatsList = sortByCode(formatsList);
+    const ec = window.EditorCommon;
+    formatsList = ec && ec.sortFormats ? ec.sortFormats(formatsList) : sortByCode(formatsList);
     techniquesList = sortByCode(techniquesList);
+  }
+
+  function renderFormatGroupRow(label) {
+    const tr = document.createElement('tr');
+    tr.className = 'codes-format-group-row';
+    const td = document.createElement('td');
+    td.colSpan = 6;
+    td.textContent = label;
+    tr.appendChild(td);
+    formatsTbody.appendChild(tr);
   }
 
   function renderFormats() {
     if (!formatsTbody) return;
     formatsTbody.innerHTML = '';
-    for (const f of formatsList) {
+    const ec = window.EditorCommon;
+    const groups =
+      ec && ec.groupFormatsByFamily
+        ? ec.groupFormatsByFamily(formatsList)
+        : [{ label: null, items: formatsList }];
+
+    for (const group of groups) {
+      if (group.label) renderFormatGroupRow(group.label);
+      for (const f of group.items) {
       const tr = document.createElement('tr');
       tr.dataset.code = f.code;
       if (dirtyFormats.has(f.code)) tr.classList.add('legend-editor-row--dirty');
@@ -262,6 +281,7 @@
       tr.appendChild(tdW);
       appendCountAndDelete(tr, f, 'format');
       formatsTbody.appendChild(tr);
+      }
     }
   }
 

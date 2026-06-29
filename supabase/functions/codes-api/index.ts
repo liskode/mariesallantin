@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { sortFormats } from '../_shared/format-sort.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -107,7 +108,7 @@ async function fetchCodesWithCounts(supabase: SupabaseClient) {
   }
 
   return {
-    formats: formats.map((f) => ({
+    formats: sortFormats(formats).map((f) => ({
       ...f,
       work_count: formatCounts.get(f.code as string) || 0,
     })),

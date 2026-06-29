@@ -8,6 +8,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
+import { sortFormats } from './format-sort.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -159,7 +160,7 @@ async function fetchMeta(supabase) {
     if (r.error) throw r.error;
   }
   return {
-    formats: formats.data || [],
+    formats: sortFormats(formats.data || []),
     techniques: techniques.data || [],
     series: series.data || [],
     collectors: (collectors.data || []).map((c) => ({

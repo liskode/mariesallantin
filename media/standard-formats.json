@@ -60,5 +60,15 @@
   { "code": "060M", "label": "Marine n°60 (130 × 81 cm)", "height_cm": 130, "width_cm": 81 },
   { "code": "080M", "label": "Marine n°80 (146 × 89 cm)", "height_cm": 146, "width_cm": 89 },
   { "code": "100M", "label": "Marine n°100 (162 × 97 cm)", "height_cm": 162, "width_cm": 97 },
-  { "code": "120M", "label": "Marine n°120 (195 × 97 cm)", "height_cm": 195, "width_cm": 97 }
+  { "code": "120M", "label": "Marine n°120 (195 × 97 cm)", "height_cm": 195, "width_cm": 97 },
+
+  { "code": "025C", "label": "Format carré (25cm x 25cm)", "height_cm": 25, "width_cm": 25 },
+  { "code": "050C", "label": "Format carré (50cm x 50cm)", "height_cm": 50, "width_cm": 50 },
+  { "code": "060C", "label": "Format carré (60cm x 60cm)", "height_cm": 60, "width_cm": 60 },
+  { "code": "070C", "label": "Format carré (70cm x 70cm)", "height_cm": 70, "width_cm": 70 },
+  { "code": "080C", "label": "Format carré (80cm x 80cm)", "height_cm": 80, "width_cm": 80 },
+  { "code": "100C", "label": "Format carré (100cm x 100cm)", "height_cm": 100, "width_cm": 100 },
+  { "code": "130C", "label": "Format carré (130cm x 130cm)", "height_cm": 130, "width_cm": 130 },
+  { "code": "150C", "label": "Format carré (150cm x 150cm)", "height_cm": 150, "width_cm": 150 },
+  { "code": "200C", "label": "Format carré (200cm x 200cm)", "height_cm": 200, "width_cm": 200 }
 ]
