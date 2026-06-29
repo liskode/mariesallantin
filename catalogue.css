@@ -1554,6 +1554,7 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   white-space: nowrap;
   font-size: 0.78rem;
   width: 3.5rem;
+  font-variant-numeric: slashed-zero;
 }
 
 .codes-formats-table .codes-label-input {
