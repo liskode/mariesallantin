@@ -1,5 +1,14 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
 import { sortFormats } from '../_shared/format-sort.ts';
+import {
+  buildWorkRecords,
+  fetchExistingWorkIds,
+  fetchNextSortOrder,
+  formatWorkId,
+  persistWorksToSupabase,
+  planWorkImports,
+  resolveNextSequentialStart,
+} from '../_shared/work-import.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -173,6 +182,138 @@ Deno.serve(async (req) => {
       const supabase = createSupabase();
       const works = await fetchWorksWithSeries(supabase);
       return jsonResponse(200, { ok: true, works });
+    }
+
+    if (req.method === 'GET' && path === '/api/works/next-id') {
+      const token = url.searchParams.get('token') || '';
+      if (!checkToken(token)) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      const supabase = createSupabase();
+      const start = await resolveNextSequentialStart(supabase);
+      return jsonResponse(200, { ok: true, next_id: formatWorkId(start) });
+    }
+
+    if (req.method === 'POST' && path === '/api/works/import/plan') {
+      const body = await req.json();
+      if (!checkToken(String(body.token || ''))) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      const idMode = body.id_mode === 'from_filename' ? 'from_filename' : 'sequential';
+      const files = Array.isArray(body.files) ? body.files : [];
+      const supabase = createSupabase();
+      const reserved = await fetchExistingWorkIds(supabase);
+      const sequentialStart = await resolveNextSequentialStart(supabase);
+      const plan = planWorkImports(
+        files.map((f: { originalName?: string; name?: string }) => ({
+          originalName: String(f.originalName || f.name || ''),
+        })),
+        idMode,
+        reserved,
+        sequentialStart
+      );
+      return jsonResponse(200, {
+        ok: true,
+        id_mode: idMode,
+        next_sequential_id: formatWorkId(sequentialStart),
+        plan,
+      });
+    }
+
+    if (req.method === 'POST' && path === '/api/works/import') {
+      const body = await req.json();
+      if (!checkToken(String(body.token || ''))) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      const idMode = body.id_mode === 'from_filename' ? 'from_filename' : 'sequential';
+      const seriesCodes = [
+        ...new Set(
+          (Array.isArray(body.series_codes) ? body.series_codes : [])
+            .map((c: string) => String(c || '').trim().toUpperCase())
+            .filter(Boolean)
+        ),
+      ];
+      const files = Array.isArray(body.files) ? body.files : [];
+      if (!files.length) {
+        return jsonResponse(400, { ok: false, error: 'aucun fichier à importer' });
+      }
+
+      const supabase = createSupabase();
+      const meta = await fetchMeta(supabase);
+      const knownFormats = new Set((meta.formats || []).map((f) => f.code as string));
+      const knownTechniques = new Set((meta.techniques || []).map((t) => t.code as string));
+      const reserved = await fetchExistingWorkIds(supabase);
+      const sequentialStart = await resolveNextSequentialStart(supabase);
+      const plan = planWorkImports(
+        files.map((f: { originalName?: string; name?: string }) => ({
+          originalName: String(f.originalName || f.name || ''),
+        })),
+        idMode,
+        reserved,
+        sequentialStart
+      );
+
+      let sortOrder = await fetchNextSortOrder(supabase);
+      const dbRecords: Array<{ dbRow: Record<string, unknown>; seriesCodes: string[] }> = [];
+      const imported: Array<Record<string, unknown>> = [];
+      const fileByName = new Map(
+        files.map((f: { originalName?: string; name?: string; contentBase64?: string }) => [
+          String(f.originalName || f.name || ''),
+          f,
+        ])
+      );
+
+      for (const item of plan) {
+        if (item.error) {
+          imported.push({ ...item, status: 'error' });
+          continue;
+        }
+        const src = fileByName.get(item.originalName);
+        if (!src?.contentBase64) {
+          imported.push({ ...item, status: 'error', error: 'contenu image manquant' });
+          continue;
+        }
+        const built = buildWorkRecords({
+          workId: item.workId,
+          catalogueBasename: item.catalogueBasename,
+          seriesCodes,
+          sortOrder,
+          knownFormats,
+          knownTechniques,
+        });
+        sortOrder += 1;
+        dbRecords.push(built);
+        imported.push({
+          workId: item.workId,
+          originalName: item.originalName,
+          catalogueBasename: item.catalogueBasename,
+          media: built.mediaRel,
+          status: 'ok',
+          files_written: false,
+        });
+      }
+
+      if (!dbRecords.length) {
+        return jsonResponse(400, {
+          ok: false,
+          error: 'aucune œuvre importée',
+          imported,
+          plan,
+        });
+      }
+
+      await persistWorksToSupabase(supabase, dbRecords);
+      const works = await fetchWorksWithSeries(supabase);
+      return jsonResponse(200, {
+        ok: true,
+        imported,
+        works,
+        series_codes: seriesCodes,
+        mode: 'database_only',
+        files_written: false,
+        notice:
+          'Fiches créées dans Supabase. Déposez les images dans media/catalogue/ (noms indiqués) ou importez via npm run works:api en local.',
+      });
     }
 
     if (req.method === 'POST' && path === '/api/works/save') {

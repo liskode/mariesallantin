@@ -80,6 +80,7 @@
               </div>
             </div>
             <div class="catalogue-edit-tools">
+              <button type="button" class="legend-editor-btn" id="works-import-btn">Importer des œuvres</button>
               <button type="button" class="legend-editor-btn legend-editor-btn--save legend-editor-btn--save-clean" id="works-save-btn" disabled>
                 Modifications enregistrées
               </button>
@@ -188,7 +189,60 @@
 
   <img id="works-preview-img" class="catalogue-preview" alt="" aria-hidden="true" />
 
-  <script src="editor-common.js?v=20250628-3"></script>
-  <script src="works-editor.js?v=20250628-3"></script>
+  <dialog id="works-import-dialog" class="works-import-dialog">
+    <div class="works-import-dialog-panel">
+      <header class="works-import-dialog-header">
+        <h2 class="works-import-dialog-title">Importer des œuvres</h2>
+        <button type="button" class="works-import-dialog-close" id="works-import-close" aria-label="Fermer">×</button>
+      </header>
+      <p class="works-import-dialog-hint" id="works-import-hint">
+        Chargez des images JPEG/PNG/WebP. Les fiches sont créées dans Supabase avec les séries choisies.
+      </p>
+      <div class="works-import-form">
+        <label class="works-import-label">
+          Images
+          <input type="file" id="works-import-files" accept="image/jpeg,image/png,image/webp,image/gif" multiple />
+        </label>
+        <fieldset class="works-import-fieldset">
+          <legend>Code œuvre (MS####)</legend>
+          <label class="works-import-radio">
+            <input type="radio" name="works-import-id-mode" value="sequential" checked />
+            Numéro séquentiel (<span id="works-import-next-id">…</span>)
+          </label>
+          <label class="works-import-radio">
+            <input type="radio" name="works-import-id-mode" value="from_filename" />
+            Code MS du nom de fichier (ex. <code>MS0300_…</code>.jpeg)
+          </label>
+        </fieldset>
+        <fieldset class="works-import-fieldset works-import-series-fieldset">
+          <legend>Séries à attribuer à toutes les œuvres importées</legend>
+          <div id="works-import-series-list" class="works-import-series-list"></div>
+        </fieldset>
+      </div>
+      <div class="works-import-preview-wrap" id="works-import-preview-wrap" hidden>
+        <table class="catalogue-table works-import-preview-table">
+          <thead>
+            <tr>
+              <th>Fichier</th>
+              <th>Code</th>
+              <th>Nom enregistré</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="works-import-preview-tbody"></tbody>
+        </table>
+      </div>
+      <p id="works-import-status" class="legend-editor-api-hint" aria-live="polite"></p>
+      <footer class="works-import-dialog-footer">
+        <button type="button" class="legend-editor-btn" id="works-import-cancel">Annuler</button>
+        <button type="button" class="legend-editor-btn legend-editor-btn--save" id="works-import-submit" disabled>
+          Importer
+        </button>
+      </footer>
+    </div>
+  </dialog>
+
+  <script src="editor-common.js?v=20250630-1"></script>
+  <script src="works-editor.js?v=20250630-1"></script>
 </body>
 </html>

@@ -1233,6 +1233,250 @@
         : 'API : ' + base;
   }
 
+  function formatApiError(err) {
+    if (!err) return 'Erreur inconnue';
+    if (typeof err === 'string') return err;
+    if (err.message) return String(err.message);
+    try {
+      return JSON.stringify(err);
+    } catch {
+      return String(err);
+    }
+  }
+
+  const importDialog = document.getElementById('works-import-dialog');
+  const importBtn = document.getElementById('works-import-btn');
+  const importFilesEl = document.getElementById('works-import-files');
+  const importCloseBtn = document.getElementById('works-import-close');
+  const importCancelBtn = document.getElementById('works-import-cancel');
+  const importSubmitBtn = document.getElementById('works-import-submit');
+  const importStatusEl = document.getElementById('works-import-status');
+  const importHintEl = document.getElementById('works-import-hint');
+  const importPreviewWrap = document.getElementById('works-import-preview-wrap');
+  const importPreviewTbody = document.getElementById('works-import-preview-tbody');
+  const importNextIdEl = document.getElementById('works-import-next-id');
+
+  /** @type {File[]} */
+  let importSelectedFiles = [];
+  /** @type {Array<object>} */
+  let importPlan = [];
+
+  function updateImportHint() {
+    if (!importHintEl) return;
+    importHintEl.textContent = isLocalDevServer()
+      ? 'Import complet : images dans media/catalogue/, fiches Supabase, works.json et miniatures WebP.'
+      : 'En ligne : fiches Supabase uniquement. Pour enregistrer les images sur le site, utilisez npm run works:api en local ou déposez les fichiers dans media/catalogue/ (noms indiqués après import).';
+  }
+
+  async function loadNextSequentialId() {
+    if (!importNextIdEl) return;
+    try {
+      const r = await apiFetch('/api/works/next-id?token=' + encodeURIComponent(token));
+      const j = await r.json();
+      if (j.ok) importNextIdEl.textContent = j.next_id || '—';
+    } catch {
+      importNextIdEl.textContent = '—';
+    }
+  }
+
+  function renderImportSeriesCheckboxes() {
+    const root = document.getElementById('works-import-series-list');
+    if (!root) return;
+    root.innerHTML = '';
+    const list = meta.series || [];
+    if (!list.length) {
+      root.textContent = 'Aucune série chargée.';
+      return;
+    }
+    for (const s of list) {
+      const label = document.createElement('label');
+      label.className = 'works-import-series-item';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = s.code;
+      label.appendChild(cb);
+      const text = document.createTextNode(
+        ' ' + s.code + (s.label ? ' — ' + s.label : '')
+      );
+      label.appendChild(text);
+      root.appendChild(label);
+    }
+  }
+
+  function getImportSeriesCodes() {
+    const root = document.getElementById('works-import-series-list');
+    if (!root) return [];
+    return [...root.querySelectorAll('input[type="checkbox"]:checked')].map((el) =>
+      String(el.value || '').trim().toUpperCase()
+    );
+  }
+
+  function getImportIdMode() {
+    const checked = document.querySelector('input[name="works-import-id-mode"]:checked');
+    return checked && checked.value === 'from_filename' ? 'from_filename' : 'sequential';
+  }
+
+  function renderImportPreview(plan) {
+    if (!importPreviewTbody || !importPreviewWrap || !importSubmitBtn) return;
+    importPreviewTbody.innerHTML = '';
+    let okCount = 0;
+    for (const row of plan) {
+      const tr = document.createElement('tr');
+      if (row.error) tr.className = 'works-import-preview-row--error';
+      else okCount += 1;
+
+      const tdFile = document.createElement('td');
+      tdFile.textContent = row.originalName || '';
+      tr.appendChild(tdFile);
+
+      const tdCode = document.createElement('td');
+      tdCode.textContent = row.workId || '—';
+      tr.appendChild(tdCode);
+
+      const tdName = document.createElement('td');
+      tdName.textContent = row.catalogueBasename || '—';
+      tr.appendChild(tdName);
+
+      const tdErr = document.createElement('td');
+      tdErr.textContent = row.error || '';
+      tr.appendChild(tdErr);
+
+      importPreviewTbody.appendChild(tr);
+    }
+    importPreviewWrap.hidden = !plan.length;
+    importSubmitBtn.disabled = okCount === 0;
+    if (importStatusEl) {
+      importStatusEl.textContent = plan.length
+        ? okCount + ' œuvre(s) prête(s) sur ' + plan.length
+        : '';
+      importStatusEl.classList.remove('legend-editor-api-hint--error');
+    }
+  }
+
+  async function refreshImportPlan() {
+    if (!importSelectedFiles.length) {
+      importPlan = [];
+      renderImportPreview([]);
+      return;
+    }
+    if (importStatusEl) importStatusEl.textContent = 'Préparation de l’aperçu…';
+    const files = importSelectedFiles.map((f) => ({ originalName: f.name }));
+    const r = await apiFetch('/api/works/import/plan', {
+      method: 'POST',
+      body: JSON.stringify({
+        token,
+        id_mode: getImportIdMode(),
+        files,
+      }),
+    });
+    const j = await r.json();
+    if (!r.ok || !j.ok) {
+      if (importStatusEl) {
+        importStatusEl.textContent = formatApiError(j.error) || 'aperçu impossible';
+        importStatusEl.classList.add('legend-editor-api-hint--error');
+      }
+      importPlan = [];
+      renderImportPreview([]);
+      return;
+    }
+    importPlan = j.plan || [];
+    renderImportPreview(importPlan);
+  }
+
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const s = String(reader.result || '');
+        const comma = s.indexOf(',');
+        resolve(comma >= 0 ? s.slice(comma + 1) : s);
+      };
+      reader.onerror = () => reject(reader.error || new Error('lecture fichier'));
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function openImportDialog() {
+    if (!importDialog) return;
+    importSelectedFiles = [];
+    importPlan = [];
+    if (importFilesEl) importFilesEl.value = '';
+    renderImportSeriesCheckboxes();
+    updateImportHint();
+    await loadNextSequentialId();
+    renderImportPreview([]);
+    if (importStatusEl) {
+      importStatusEl.textContent = '';
+      importStatusEl.classList.remove('legend-editor-api-hint--error');
+    }
+    importDialog.showModal();
+  }
+
+  async function runWorksImport() {
+    if (!importSelectedFiles.length || !importSubmitBtn) return;
+    const seriesCodes = getImportSeriesCodes();
+    const idMode = getImportIdMode();
+    const batchSize = isLocalDevServer() ? 12 : 2;
+    importSubmitBtn.disabled = true;
+    if (importStatusEl) {
+      importStatusEl.textContent = 'Import en cours…';
+      importStatusEl.classList.remove('legend-editor-api-hint--error');
+    }
+
+    let lastWorks = worksList;
+    let totalOk = 0;
+    const notices = [];
+
+    try {
+      for (let i = 0; i < importSelectedFiles.length; i += batchSize) {
+        const batch = importSelectedFiles.slice(i, i + batchSize);
+        const files = [];
+        for (const f of batch) {
+          files.push({
+            originalName: f.name,
+            contentBase64: await fileToBase64(f),
+          });
+        }
+        const r = await apiFetch('/api/works/import', {
+          method: 'POST',
+          body: JSON.stringify({
+            token,
+            id_mode: idMode,
+            series_codes: seriesCodes,
+            files,
+          }),
+        });
+        const j = await r.json();
+        if (!r.ok || !j.ok) {
+          throw new Error(formatApiError(j.error) || 'import échoué');
+        }
+        lastWorks = j.works || lastWorks;
+        totalOk += (j.imported || []).filter((row) => row.status === 'ok').length;
+        if (j.notice) notices.push(j.notice);
+      }
+
+      worksList = lastWorks;
+      dirtyIds.clear();
+      workMediaById = null;
+      await loadWorksCatalog();
+      updateSaveBtn();
+      renderTable();
+      if (importDialog) importDialog.close();
+
+      let msg = totalOk + ' œuvre(s) importée(s).';
+      if (!isLocalDevServer() && notices.length) {
+        msg += ' ' + notices[0];
+      }
+      setStatus(msg);
+    } catch (e) {
+      if (importStatusEl) {
+        importStatusEl.textContent = formatApiError(e);
+        importStatusEl.classList.add('legend-editor-api-hint--error');
+      }
+      importSubmitBtn.disabled = false;
+    }
+  }
+
   function bindEvents() {
     loginBtn.addEventListener('click', async () => {
       const pass = passEl.value.trim();
@@ -1267,6 +1511,33 @@
     });
 
     saveBtn.addEventListener('click', () => saveWorks());
+
+    importBtn?.addEventListener('click', () => {
+      openImportDialog().catch((e) => setStatus(formatApiError(e), true));
+    });
+
+    importCloseBtn?.addEventListener('click', () => importDialog?.close());
+    importCancelBtn?.addEventListener('click', () => importDialog?.close());
+
+    importFilesEl?.addEventListener('change', () => {
+      importSelectedFiles = importFilesEl.files ? [...importFilesEl.files] : [];
+      refreshImportPlan().catch((e) => {
+        if (importStatusEl) {
+          importStatusEl.textContent = formatApiError(e);
+          importStatusEl.classList.add('legend-editor-api-hint--error');
+        }
+      });
+    });
+
+    document.querySelectorAll('input[name="works-import-id-mode"]').forEach((el) => {
+      el.addEventListener('change', () => {
+        refreshImportPlan().catch(() => {});
+      });
+    });
+
+    importSubmitBtn?.addEventListener('click', () => {
+      runWorksImport().catch((e) => setStatus(formatApiError(e), true));
+    });
 
     filterEl?.addEventListener('input', () => {
       filterText = filterEl.value;

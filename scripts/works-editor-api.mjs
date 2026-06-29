@@ -9,6 +9,18 @@ import path from 'path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 import { sortFormats } from './format-sort.mjs';
+import {
+  appendWorksJsonEntries,
+  buildWorkRecords,
+  fetchExistingWorkIds,
+  fetchNextSortOrder,
+  formatWorkId,
+  generateThumbnailForMedia,
+  persistWorksToSupabase,
+  planWorkImports,
+  resolveNextSequentialStart,
+  writeCatalogueFile,
+} from './work-import.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -83,10 +95,19 @@ function sendJson(res, status, obj) {
   res.end(body);
 }
 
-function readBody(req) {
+function readBody(req, maxBytes = 120 * 1024 * 1024) {
   return new Promise((resolve, reject) => {
     const chunks = [];
-    req.on('data', (c) => chunks.push(c));
+    let size = 0;
+    req.on('data', (c) => {
+      size += c.length;
+      if (size > maxBytes) {
+        reject(new Error('corps de requête trop volumineux'));
+        req.destroy();
+        return;
+      }
+      chunks.push(c);
+    });
     req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
     req.on('error', reject);
   });
@@ -199,6 +220,160 @@ async function fetchWorksWithSeries(supabase) {
   }));
 }
 
+async function handleImportPlan(body) {
+  const idMode = body.id_mode === 'from_filename' ? 'from_filename' : 'sequential';
+  const files = Array.isArray(body.files) ? body.files : [];
+  const names = files.map((f) => ({ originalName: String(f.originalName || f.name || '') }));
+  const worksJsonPath = path.join(root, 'media', 'works.json');
+  const supabase = createSupabase();
+  const reserved = await fetchExistingWorkIds(supabase);
+  const sequentialStart = await resolveNextSequentialStart(supabase, worksJsonPath);
+  const plan = planWorkImports(names, idMode, reserved, sequentialStart);
+  return {
+    ok: true,
+    id_mode: idMode,
+    next_sequential_id: formatWorkId(sequentialStart),
+    plan,
+  };
+}
+
+async function handleImportWorks(body, { writeFiles }) {
+  const idMode = body.id_mode === 'from_filename' ? 'from_filename' : 'sequential';
+  const seriesCodes = [
+    ...new Set(
+      (Array.isArray(body.series_codes) ? body.series_codes : [])
+        .map((c) => String(c || '').trim().toUpperCase())
+        .filter(Boolean)
+    ),
+  ];
+  const files = Array.isArray(body.files) ? body.files : [];
+  if (!files.length) {
+    return { ok: false, status: 400, error: 'aucun fichier à importer' };
+  }
+
+  const worksJsonPath = path.join(root, 'media', 'works.json');
+  const catalogueDir = path.join(root, 'media', 'catalogue');
+  const mediaRoot = path.join(root, 'media');
+  const supabase = createSupabase();
+  const meta = await fetchMeta(supabase);
+  const knownFormats = new Set((meta.formats || []).map((f) => f.code));
+  const knownTechniques = new Set((meta.techniques || []).map((t) => t.code));
+
+  const reserved = await fetchExistingWorkIds(supabase);
+  const sequentialStart = await resolveNextSequentialStart(supabase, worksJsonPath);
+  const plan = planWorkImports(
+    files.map((f) => ({ originalName: String(f.originalName || f.name || '') })),
+    idMode,
+    reserved,
+    sequentialStart
+  );
+
+  const errors = plan.filter((p) => p.error);
+  if (errors.length === plan.length) {
+    return {
+      ok: false,
+      status: 400,
+      error: errors[0].error,
+      plan,
+    };
+  }
+
+  let sortOrder = await fetchNextSortOrder(supabase);
+  const dbRecords = [];
+  const jsonEntries = [];
+  const imported = [];
+  const fileByName = new Map(
+    files.map((f) => [String(f.originalName || f.name || ''), f])
+  );
+
+  for (const item of plan) {
+    if (item.error) {
+      imported.push({ ...item, status: 'error' });
+      continue;
+    }
+    const src = fileByName.get(item.originalName);
+    if (!src) {
+      imported.push({ ...item, status: 'error', error: 'fichier manquant dans la requête' });
+      continue;
+    }
+
+    const buffer = src.contentBase64
+      ? Buffer.from(String(src.contentBase64), 'base64')
+      : null;
+    if (!buffer || !buffer.length) {
+      imported.push({ ...item, status: 'error', error: 'contenu image vide' });
+      continue;
+    }
+
+    const destPath = path.join(catalogueDir, item.catalogueBasename);
+    if (fs.existsSync(destPath)) {
+      imported.push({
+        ...item,
+        status: 'error',
+        error: `fichier déjà présent : ${item.catalogueBasename}`,
+      });
+      continue;
+    }
+
+    const built = buildWorkRecords({
+      workId: item.workId,
+      catalogueBasename: item.catalogueBasename,
+      seriesCodes,
+      sortOrder,
+      knownFormats,
+      knownTechniques,
+    });
+    sortOrder += 1;
+
+    if (writeFiles) {
+      await writeCatalogueFile(catalogueDir, item.catalogueBasename, buffer);
+      try {
+        await generateThumbnailForMedia(mediaRoot, built.mediaRel);
+      } catch (e) {
+        console.warn('[thumb]', item.workId, e?.message || e);
+      }
+    }
+
+    dbRecords.push(built);
+    jsonEntries.push(built.jsonRow);
+    imported.push({
+      workId: item.workId,
+      originalName: item.originalName,
+      catalogueBasename: item.catalogueBasename,
+      media: built.mediaRel,
+      status: 'ok',
+      files_written: writeFiles,
+    });
+  }
+
+  const okRecords = dbRecords.filter((r) => r.dbRow?.id);
+  if (!okRecords.length) {
+    return {
+      ok: false,
+      status: 400,
+      error: 'aucune œuvre importée',
+      imported,
+      plan,
+    };
+  }
+
+  await persistWorksToSupabase(supabase, okRecords);
+  if (writeFiles && jsonEntries.length) {
+    appendWorksJsonEntries(worksJsonPath, jsonEntries);
+  }
+
+  const works = await fetchWorksWithSeries(supabase);
+  return {
+    ok: true,
+    status: 200,
+    imported,
+    works,
+    series_codes: seriesCodes,
+    mode: writeFiles ? 'full' : 'database_only',
+    files_written: writeFiles,
+  };
+}
+
 const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
@@ -269,6 +444,40 @@ const server = http.createServer(async (req, res) => {
       }
       const works = await fetchWorksWithSeries(createSupabase());
       sendJson(res, 200, { ok: true, works });
+      return;
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/works/next-id') {
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      const worksJsonPath = path.join(root, 'media', 'works.json');
+      const supabase = createSupabase();
+      const start = await resolveNextSequentialStart(supabase, worksJsonPath);
+      sendJson(res, 200, { ok: true, next_id: formatWorkId(start) });
+      return;
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/works/import/plan') {
+      const body = JSON.parse(await readBody(req));
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      const result = await handleImportPlan(body);
+      sendJson(res, 200, result);
+      return;
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/works/import') {
+      const body = JSON.parse(await readBody(req));
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      const result = await handleImportWorks(body, { writeFiles: true });
+      sendJson(res, result.status || 200, result);
       return;
     }
 
