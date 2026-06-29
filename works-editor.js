@@ -1555,6 +1555,7 @@
       btn.addEventListener('click', () => {
         sortColumn = btn.getAttribute('data-sort-key') || 'order';
         currentPage = 0;
+        if (pageSizeEl) pageSizeEl.value = 'all';
         renderTable();
       });
     });
