@@ -114,6 +114,12 @@ document.addEventListener('DOMContentLoaded', () => {
     return withArt.concat(extra);
   }
 
+  function isGalleryRoute() {
+    if (window.location.search.includes('gallery')) return true;
+    const hash = window.location.hash.replace('#', '').trim();
+    return hash.length > 0;
+  }
+
   if (typeof WorksCatalog === 'undefined') {
     console.error('Charger site-catalog.js avant gallery.js');
   } else {
@@ -126,8 +132,8 @@ document.addEventListener('DOMContentLoaded', () => {
         Object.keys(data.allSeries).forEach((k) => {
           allSeries[k] = data.allSeries[k];
         });
-        if (window.showSeriesOverview) window.showSeriesOverview();
         if (typeof window.onCatalogReady === 'function') window.onCatalogReady(data);
+        if (window.showSeriesOverview && isGalleryRoute()) window.showSeriesOverview();
       })
       .catch((err) => console.error('Chargement du catalogue œuvres:', err));
   }

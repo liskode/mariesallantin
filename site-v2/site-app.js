@@ -7,11 +7,18 @@
     var overview = document.getElementById('series-overview');
     var gallery = document.getElementById('gallery');
     if (!welcome || !overview || !gallery) return;
+    if (section !== 'welcome-section') stopHeroRotation();
     welcome.style.display = section === 'welcome-section' ? '' : 'none';
     overview.style.display = section === 'series-overview' ? '' : 'none';
     gallery.style.display = section === 'gallery' ? '' : 'none';
   }
   window.showSection = showSection;
+
+  function isGalleryRoute() {
+    if (window.location.search.includes('gallery')) return true;
+    var hash = window.location.hash.replace('#', '').trim();
+    return hash.length > 0;
+  }
 
   function buildSeriesMenu(data) {
     var ul = document.getElementById('series-list');
@@ -26,6 +33,7 @@
       a.textContent = name;
       a.onclick = function (e) {
         e.preventDefault();
+        stopHeroRotation();
         showSection('gallery');
         window.scrollTo({ top: document.getElementById('gallery').offsetTop - 40, behavior: 'smooth' });
       };
