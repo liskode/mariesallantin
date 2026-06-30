@@ -260,15 +260,16 @@
 
   function mediaPathForWork(work) {
     if (!work || !work.id) return '';
-    if (workMediaById && workMediaById.has(work.id)) {
-      return workMediaById.get(work.id);
+    const workId = String(work.id).trim().toUpperCase();
+    if (workMediaById && workMediaById.has(workId)) {
+      return workMediaById.get(workId);
     }
     const orig = String(work.filename_original || '').trim().replace(/\\/g, '/');
-    if (orig && orig.toUpperCase().startsWith(work.id.toUpperCase())) {
+    if (orig && orig.toUpperCase().startsWith(workId)) {
       return 'catalogue/' + orig;
     }
     const ext = String(work.image_ext || 'jpeg').replace(/^\./, '');
-    return 'catalogue/' + work.id + '.' + ext;
+    return 'catalogue/' + workId + '.' + ext;
   }
 
   function thumbUrlForWork(work) {
@@ -292,17 +293,34 @@
     workMediaById = new Map();
     workImageDimensionsById = new Map();
     try {
-      const r = await fetch(MEDIA_BASE + 'works.json');
+      const r = await fetch(MEDIA_BASE + 'works.json', { cache: 'no-store' });
       if (r.ok) {
         const j = await r.json();
         for (const w of j.works || []) {
-          if (w.id && w.media) workMediaById.set(w.id, String(w.media));
+          const id = String(w.id || '').trim().toUpperCase();
+          if (id && w.media) workMediaById.set(id, String(w.media).trim());
           const dim = parseDimensionsPx(w.dimensions);
-          if (w.id && dim) workImageDimensionsById.set(w.id, dim);
+          if (id && dim) workImageDimensionsById.set(id, dim);
         }
       }
     } catch {
       /* optionnel */
+    }
+  }
+
+  async function reloadWorksCatalog() {
+    workMediaById = null;
+    workImageDimensionsById = null;
+    await loadWorksCatalog();
+  }
+
+  function mergeImportMediaPaths(importedRows) {
+    if (!importedRows || !importedRows.length) return;
+    if (!workMediaById) workMediaById = new Map();
+    for (const row of importedRows) {
+      if (row.status !== 'ok' || !row.workId || !row.media) continue;
+      const id = String(row.workId).trim().toUpperCase();
+      workMediaById.set(id, String(row.media).trim());
     }
   }
 
@@ -543,8 +561,20 @@
         body: JSON.stringify({ token, work_id: work.id }),
       });
       const j = await r.json();
-      if (!r.ok || !j.ok) throw new Error(formatApiError(j.error) || 'suppression échouée');
-      worksList = j.works || worksList.filter((w) => w.id !== work.id);
+      if (!r.ok || !j.ok) {
+        if (r.status === 404) {
+          throw new Error(
+            'Suppression indisponible : redémarrez npm run works:api (local) ou déployez works-api (en ligne).'
+          );
+        }
+        throw new Error(formatApiError(j.error) || 'suppression échouée');
+      }
+      const deletedId = String(j.deleted || work.id)
+        .trim()
+        .toUpperCase();
+      worksList = Array.isArray(j.works)
+        ? j.works.filter((w) => String(w.id).trim().toUpperCase() !== deletedId)
+        : worksList.filter((w) => String(w.id).trim().toUpperCase() !== deletedId);
       dirtyIds.delete(work.id);
       if (workMediaById) workMediaById.delete(work.id);
       if (workImageDimensionsById) workImageDimensionsById.delete(work.id);
@@ -1383,19 +1413,26 @@
       img.alt = '';
       img.loading = 'lazy';
       const url = thumbUrlForWork(work);
+      const fullSrc = fullImageUrlForWork(work);
       if (url) {
         img.src = url;
         img.onerror = function () {
-          const full = mediaPathForWork(work);
-          if (full) {
+          if (fullSrc && img.src !== fullSrc) {
             img.onerror = null;
-            img.src = MEDIA_BASE + encodeMediaPath(full);
+            img.src = fullSrc;
+            return;
+          }
+          img.classList.add('works-thumb-img--empty');
+          if (isProductionHost()) {
+            img.title =
+              'Image absente sur le site — après import local, committez et publiez media/catalogue/ et media/works.json';
           }
         };
+      } else if (fullSrc) {
+        img.src = fullSrc;
       } else {
         img.classList.add('works-thumb-img--empty');
       }
-      const fullSrc = fullImageUrlForWork(work);
       if (fullSrc) attachThumbPreview(img, fullSrc);
       tdThumb.appendChild(img);
       tr.appendChild(tdThumb);
@@ -1857,6 +1894,7 @@
 
     let lastWorks = worksList;
     let totalOk = 0;
+    const allImported = [];
 
     try {
       for (let i = 0; i < importSelectedFiles.length; i += batchSize) {
@@ -1883,25 +1921,31 @@
         }
         lastWorks = j.works || lastWorks;
         totalOk += (j.imported || []).filter((row) => row.status === 'ok').length;
+        allImported.push(...(j.imported || []));
       }
 
       worksList = lastWorks;
       dirtyIds.clear();
-      workMediaById = null;
-      workImageDimensionsById = null;
-      await loadWorksCatalog();
+      await reloadWorksCatalog();
+      mergeImportMediaPaths(allImported);
+      const list = sortWorks(filterWorks(worksList));
+      const pageSize = getPageSize();
+      currentPage = Math.max(0, Math.ceil(list.length / pageSize) - 1);
       updateSaveBtn();
       renderTable();
       if (importDialog) importDialog.close();
 
       let msg = totalOk + ' œuvre(s) importée(s).';
+      msg +=
+        ' Publiez media/catalogue/, media/catalogue/_thumbs/ et media/works.json (git push) pour les vignettes sur mariesallantin.art.';
       setStatus(msg);
     } catch (e) {
       if (importStatusEl) {
         importStatusEl.textContent = formatApiError(e);
         importStatusEl.classList.add('legend-editor-api-hint--error');
       }
-      importSubmitBtn.disabled = false;
+    } finally {
+      if (importSubmitBtn) importSubmitBtn.disabled = false;
     }
   }
 
