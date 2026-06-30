@@ -146,6 +146,81 @@
 
 .site-v2 .series-gallery {
   padding-top: 1.25rem;
+  max-width: 980px;
+}
+
+/* Phase 2 — grille homogène */
+.site-v2 .paintings-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(148px, 1fr));
+  gap: 1rem;
+  padding: 0.25rem 0 2rem;
+}
+
+.site-v2 .painting-thumb-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  overflow: hidden;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.site-v2 .painting-thumb-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.site-v2 .painting-thumb-btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.site-v2 .painting-thumb {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  height: auto;
+  max-width: none;
+  margin: 0;
+  object-fit: cover;
+  display: block;
+  border-radius: 0;
+  box-shadow: none;
+  background: #e8eaed;
+}
+
+.site-v2 .series-overview {
+  gap: 1.5rem;
+  max-width: 980px;
+}
+
+.site-v2 .series-overview-item {
+  padding: 1.25rem 1rem 1rem;
+  border: 1px solid var(--border);
+  transform: none;
+}
+
+.site-v2 .series-overview-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.site-v2 .series-overview-title {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.site-v2 .series-overview-img {
+  width: 100%;
+  max-width: none;
+  aspect-ratio: 4 / 5;
+  height: auto;
+  border-radius: 4px;
 }
 
 /* Accueil — hero allégé */
@@ -492,15 +567,66 @@
   }
 }
 
-/* Lightbox site-v2 — série au-dessus du tableau, puis titre œuvre */
-.lightbox .lightbox-stage {
+/* Lightbox site-v2 — phase 2 : fond épuré, contrôles discrets */
+.site-v2 .lightbox {
+  background: rgba(20, 20, 24, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+}
+
+.site-v2 .lightbox.is-open {
+  opacity: 1;
+}
+
+.site-v2 .lightbox .close,
+.site-v2 .lightbox .prev,
+.site-v2 .lightbox .next {
+  background: transparent;
+  box-shadow: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 1.65rem;
+  font-weight: 300;
+  width: 44px;
+  height: 44px;
+  border-radius: 6px;
+  line-height: 1;
+  padding: 0;
+}
+
+.site-v2 .lightbox .close:hover,
+.site-v2 .lightbox .prev:hover,
+.site-v2 .lightbox .next:hover,
+.site-v2 .lightbox .close:focus-visible,
+.site-v2 .lightbox .prev:focus-visible,
+.site-v2 .lightbox .next:focus-visible {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.site-v2 .lightbox .close {
+  top: 1.25rem;
+  right: 1.25rem;
+}
+
+.site-v2 .lightbox .prev {
+  left: 0.75rem;
+}
+
+.site-v2 .lightbox .next {
+  right: 0.75rem;
+}
+
+.site-v2 .lightbox .lightbox-stage {
   display: flex;
   flex-direction: column;
   align-items: center;
   max-width: min(92vw, 56rem);
 }
 
-.lightbox .lightbox-series-heading {
+.site-v2 .lightbox .lightbox-series-heading {
   color: rgba(255, 255, 255, 0.92);
   font-size: 1.15rem;
   font-weight: 600;
@@ -511,20 +637,23 @@
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
 
-.lightbox .lightbox-stage img {
+.site-v2 .lightbox .lightbox-stage img {
   max-width: 100%;
   max-height: min(68vh, 720px);
   width: auto;
   height: auto;
+  border-radius: 2px;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.45);
+  background: transparent;
 }
 
-.lightbox .lightbox-caption {
+.site-v2 .lightbox .lightbox-caption {
   margin: 1rem 0 0;
   max-width: min(90vw, 42rem);
   text-align: center;
 }
 
-.lightbox .lightbox-work-title {
+.site-v2 .lightbox .lightbox-work-title {
   color: #fff;
   font-size: 1.05rem;
   font-weight: 500;
@@ -532,7 +661,7 @@
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
-.lightbox .lightbox-work-meta {
+.site-v2 .lightbox .lightbox-work-meta {
   margin-top: 0.4rem;
   color: rgba(255, 255, 255, 0.78);
   font-size: 0.82rem;
@@ -540,4 +669,24 @@
   line-height: 1.45;
   letter-spacing: 0.01em;
   text-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+}
+
+@media (max-width: 900px) {
+  .site-v2 .paintings-container {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.75rem;
+  }
+
+  .site-v2 .lightbox .close {
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+
+  .site-v2 .lightbox .prev {
+    left: 0.35rem;
+  }
+
+  .site-v2 .lightbox .next {
+    right: 0.35rem;
+  }
 }

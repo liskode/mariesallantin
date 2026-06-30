@@ -401,6 +401,32 @@
       .join('/');
   }
 
+  const RASTER_IMAGE_EXT = new Set(['.jpg', '.jpeg', '.png', '.webp', '.gif', '.bmp', '.tif', '.tiff', '.avif']);
+
+  /** Chemin relatif miniature WebP (catalogue/_thumbs/…) ou null. */
+  function webThumbRelFromMediaFp(mediaFp) {
+    const fp = String(mediaFp || '')
+      .trim()
+      .replace(/\\/g, '/');
+    if (!fp.toLowerCase().startsWith('catalogue/')) return null;
+    const rest = fp.slice('catalogue/'.length);
+    const lastSlash = rest.lastIndexOf('/');
+    const filePart = lastSlash >= 0 ? rest.slice(lastSlash + 1) : rest;
+    const lastDot = filePart.lastIndexOf('.');
+    const ext = lastDot >= 0 ? filePart.slice(lastDot).toLowerCase() : '';
+    if (!RASTER_IMAGE_EXT.has(ext)) return null;
+    const stem = filePart.replace(/\.[^.]+$/i, '');
+    const dirPart = lastSlash >= 0 ? rest.slice(0, lastSlash) : '';
+    return dirPart
+      ? 'catalogue/_thumbs/' + dirPart + '/' + stem + '.webp'
+      : 'catalogue/_thumbs/' + stem + '.webp';
+  }
+
+  function buildThumbUrl(mediaRelativePath) {
+    const thumbRel = webThumbRelFromMediaFp(mediaRelativePath);
+    return thumbRel ? buildMediaUrl(thumbRel) : buildMediaUrl(mediaRelativePath);
+  }
+
   async function load() {
     if (cache) return cache;
     const [payload, mediaMap] = await Promise.all([fetchCatalogPayload(), loadWorksJsonMediaMap()]);
@@ -419,6 +445,7 @@
     clearCache,
     getSeriesCounts,
     buildMediaUrl,
+    buildThumbUrl,
     buildFromPayload,
     mediaPathForWork,
   };

@@ -142,7 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (e.key === 'Escape' && isLightboxOpen()) {
       e.preventDefault();
-      lightbox.style.display = 'none';
+      closeLightbox();
     }
   }
 
@@ -155,6 +155,46 @@ document.addEventListener('DOMContentLoaded', () => {
       return WorksCatalog.buildMediaUrl(filePath);
     }
     return `../media/${filePath}`;
+  }
+
+  function thumbSrc(filePath) {
+    if (typeof WorksCatalog !== 'undefined' && typeof WorksCatalog.buildThumbUrl === 'function') {
+      return WorksCatalog.buildThumbUrl(filePath);
+    }
+    return mediaSrc(filePath);
+  }
+
+  function attachLazyImage(img, filePath, options) {
+    const opts = options || {};
+    const fullSrc = mediaSrc(filePath);
+    const displaySrc = opts.forceFull ? fullSrc : thumbSrc(filePath);
+    img.src = displaySrc;
+    img.loading = opts.eager ? 'eager' : 'lazy';
+    img.decoding = 'async';
+    if (!opts.eager && displaySrc !== fullSrc) {
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = fullSrc;
+      };
+    }
+    return img;
+  }
+
+  function createPaintingThumb(painting, idx) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'painting-thumb-btn';
+    btn.setAttribute('aria-label', painting.title || painting.id || 'Voir l’œuvre');
+    const img = document.createElement('img');
+    img.className = 'painting-thumb';
+    img.alt = painting.title || '';
+    attachLazyImage(img, painting.filePath);
+    btn.appendChild(img);
+    btn.onclick = () => {
+      currentIndex = idx;
+      showLightbox(idx);
+    };
+    return btn;
   }
 
   function overviewImageForSeries(code) {
@@ -180,6 +220,17 @@ document.addEventListener('DOMContentLoaded', () => {
     return parts.join(' · ');
   }
 
+  function closeLightbox() {
+    if (!lightbox) return;
+    lightbox.style.display = 'none';
+    lightbox.classList.remove('is-open');
+  }
+
+  function openLightboxDisplay() {
+    lightbox.style.display = 'flex';
+    requestAnimationFrame(() => lightbox.classList.add('is-open'));
+  }
+
   function updateLightboxCaption(work) {
     if (!lightboxWorkTitle || !lightboxWorkMeta) return;
     lightboxWorkTitle.textContent = work && work.title ? work.title : '';
@@ -193,17 +244,17 @@ document.addEventListener('DOMContentLoaded', () => {
     lightbox.className = 'lightbox';
     lightbox.style.display = 'none';
     lightbox.innerHTML = `
-      <span class="close">&times;</span>
-      <span class="prev">&#10094;</span>
+      <button type="button" class="close" aria-label="Fermer">&times;</button>
+      <button type="button" class="prev" aria-label="Œuvre précédente">&#10094;</button>
       <div class="lightbox-stage">
         <div class="lightbox-series-heading" aria-live="polite"></div>
-        <img src="" alt="" />
+        <img src="" alt="" decoding="async" />
         <div class="lightbox-caption">
           <div class="lightbox-work-title"></div>
           <div class="lightbox-work-meta"></div>
         </div>
       </div>
-      <span class="next">&#10095;</span>
+      <button type="button" class="next" aria-label="Œuvre suivante">&#10095;</button>
     `;
     document.body.appendChild(lightbox);
     lightboxImg = lightbox.querySelector('.lightbox-stage img');
@@ -215,9 +266,9 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxPrev = lightbox.querySelector('.prev');
     lightboxNext = lightbox.querySelector('.next');
 
-    lightboxClose.onclick = () => (lightbox.style.display = 'none');
+    lightboxClose.onclick = () => closeLightbox();
     lightbox.onclick = (e) => {
-      if (e.target === lightbox) lightbox.style.display = 'none';
+      if (e.target === lightbox) closeLightbox();
     };
     lightboxPrev.onclick = (e) => {
       e.stopPropagation();
@@ -239,7 +290,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxImg.alt = work.title;
     updateLightboxSeriesHeading();
     updateLightboxCaption(work);
-    lightbox.style.display = 'flex';
+    openLightboxDisplay();
   }
 
   function seriesCodesForGallery(data) {
@@ -300,16 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const paintingsContainer = document.createElement('div');
     paintingsContainer.className = 'paintings-container';
     currentSeries.forEach((painting, idx) => {
-      const img = document.createElement('img');
-      img.src = mediaSrc(painting.filePath);
-      img.alt = painting.title;
-      img.className = 'painting-thumb';
-      img.tabIndex = 0;
-      img.onclick = () => {
-        currentIndex = idx;
-        showLightbox(idx);
-      };
-      paintingsContainer.appendChild(img);
+      paintingsContainer.appendChild(createPaintingThumb(painting, idx));
     });
     gallery.appendChild(paintingsContainer);
   }
@@ -334,10 +376,10 @@ document.addEventListener('DOMContentLoaded', () => {
       title.className = 'series-overview-title';
       title.textContent = seriesNames[code];
       const img = document.createElement('img');
-      img.src = mediaSrc(cover.filePath);
       img.alt = seriesNames[code];
       img.className = 'series-overview-img';
       img.style.cursor = 'pointer';
+      attachLazyImage(img, cover.filePath);
       img.onclick = () => {
         selectSeries(code, { imageIndex: 0, openLightbox: window.innerWidth < 900 });
       };
