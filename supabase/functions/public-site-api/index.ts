@@ -49,7 +49,7 @@ async function fetchCatalog(supabase: SupabaseClient) {
       .order('sort_order', { ascending: true })
       .order('code', { ascending: true }),
     supabase.from('work_series').select('work_id, series_code'),
-    supabase.from('formats').select('code, label').order('sort_order', { ascending: true }),
+    supabase.from('formats').select('code, label, width_cm, height_cm').order('sort_order', { ascending: true }),
     supabase.from('techniques').select('code, label').order('sort_order', { ascending: true }),
   ]);
 

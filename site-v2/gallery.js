@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const parts = [];
     if (work.year) parts.push(work.year);
     if (work.techniqueLabel) parts.push(work.techniqueLabel);
-    if (work.formatLabel) parts.push(work.formatLabel);
+    if (work.formatSize) parts.push(work.formatSize);
     return parts.join(' · ');
   }
 

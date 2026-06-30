@@ -60,6 +60,43 @@
     return configCache;
   }
 
+  async function fetchCodeTables(cfg) {
+    const base = String(cfg.supabaseUrl || '').replace(/\/$/, '');
+    const key = String(cfg.anonKey || '').trim();
+    const headers = { apikey: key, Authorization: 'Bearer ' + key };
+    const [formatsRes, techniquesRes] = await Promise.all([
+      fetch(base + '/rest/v1/formats?select=code,label,width_cm,height_cm&order=sort_order.asc', {
+        headers,
+        cache: 'no-store',
+      }),
+      fetch(base + '/rest/v1/techniques?select=code,label&order=sort_order.asc', {
+        headers,
+        cache: 'no-store',
+      }),
+    ]);
+    if (!formatsRes.ok || !techniquesRes.ok) {
+      throw new Error('Lecture formats/techniques Supabase');
+    }
+    return {
+      formats: await formatsRes.json(),
+      techniques: await techniquesRes.json(),
+    };
+  }
+
+  async function enrichPayloadCodeTables(payload, cfg) {
+    const needsFormats = !Array.isArray(payload.formats) || !payload.formats.length;
+    const needsTechniques = !Array.isArray(payload.techniques) || !payload.techniques.length;
+    if (!needsFormats && !needsTechniques) return payload;
+    try {
+      const tables = await fetchCodeTables(cfg);
+      if (needsFormats) payload.formats = tables.formats;
+      if (needsTechniques) payload.techniques = tables.techniques;
+    } catch (e) {
+      console.warn('Complément formats/techniques indisponible', e);
+    }
+    return payload;
+  }
+
   async function fetchCatalogPayload() {
     const cfg = await loadConfig();
     const apiUrl = String(cfg.publicSiteApiUrl || '').trim();
@@ -68,7 +105,9 @@
       const r = await fetch(url, { cache: 'no-store' });
       if (r.ok) {
         const data = await r.json();
-        if (data && data.ok !== false && Array.isArray(data.works)) return data;
+        if (data && data.ok !== false && Array.isArray(data.works)) {
+          return enrichPayloadCodeTables(data, cfg);
+        }
       }
       console.warn('public-site-api indisponible, repli Supabase direct');
     }
@@ -99,7 +138,7 @@
         { headers, cache: 'no-store' }
       ),
       fetch(base + '/rest/v1/work_series?select=work_id,series_code', { headers, cache: 'no-store' }),
-      fetch(base + '/rest/v1/formats?select=code,label&order=sort_order.asc', { headers, cache: 'no-store' }),
+      fetch(base + '/rest/v1/formats?select=code,label,width_cm,height_cm&order=sort_order.asc', { headers, cache: 'no-store' }),
       fetch(base + '/rest/v1/techniques?select=code,label&order=sort_order.asc', { headers, cache: 'no-store' }),
     ]);
     if (!seriesRes.ok) throw new Error('Lecture series Supabase : ' + seriesRes.status);
@@ -168,25 +207,46 @@
     };
   }
 
+  function formatCmValue(n) {
+    const num = Number(n);
+    if (!Number.isFinite(num) || num <= 0) return '';
+    if (Math.abs(num - Math.round(num)) < 0.001) return String(Math.round(num));
+    return num.toFixed(1).replace('.', ',');
+  }
+
   function buildLabelMaps(payload) {
-    const formatLabels = {};
     const techniqueLabels = {};
+    const formatDimensions = {};
     (payload.formats || []).forEach((f) => {
       const code = String(f.code || '').trim().toUpperCase();
-      if (code) formatLabels[code] = String(f.label || code).trim();
+      if (!code) return;
+      formatDimensions[code] = {
+        width_cm: f.width_cm != null ? Number(f.width_cm) : null,
+        height_cm: f.height_cm != null ? Number(f.height_cm) : null,
+      };
     });
     (payload.techniques || []).forEach((t) => {
       const code = String(t.code || '').trim().toUpperCase();
       if (code) techniqueLabels[code] = String(t.label || code).trim();
     });
-    return { formatLabels, techniqueLabels };
+    return { techniqueLabels, formatDimensions };
   }
 
-  function labelsForWork(w, formatLabels, techniqueLabels) {
+  function formatSizeText(formatCode, formatDimensions) {
+    if (!formatCode) return '';
+    const dims = formatDimensions[formatCode];
+    if (!dims) return '';
+    const h = formatCmValue(dims.height_cm);
+    const w = formatCmValue(dims.width_cm);
+    if (!h || !w) return '';
+    return h + ' x ' + w + ' cm';
+  }
+
+  function labelsForWork(w, techniqueLabels, formatDimensions) {
     const formatCode = w.format_code != null ? String(w.format_code).trim().toUpperCase() : '';
     const techniqueCode = w.technique_code != null ? String(w.technique_code).trim().toUpperCase() : '';
     return {
-      formatLabel: formatCode ? formatLabels[formatCode] || '' : '',
+      formatSize: formatSizeText(formatCode, formatDimensions),
       techniqueLabel: techniqueCode ? techniqueLabels[techniqueCode] || '' : '',
     };
   }
@@ -209,13 +269,13 @@
         if (s.icon_work_id) seriesIconWorkIds[code] = s.icon_work_id;
       });
 
-    const { formatLabels, techniqueLabels } = buildLabelMaps(payload);
+    const { techniqueLabels, formatDimensions } = buildLabelMaps(payload);
 
     const works = (payload.works || []).map((w) => {
       const id = String(w.id).trim();
       const media = mediaPathForWork(id, w.image_ext, w.filename_original, mediaMap);
       const series = uniqSeriesCodes(w.series_codes || []);
-      const { formatLabel, techniqueLabel } = labelsForWork(w, formatLabels, techniqueLabels);
+      const { formatSize, techniqueLabel } = labelsForWork(w, techniqueLabels, formatDimensions);
       return {
         id,
         media,
@@ -227,7 +287,7 @@
         dimensions: '',
         tailleMo: null,
         format: w.format_code != null ? String(w.format_code).trim().toUpperCase() : '',
-        formatLabel,
+        formatSize,
         year: w.year != null && w.year !== '' ? String(w.year).trim() : '',
         technique: w.technique_code != null ? String(w.technique_code).trim().toUpperCase() : '',
         techniqueLabel,
@@ -245,7 +305,7 @@
         dimensions: w.dimensions,
         tailleMo: w.tailleMo,
         format: w.format,
-        formatLabel: w.formatLabel,
+        formatSize: w.formatSize,
         year: w.year,
         technique: w.technique,
         techniqueLabel: w.techniqueLabel,
