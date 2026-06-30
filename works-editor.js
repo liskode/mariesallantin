@@ -1570,6 +1570,7 @@
       await loadMeta();
       await loadWorks();
       setStatus('');
+      updateLocalStudioUi();
     } catch (e) {
       setStatus(String(e.message || e), true);
     }
@@ -1610,6 +1611,17 @@
   const importNextIdEl = document.getElementById('works-import-next-id');
   const importNextIdWrap = document.getElementById('works-import-next-id-wrap');
   const importPhotoStatusEl = document.getElementById('works-import-photo-status');
+  const importPublishWrap = document.getElementById('works-import-publish-wrap');
+  const importPublishAfterEl = document.getElementById('works-import-publish-after');
+  const importCodesHintEl = document.getElementById('works-import-codes-hint');
+  const publishBtn = document.getElementById('works-publish-btn');
+  const publishDialog = document.getElementById('works-publish-dialog');
+  const publishCloseBtn = document.getElementById('works-publish-close');
+  const publishCancelBtn = document.getElementById('works-publish-cancel');
+  const publishConfirmBtn = document.getElementById('works-publish-confirm');
+  const publishFileListEl = document.getElementById('works-publish-file-list');
+  const publishMessageEl = document.getElementById('works-publish-message');
+  const publishStatusEl = document.getElementById('works-publish-status');
 
   /** @type {File[]} */
   let importSelectedFiles = [];
@@ -1617,6 +1629,11 @@
   let importPlan = [];
   /** @type {string[]} */
   let importPreviewObjectUrls = [];
+  /** @type {Record<string, object>} */
+  let importOverrides = {};
+  let importPlanRefreshTimer = null;
+  /** @type {string[]} */
+  let pendingPublishWorkIds = [];
 
   function revokeImportPreviewObjectUrls() {
     for (const url of importPreviewObjectUrls) {
@@ -1640,28 +1657,131 @@
     return url;
   }
 
+  function updateLocalStudioUi() {
+    const local = isLocalDevServer();
+    if (publishBtn) publishBtn.hidden = !local;
+    if (importPublishWrap) importPublishWrap.hidden = !local;
+    if (importCodesHintEl) importCodesHintEl.hidden = !local;
+    updateImportSubmitLabel();
+  }
+
+  function updateImportSubmitLabel() {
+    if (!importSubmitBtn) return;
+    if (!isLocalDevServer()) {
+      importSubmitBtn.textContent = 'Simuler';
+      return;
+    }
+    const publish = importPublishAfterEl && importPublishAfterEl.checked;
+    importSubmitBtn.textContent = publish ? 'Importer et publier' : 'Importer';
+  }
+
+  function setImportOverride(originalName, field, value) {
+    const name = String(originalName || '').trim();
+    if (!name) return;
+    if (!importOverrides[name]) importOverrides[name] = {};
+    importOverrides[name][field] = value;
+  }
+
+  function getImportOverridesPayload() {
+    return importOverrides;
+  }
+
+  function scheduleImportPlanRefresh() {
+    clearTimeout(importPlanRefreshTimer);
+    importPlanRefreshTimer = setTimeout(() => {
+      refreshImportPlan().catch(() => {});
+    }, 280);
+  }
+
+  function effectiveImportValue(row, field) {
+    const ov = importOverrides[row.originalName];
+    if (ov && field in ov && ov[field] != null) return ov[field];
+    if (field === 'format_code') return row.formatCode || '';
+    if (field === 'technique_code') return row.techniqueCode || '';
+    if (field === 'series_codes') return row.seriesCodes || [];
+    if (field === 'title') return row.title || '';
+    return '';
+  }
+
+  function createImportCodeSelect(row, type) {
+    const sel = document.createElement('select');
+    sel.className = 'legend-select works-import-code-select';
+    const empty = document.createElement('option');
+    empty.value = '';
+    empty.textContent = '—';
+    sel.appendChild(empty);
+    const items = type === 'format' ? meta.formats : meta.techniques;
+    for (const item of items || []) {
+      const opt = document.createElement('option');
+      opt.value = item.code;
+      opt.textContent = item.label ? item.code + ' — ' + item.label : item.code;
+      sel.appendChild(opt);
+    }
+    const field = type === 'format' ? 'format_code' : 'technique_code';
+    sel.value = effectiveImportValue(row, field) || '';
+    const err = String(row.error || '');
+    if (
+      (type === 'format' && err.includes('format')) ||
+      (type === 'technique' && err.includes('technique'))
+    ) {
+      sel.classList.add('works-import-code-select--warn');
+    }
+    sel.addEventListener('change', () => {
+      setImportOverride(row.originalName, field, sel.value || null);
+      scheduleImportPlanRefresh();
+    });
+    return sel;
+  }
+
+  function createImportSeriesSelect(row) {
+    const sel = document.createElement('select');
+    sel.className = 'legend-select works-import-series-select';
+    sel.multiple = true;
+    sel.size = 3;
+    sel.title = 'Maintenir Ctrl (Cmd) pour sélectionner plusieurs séries';
+    for (const s of meta.series || []) {
+      const opt = document.createElement('option');
+      opt.value = s.code;
+      opt.textContent = s.label ? s.code + ' — ' + s.label : s.code;
+      sel.appendChild(opt);
+    }
+    const selected = new Set(
+      (effectiveImportValue(row, 'series_codes') || []).map((c) => String(c).toUpperCase())
+    );
+    for (const opt of sel.options) {
+      opt.selected = selected.has(opt.value);
+    }
+    if (String(row.error || '').includes('série')) {
+      sel.classList.add('works-import-code-select--warn');
+    }
+    sel.addEventListener('change', () => {
+      const codes = [...sel.selectedOptions].map((o) => o.value);
+      setImportOverride(row.originalName, 'series_codes', codes);
+      scheduleImportPlanRefresh();
+    });
+    return sel;
+  }
+
   function updateImportEnvNotice() {
     const el = importEnvNoticeEl;
     if (!el) return;
     if (isLocalDevServer()) {
       el.className = 'works-import-env-notice works-import-env-notice--local';
       el.innerHTML =
-        '<strong class="works-import-env-title">Import complet (API locale)</strong>' +
-        '<p>Les images sont copiées dans <code>media/catalogue/</code> sous <code>MS####.ext</code>, les fiches sont enregistrées dans Supabase, ' +
-        '<code>media/works.json</code> et les miniatures WebP sont mis à jour.</p>' +
-        '<p>Après import, commitez et publiez les fichiers <code>media/</code> pour les rendre visibles sur le site.</p>';
+        '<strong class="works-import-env-title">Studio import (API locale)</strong>' +
+        '<p>Lancez <code>npm run works:import</code> pour ouvrir cet écran automatiquement.</p>' +
+        '<p>Corrigez format, technique ou série dans le tableau si besoin, puis <strong>Importer et publier</strong> ' +
+        'enregistre les fichiers, Supabase, <code>works.json</code> et pousse sur GitHub Pages.</p>';
       return;
     }
     el.className = 'works-import-env-notice works-import-env-notice--online';
     el.innerHTML =
       '<strong class="works-import-env-title">Simulation d’import — aucune écriture en ligne</strong>' +
-      '<p>Depuis <code>mariesallantin.art</code>, ce bouton sert uniquement à <strong>vérifier</strong> vos fichiers : codes MS attribués, ' +
-      'nom d’image cible (<code>MS####.ext</code>), séries, format, technique, titre et erreurs éventuelles (codes inconnus, etc.).</p>' +
-      '<p><strong>Pour importer réellement</strong> (fichiers + base + <code>works.json</code>)&nbsp;:</p>' +
+      '<p>Vérifiez les codes MS, corrigez format / technique / série dans le tableau, puis simulez.</p>' +
+      '<p><strong>Pour importer et publier sur le site</strong>&nbsp;:</p>' +
       '<ol>' +
-      '<li>Exécuter <code>npm run works:api</code> dans le projet</li>' +
-      '<li>Ouvrir <code>http://127.0.0.1:47835/</code></li>' +
-      '<li>Utiliser le même dialogue d’import puis publier <code>media/</code></li>' +
+      '<li><code>npm run works:import</code> dans le projet (ou <code>npm run works:api</code>)</li>' +
+      '<li>Importer et publier depuis <code>http://127.0.0.1:47835/</code></li>' +
       '</ol>';
   }
 
@@ -1670,7 +1790,8 @@
     if (importDialogTitle) {
       importDialogTitle.textContent = local ? 'Importer des œuvres' : 'Simulation d’import';
     }
-    if (importSubmitBtn) importSubmitBtn.hidden = !local;
+    if (importSubmitBtn) importSubmitBtn.hidden = false;
+    updateLocalStudioUi();
   }
 
   async function loadNextSequentialId() {
@@ -1757,21 +1878,49 @@
       tdImage.textContent = row.catalogueBasename || '—';
       tr.appendChild(tdImage);
 
-      const tdMeta = document.createElement('td');
-      tdMeta.className = 'works-import-meta-cell';
+      const tdSeries = document.createElement('td');
+      tdSeries.className = 'works-import-code-cell';
       if (row.effectiveMode === 'update') {
-        tdMeta.textContent = '—';
+        tdSeries.textContent = '—';
       } else {
-        const parts = [];
-        if ((row.seriesCodes || []).length) parts.push((row.seriesCodes || []).join(' '));
-        if (row.formatCode) parts.push(row.formatCode);
-        if (row.techniqueCode) parts.push(row.techniqueCode);
-        if (row.year) parts.push(String(row.year));
-        const codes = parts.join(' · ');
-        const title = row.title || '';
-        tdMeta.textContent = codes ? codes + (title ? ' — ' + title : '') : title || '—';
+        tdSeries.appendChild(createImportSeriesSelect(row));
       }
-      tr.appendChild(tdMeta);
+      tr.appendChild(tdSeries);
+
+      const tdFormat = document.createElement('td');
+      tdFormat.className = 'works-import-code-cell';
+      if (row.effectiveMode === 'update') {
+        tdFormat.textContent = '—';
+      } else {
+        tdFormat.appendChild(createImportCodeSelect(row, 'format'));
+      }
+      tr.appendChild(tdFormat);
+
+      const tdTechnique = document.createElement('td');
+      tdTechnique.className = 'works-import-code-cell';
+      if (row.effectiveMode === 'update') {
+        tdTechnique.textContent = '—';
+      } else {
+        tdTechnique.appendChild(createImportCodeSelect(row, 'technique'));
+      }
+      tr.appendChild(tdTechnique);
+
+      const tdTitle = document.createElement('td');
+      tdTitle.className = 'works-import-title-cell';
+      if (row.effectiveMode === 'update') {
+        tdTitle.textContent = '—';
+      } else {
+        const titleInput = document.createElement('input');
+        titleInput.type = 'text';
+        titleInput.className = 'works-import-title-input';
+        titleInput.value = effectiveImportValue(row, 'title') || '';
+        titleInput.addEventListener('change', () => {
+          setImportOverride(row.originalName, 'title', titleInput.value.trim() || null);
+          scheduleImportPlanRefresh();
+        });
+        tdTitle.appendChild(titleInput);
+      }
+      tr.appendChild(tdTitle);
 
       const tdErr = document.createElement('td');
       tdErr.className = 'works-import-format-ratio-cell';
@@ -1790,9 +1939,14 @@
     }
     importPreviewWrap.hidden = !plan.length;
     probeImportFormatRatios(plan);
-    if (importSubmitBtn && isLocalDevServer()) {
+    if (importSubmitBtn) {
       importSubmitBtn.disabled = okCount === 0;
     }
+    if (importCodesHintEl) {
+      importCodesHintEl.hidden =
+        !isLocalDevServer() || !plan.some((r) => r.error && /inconnu/i.test(String(r.error)));
+    }
+    updateImportSubmitLabel();
     if (importStatusEl) {
       if (!plan.length) {
         importStatusEl.textContent = '';
@@ -1804,7 +1958,9 @@
         if (warnCount) msg += ' · ' + warnCount + ' avertissement(s)';
         if (!isLocalDevServer()) msg += ' — simulation (aucune écriture)';
         else if (okCount === 0 && plan.length) {
-          msg += ' — corrigez les erreurs (codes inconnus, etc.) pour activer Importer';
+          msg += ' — corrigez format, technique ou série pour activer l’import';
+        } else if (importPublishAfterEl && importPublishAfterEl.checked) {
+          msg += ' — puis publication git push';
         }
         importStatusEl.textContent = msg;
       }
@@ -1827,6 +1983,7 @@
         import_mode: getImportMode(),
         photo_status_code: getImportPhotoStatusCode(),
         files,
+        overrides: getImportOverridesPayload(),
       }),
     });
     const j = await r.json();
@@ -1866,6 +2023,7 @@
     revokeImportPreviewObjectUrls();
     importSelectedFiles = [];
     importPlan = [];
+    importOverrides = {};
     if (importFilesEl) importFilesEl.value = '';
     updateImportModeUi();
     updateImportDialogForEnv();
@@ -1880,9 +2038,132 @@
     importDialog.showModal();
   }
 
+  async function loadPublishPreview(workIds) {
+    const qs =
+      '/api/works/publish/preview?token=' +
+      encodeURIComponent(token) +
+      (workIds && workIds.length
+        ? '&work_ids=' + encodeURIComponent(workIds.join(','))
+        : '');
+    const r = await apiFetch(qs);
+    const j = await r.json();
+    if (!r.ok || !j.ok) throw new Error(formatApiError(j.error) || 'aperçu publication impossible');
+    return j;
+  }
+
+  function defaultPublishMessage(workIds) {
+    if (!workIds || !workIds.length) {
+      return 'Publie médias catalogue sur mariesallantin.art';
+    }
+    if (workIds.length === 1) {
+      return 'Publie œuvre ' + workIds[0] + ' sur mariesallantin.art';
+    }
+    return (
+      'Publie œuvres ' + workIds[0] + '–' + workIds[workIds.length - 1] + ' sur mariesallantin.art'
+    );
+  }
+
+  async function openPublishDialog(workIds) {
+    if (!isLocalDevServer() || !publishDialog) return;
+    pendingPublishWorkIds = workIds || [];
+    if (publishStatusEl) {
+      publishStatusEl.textContent = '';
+      publishStatusEl.classList.remove('legend-editor-api-hint--error');
+    }
+    if (publishFileListEl) publishFileListEl.innerHTML = '';
+    if (publishMessageEl) {
+      publishMessageEl.value = defaultPublishMessage(pendingPublishWorkIds);
+    }
+    try {
+      const preview = await loadPublishPreview(pendingPublishWorkIds);
+      if (publishFileListEl) {
+        publishFileListEl.innerHTML = '';
+        for (const p of preview.paths || []) {
+          const li = document.createElement('li');
+          li.textContent = p;
+          publishFileListEl.appendChild(li);
+        }
+        if (!preview.paths || !preview.paths.length) {
+          const li = document.createElement('li');
+          li.textContent = 'Aucun fichier en attente de publication.';
+          publishFileListEl.appendChild(li);
+        }
+      }
+      if (publishConfirmBtn) {
+        publishConfirmBtn.disabled = !preview.paths || !preview.paths.length;
+      }
+    } catch (e) {
+      if (publishStatusEl) {
+        publishStatusEl.textContent = formatApiError(e);
+        publishStatusEl.classList.add('legend-editor-api-hint--error');
+      }
+      if (publishConfirmBtn) publishConfirmBtn.disabled = true;
+    }
+    publishDialog.showModal();
+  }
+
+  async function runPublish({ workIds, message, closeDialog }) {
+    if (!isLocalDevServer()) {
+      throw new Error('publication réservée à l’API locale — npm run works:import');
+    }
+    const ids = (workIds || []).map((id) => String(id).trim().toUpperCase()).filter(Boolean);
+    const r = await apiFetch('/api/works/publish', {
+      method: 'POST',
+      body: JSON.stringify({
+        token,
+        work_ids: ids,
+        message: message || defaultPublishMessage(ids),
+      }),
+    });
+    const j = await r.json();
+    if (!r.ok || !j.ok) throw new Error(formatApiError(j.error) || 'publication échouée');
+    if (closeDialog && publishDialog) publishDialog.close();
+    return j;
+  }
+
+  async function publishImportedWorks(workIds) {
+    if (!workIds.length) return null;
+    setStatus('Publication sur mariesallantin.art…');
+    try {
+      const j = await runPublish({
+        workIds,
+        message: defaultPublishMessage(workIds),
+        closeDialog: true,
+      });
+      if (j.pushed) {
+        setStatus(
+          workIds.length +
+            ' œuvre(s) importée(s) et publiée(s) — vignettes visibles sur mariesallantin.art dans 1–2 min.'
+        );
+      } else {
+        setStatus(
+          workIds.length +
+            ' œuvre(s) importée(s) — rien à publier (fichiers déjà sur le dépôt).'
+        );
+      }
+      return j;
+    } catch (e) {
+      setStatus(
+        'Import terminé mais publication échouée : ' +
+          formatApiError(e) +
+          ' — utilisez « Publier médias ».',
+        true
+      );
+      return null;
+    }
+  }
+
   async function runWorksImport() {
-    if (!isLocalDevServer()) return;
     if (!importSelectedFiles.length || !importSubmitBtn) return;
+    if (!isLocalDevServer()) {
+      const ok = importPlan.filter((r) => !r.error).length;
+      if (importStatusEl) {
+        importStatusEl.textContent =
+          ok +
+          ' fichier(s) prêt(s) — pour importer et publier, lancez npm run works:import en local.';
+      }
+      return;
+    }
     const importMode = getImportMode();
     const photoStatusCode = getImportPhotoStatusCode();
     const batchSize = isLocalDevServer() ? 12 : 2;
@@ -1913,6 +2194,7 @@
             import_mode: importMode,
             photo_status_code: photoStatusCode,
             files,
+            overrides: getImportOverridesPayload(),
           }),
         });
         const j = await r.json();
@@ -1935,10 +2217,19 @@
       renderTable();
       if (importDialog) importDialog.close();
 
-      let msg = totalOk + ' œuvre(s) importée(s).';
-      msg +=
-        ' Publiez media/catalogue/, media/catalogue/_thumbs/ et media/works.json (git push) pour les vignettes sur mariesallantin.art.';
-      setStatus(msg);
+      const importedIds = allImported
+        .filter((row) => row.status === 'ok' && row.workId)
+        .map((row) => String(row.workId).toUpperCase());
+
+      if (importPublishAfterEl && importPublishAfterEl.checked && importedIds.length) {
+        await publishImportedWorks(importedIds);
+      } else {
+        let msg = totalOk + ' œuvre(s) importée(s).';
+        if (isLocalDevServer()) {
+          msg += ' Cochez « Publier après import » ou utilisez « Publier médias » pour le site en ligne.';
+        }
+        setStatus(msg);
+      }
     } catch (e) {
       if (importStatusEl) {
         importStatusEl.textContent = formatApiError(e);
@@ -2023,6 +2314,49 @@
 
     importSubmitBtn?.addEventListener('click', () => {
       runWorksImport().catch((e) => setStatus(formatApiError(e), true));
+    });
+
+    importPublishAfterEl?.addEventListener('change', () => updateImportSubmitLabel());
+
+    publishBtn?.addEventListener('click', () => {
+      openPublishDialog([]).catch((e) => setStatus(formatApiError(e), true));
+    });
+
+    publishCloseBtn?.addEventListener('click', () => publishDialog?.close());
+    publishCancelBtn?.addEventListener('click', () => publishDialog?.close());
+
+    publishConfirmBtn?.addEventListener('click', async () => {
+      if (!publishConfirmBtn) return;
+      publishConfirmBtn.disabled = true;
+      if (publishStatusEl) {
+        publishStatusEl.textContent = 'Publication en cours (git push)…';
+        publishStatusEl.classList.remove('legend-editor-api-hint--error');
+      }
+      try {
+        const j = await runPublish({
+          workIds: pendingPublishWorkIds,
+          message: publishMessageEl ? publishMessageEl.value : '',
+          closeDialog: false,
+        });
+        if (publishStatusEl) {
+          publishStatusEl.textContent = j.pushed
+            ? 'Publié — le site sera à jour dans 1–2 minutes.'
+            : 'Rien à publier (dépôt déjà à jour).';
+        }
+        setStatus(
+          j.pushed
+            ? 'Médias publiés sur mariesallantin.art.'
+            : 'Aucun fichier média en attente de publication.'
+        );
+        setTimeout(() => publishDialog?.close(), 1200);
+      } catch (e) {
+        if (publishStatusEl) {
+          publishStatusEl.textContent = formatApiError(e);
+          publishStatusEl.classList.add('legend-editor-api-hint--error');
+        }
+      } finally {
+        publishConfirmBtn.disabled = false;
+      }
     });
 
     filterEl?.addEventListener('input', () => {

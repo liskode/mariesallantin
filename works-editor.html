@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250630-22" />
+  <link rel="stylesheet" href="catalogue.css?v=20250630-26" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -112,8 +112,11 @@
                   height="18"
                 />
               </button>
-              <button type="button" class="legend-editor-btn works-import-toolbar-btn" id="works-import-btn" aria-label="Importer des œuvres" title="Importer des œuvres">
+              <button type="button" class="legend-editor-btn works-import-toolbar-btn" id="works-import-btn" aria-label="Importer des œuvres" title="Importer des œuvres (studio local : npm run works:import)">
                 <img src="images/import.png" alt="" class="legend-editor-btn-picto" width="16" height="16" />
+              </button>
+              <button type="button" class="legend-editor-btn works-publish-toolbar-btn" id="works-publish-btn" hidden title="Publier les médias sur mariesallantin.art (git push)">
+                Publier médias
               </button>
             </div>
           </div>
@@ -263,7 +266,10 @@
               <th>Fichier</th>
               <th>Code</th>
               <th>Image</th>
-              <th>Métadonnées / titre</th>
+              <th>Série(s)</th>
+              <th>Format</th>
+              <th>Technique</th>
+              <th>Titre</th>
               <th>Problèmes</th>
             </tr>
           </thead>
@@ -271,6 +277,17 @@
         </table>
       </div>
       <p id="works-import-status" class="legend-editor-api-hint" aria-live="polite"></p>
+      <p class="works-import-codes-hint legend-editor-api-hint" id="works-import-codes-hint" hidden>
+        Code manquant ? Ouvrez l’éditeur
+        <a href="http://127.0.0.1:47834/" target="_blank" rel="noopener noreferrer">Codes</a>
+        ou
+        <a href="http://127.0.0.1:47833/" target="_blank" rel="noopener noreferrer">Séries</a>
+        dans un autre onglet, puis rechargez l’aperçu.
+      </p>
+      <label class="works-import-publish-option" id="works-import-publish-wrap" hidden>
+        <input type="checkbox" id="works-import-publish-after" checked />
+        Publier sur mariesallantin.art après import (<code>git push</code>)
+      </label>
       <footer class="works-import-dialog-footer">
         <button type="button" class="legend-editor-btn" id="works-import-cancel">Annuler</button>
         <button type="button" class="legend-editor-btn legend-editor-btn--save" id="works-import-submit" disabled>
@@ -280,7 +297,29 @@
     </div>
   </dialog>
 
+  <dialog id="works-publish-dialog" class="works-publish-dialog">
+    <div class="works-publish-dialog-panel">
+      <header class="works-import-dialog-header">
+        <h2 class="works-import-dialog-title">Publier sur mariesallantin.art</h2>
+        <button type="button" class="works-import-dialog-close" id="works-publish-close" aria-label="Fermer">×</button>
+      </header>
+      <p class="legend-editor-api-hint">
+        Commit et push des images, miniatures et <code>media/works.json</code> vers GitHub Pages.
+      </p>
+      <ul id="works-publish-file-list" class="works-publish-file-list"></ul>
+      <label class="works-import-label" for="works-publish-message">Message de commit</label>
+      <input type="text" id="works-publish-message" class="catalogue-login-input works-publish-message-input" />
+      <p id="works-publish-status" class="legend-editor-api-hint" aria-live="polite"></p>
+      <footer class="works-import-dialog-footer">
+        <button type="button" class="legend-editor-btn" id="works-publish-cancel">Annuler</button>
+        <button type="button" class="legend-editor-btn legend-editor-btn--save" id="works-publish-confirm">
+          Publier (git push)
+        </button>
+      </footer>
+    </div>
+  </dialog>
+
   <script src="editor-common.js?v=20250630-22"></script>
-  <script src="works-editor.js?v=20250630-25"></script>
+  <script src="works-editor.js?v=20250630-26"></script>
 </body>
 </html>

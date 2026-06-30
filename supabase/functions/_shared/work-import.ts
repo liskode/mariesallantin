@@ -237,6 +237,116 @@ export function auditImportMetadata(
   return issues;
 }
 
+export type ImportOverride = {
+  format_code?: string | null;
+  technique_code?: string | null;
+  series_codes?: string[];
+  title?: string | null;
+};
+
+export function normalizeImportOverrides(
+  raw: unknown
+): Record<string, ImportOverride> {
+  if (!raw || typeof raw !== 'object') return {};
+  const out: Record<string, ImportOverride> = {};
+  for (const [key, val] of Object.entries(raw as Record<string, unknown>)) {
+    if (!val || typeof val !== 'object') continue;
+    const name = String(key).trim();
+    if (!name) continue;
+    const entry: ImportOverride = {};
+    const v = val as Record<string, unknown>;
+    if ('format_code' in v) {
+      const c = String(v.format_code || '').trim().toUpperCase();
+      entry.format_code = c || null;
+    }
+    if ('technique_code' in v) {
+      const c = String(v.technique_code || '').trim().toUpperCase();
+      entry.technique_code = c || null;
+    }
+    if (Array.isArray(v.series_codes)) {
+      entry.series_codes = [
+        ...new Set(
+          v.series_codes.map((c) => String(c || '').trim().toUpperCase()).filter(Boolean)
+        ),
+      ];
+    }
+    if ('title' in v) {
+      const t = String(v.title || '').trim();
+      entry.title = t || null;
+    }
+    out[name] = entry;
+  }
+  return out;
+}
+
+export function applyImportOverridesToPlanItem(
+  entry: {
+    originalName: string;
+    effectiveMode: ImportMode;
+    formatCode: string | null;
+    techniqueCode: string | null;
+    seriesCodes: string[];
+    title: string;
+    issues: string[];
+    error: string | null;
+  },
+  override: ImportOverride | undefined,
+  catalog: {
+    knownSeries?: Set<string>;
+    knownTechniques?: Set<string>;
+    knownFormats?: Set<string>;
+  } = {}
+) {
+  if (!override || entry.effectiveMode === 'update') return;
+  const { knownSeries, knownTechniques, knownFormats } = catalog;
+
+  if ('format_code' in override) entry.formatCode = override.format_code || null;
+  if ('technique_code' in override) entry.techniqueCode = override.technique_code || null;
+  if ('series_codes' in override) entry.seriesCodes = [...(override.series_codes || [])];
+  if ('title' in override && override.title != null) entry.title = override.title;
+
+  const issues: string[] = [];
+  for (const code of entry.seriesCodes || []) {
+    if (knownSeries?.size && !knownSeries.has(code)) {
+      issues.push(`série inconnue : ${code}`);
+    }
+  }
+  if (entry.formatCode && knownFormats?.size && !knownFormats.has(entry.formatCode)) {
+    issues.push(`format inconnu : ${entry.formatCode}`);
+  }
+  if (entry.techniqueCode && knownTechniques?.size && !knownTechniques.has(entry.techniqueCode)) {
+    issues.push(`technique inconnue : ${entry.techniqueCode}`);
+  }
+  entry.issues = issues;
+  entry.error = issues.length ? issues.join(' ; ') : null;
+}
+
+export function applyOverridesToPlan(
+  plan: Array<{
+    originalName: string;
+    effectiveMode: ImportMode;
+    formatCode: string | null;
+    techniqueCode: string | null;
+    seriesCodes: string[];
+    title: string;
+    issues: string[];
+    error: string | null;
+  }>,
+  overrides: Record<string, ImportOverride>,
+  catalog: {
+    knownSeries?: Set<string>;
+    knownTechniques?: Set<string>;
+    knownFormats?: Set<string>;
+  }
+) {
+  if (!overrides || !plan?.length) return plan;
+  for (const item of plan) {
+    const ov = overrides[item.originalName];
+    if (ov) applyImportOverridesToPlanItem(item, ov, catalog);
+  }
+  return plan;
+}
+
 type ImportCatalog = {
   knownSeries?: Set<string> | null;
   knownTechniques?: Set<string> | null;

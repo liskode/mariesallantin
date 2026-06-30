@@ -1,0 +1,95 @@
+================================================================================
+  IMPORT D'ŒUVRES — NOTICE D'UTILISATION
+  mariesallantin.art
+================================================================================
+
+DÉMARRAGE (sur votre Mac, dans le dossier du projet)
+────────────────────────────────────────────────────
+
+  npm run works:import
+
+  → Démarre l'éditeur local et ouvre le navigateur sur :
+    http://127.0.0.1:47835/
+
+  Mot de passe : MS75
+
+  Alternative : npm run works:api  (même adresse, sans ouverture auto du navigateur)
+
+
+EN LIGNE (mariesallantin.art / works-editor.html)
+──────────────────────────────────────────────────
+
+  • Simulation uniquement : aucun fichier n'est écrit, rien n'est importé.
+  • Utile pour vérifier les codes MS attribués et corriger format / technique /
+    série avant de faire l'import réel en local.
+
+
+ÉTAPES D'IMPORT (local)
+───────────────────────
+
+  1. Cliquer sur l'icône Importer (barre d'outils à droite).
+
+  2. Choisir une ou plusieurs images JPEG / PNG / WebP.
+     Nom de fichier conseillé (mode ajout) :
+       SÉRIE_FORMAT_TECHNIQUE_ANNÉE_TITRE…
+     Exemple : COROT_HOFO_HST_1984_Mon titre.jpeg
+
+  3. Vérifier l'aperçu dans le tableau :
+       - Code MS attribué (MS####)
+       - Nom du fichier image cible
+       - Série(s), format, technique, titre
+
+  4. Corriger si besoin les listes Format / Technique / Série(s) / Titre.
+     Si un code n'existe pas encore :
+       - Ouvrir l'éditeur Codes  → http://127.0.0.1:47834/
+       - ou Séries             → http://127.0.0.1:47833/
+       - Créer le code, revenir à l'import, resélectionner les fichiers
+         ou modifier les listes dans le tableau.
+
+  5. Choisir le mode :
+       - Ajout d'œuvres      → nouveaux numéros MS####
+       - Mise à jour image   → remplace l'image d'un MS#### existant
+                               (le nom doit commencer par MS####)
+
+  6. Cocher « Publier sur mariesallantin.art après import » (recommandé).
+     Le bouton devient « Importer et publier ».
+
+  7. Cliquer sur Importer et publier.
+
+     L'outil enchaîne automatiquement :
+       • copie des images dans media/catalogue/
+       • création des miniatures WebP (media/catalogue/_thumbs/)
+       • mise à jour de Supabase (base de données)
+       • mise à jour de media/works.json
+       • git commit + git push  →  vignettes visibles en ligne sous 1 à 2 min.
+
+
+PUBLICATION MANUELLE
+────────────────────
+
+  Si vous avez importé sans cocher la publication, ou pour rattraper un oubli :
+
+  • Bouton « Publier médias » dans la barre d'outils (local uniquement).
+  • Liste les fichiers en attente, message de commit, puis git push.
+
+
+APRÈS L'IMPORT
+──────────────
+
+  • Les œuvres apparaissent dans le tableau de l'éditeur (vignettes en local).
+  • En ligne : hard refresh (Cmd+Shift+R) si les vignettes ne s'affichent pas
+    tout de suite.
+  • Ajuster titre, statuts publication / photo, collectionneur, etc. dans
+    l'éditeur puis Enregistrer si nécessaire.
+
+
+RAPPELS
+───────
+
+  • L'import réel ne fonctionne qu'en local (npm run works:import).
+  • Sans git push, les fiches sont en base Supabase mais les images ne sont
+    pas sur le site public.
+  • Redémarrer l'API après une mise à jour du code : Ctrl+C puis relancer
+    npm run works:import.
+
+================================================================================

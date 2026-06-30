@@ -4,6 +4,8 @@ import {
   fetchExistingWorkIds,
   formatWorkId,
   normalizeImportMode,
+  normalizeImportOverrides,
+  applyOverridesToPlan,
   planWorkImports,
   resolveNextSequentialStart,
 } from '../_shared/work-import.ts';
@@ -222,6 +224,7 @@ Deno.serve(async (req) => {
         sequentialStart,
         catalog
       );
+      applyOverridesToPlan(plan, normalizeImportOverrides(body.overrides), catalog);
       return jsonResponse(200, {
         ok: true,
         import_mode: importMode,

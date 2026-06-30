@@ -11,14 +11,16 @@ import { createClient } from '@supabase/supabase-js';
 import { sortFormats } from './format-sort.mjs';
 import {
   appendWorksJsonEntries,
+  applyOverridesToPlan,
   archiveExistingCatalogueFile,
   buildWorkImageUpdate,
-  buildWorkRecords,
+  buildWorkRecordsFromPlanItem,
   fetchExistingWorkIds,
   fetchNextSortOrder,
   formatWorkId,
   generateThumbnailForMedia,
   normalizeImportMode,
+  normalizeImportOverrides,
   persistWorkImageUpdatesToSupabase,
   persistWorksToSupabase,
   planWorkImports,
@@ -26,6 +28,11 @@ import {
   resolveNextSequentialStart,
   writeCatalogueFile,
 } from './work-import.mjs';
+import {
+  assertGitRepo,
+  publishMediaToGitHub,
+  resolvePublishPaths,
+} from './works-git-publish.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -245,6 +252,7 @@ async function handleImportPlan(body) {
   const existingIds = await fetchExistingWorkIds(supabase);
   const sequentialStart = await resolveNextSequentialStart(supabase, worksJsonPath);
   const plan = planWorkImports(names, importMode, existingIds, sequentialStart, catalog);
+  applyOverridesToPlan(plan, normalizeImportOverrides(body.overrides), catalog);
   return {
     ok: true,
     import_mode: importMode,
@@ -295,6 +303,7 @@ async function handleImportWorks(body, { writeFiles }) {
     sequentialStart,
     catalog
   );
+  applyOverridesToPlan(plan, normalizeImportOverrides(body.overrides), catalog);
 
   const errors = plan.filter((p) => p.error);
   if (errors.length === plan.length) {
@@ -380,14 +389,12 @@ async function handleImportWorks(body, { writeFiles }) {
       continue;
     }
 
-    const built = buildWorkRecords({
+    const built = buildWorkRecordsFromPlanItem({
       workId: item.workId,
       originalName: item.originalName,
       sortOrder,
-      knownFormats,
-      knownTechniques,
-      knownSeries,
       photoStatusCode,
+      item,
     });
     sortOrder += 1;
 
@@ -579,6 +586,47 @@ const server = http.createServer(async (req, res) => {
       }
       const works = await fetchWorksWithSeries(supabase);
       sendJson(res, 200, { ok: true, works, saved: rows.length });
+      return;
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/works/publish/preview') {
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      await assertGitRepo(root);
+      const workIdsRaw = url.searchParams.get('work_ids') || '';
+      const workIds = workIdsRaw
+        ? workIdsRaw.split(',').map((id) => id.trim().toUpperCase()).filter(Boolean)
+        : [];
+      const { paths, status } = await resolvePublishPaths(root, { workIds });
+      sendJson(res, 200, {
+        ok: true,
+        paths,
+        work_ids: status.workIds,
+        count: paths.length,
+        clean: paths.length === 0,
+        files: status.files,
+      });
+      return;
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/works/publish') {
+      const body = JSON.parse(await readBody(req));
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      await assertGitRepo(root);
+      const workIds = Array.isArray(body.work_ids)
+        ? body.work_ids.map((id) => String(id).trim().toUpperCase()).filter(Boolean)
+        : [];
+      const result = await publishMediaToGitHub(root, {
+        message: body.message,
+        workIds,
+        paths: body.paths,
+      });
+      sendJson(res, 200, { ok: true, ...result });
       return;
     }
 

@@ -279,7 +279,141 @@ export function auditImportMetadata(parsed, catalog = {}) {
 }
 
 /**
- * @param {Array<{ originalName: string }>} files
+ * @param {unknown} raw
+ * @returns {Record<string, { format_code?: string | null, technique_code?: string | null, series_codes?: string[], title?: string | null }>}
+ */
+export function normalizeImportOverrides(raw) {
+  if (!raw || typeof raw !== 'object') return {};
+  const out = {};
+  for (const [key, val] of Object.entries(raw)) {
+    if (!val || typeof val !== 'object') continue;
+    const name = String(key).trim();
+    if (!name) continue;
+    const entry = {};
+    if ('format_code' in val) {
+      const c = String(val.format_code || '').trim().toUpperCase();
+      entry.format_code = c || null;
+    }
+    if ('technique_code' in val) {
+      const c = String(val.technique_code || '').trim().toUpperCase();
+      entry.technique_code = c || null;
+    }
+    if (Array.isArray(val.series_codes)) {
+      entry.series_codes = [
+        ...new Set(
+          val.series_codes.map((c) => String(c || '').trim().toUpperCase()).filter(Boolean)
+        ),
+      ];
+    }
+    if ('title' in val) {
+      const t = String(val.title || '').trim();
+      entry.title = t || null;
+    }
+    out[name] = entry;
+  }
+  return out;
+}
+
+/**
+ * @param {object} entry
+ * @param {ReturnType<typeof normalizeImportOverrides>[string]} override
+ * @param {{ knownSeries?: Set<string>, knownTechniques?: Set<string>, knownFormats?: Set<string> }} catalog
+ */
+export function applyImportOverridesToPlanItem(entry, override, catalog = {}) {
+  if (!entry || !override || entry.effectiveMode === 'update') return;
+  const { knownSeries, knownTechniques, knownFormats } = catalog;
+
+  if ('format_code' in override) {
+    entry.formatCode = override.format_code || null;
+  }
+  if ('technique_code' in override) {
+    entry.techniqueCode = override.technique_code || null;
+  }
+  if ('series_codes' in override) {
+    entry.seriesCodes = [...(override.series_codes || [])];
+  }
+  if ('title' in override && override.title != null) {
+    entry.title = override.title;
+  }
+
+  const issues = [];
+  for (const code of entry.seriesCodes || []) {
+    if (knownSeries?.size && !knownSeries.has(code)) {
+      issues.push(`série inconnue : ${code}`);
+    }
+  }
+  if (entry.formatCode && knownFormats?.size && !knownFormats.has(entry.formatCode)) {
+    issues.push(`format inconnu : ${entry.formatCode}`);
+  }
+  if (entry.techniqueCode && knownTechniques?.size && !knownTechniques.has(entry.techniqueCode)) {
+    issues.push(`technique inconnue : ${entry.techniqueCode}`);
+  }
+
+  entry.issues = issues;
+  entry.error = issues.length ? issues.join(' ; ') : null;
+}
+
+/**
+ * @param {Array<object>} plan
+ * @param {ReturnType<typeof normalizeImportOverrides>} overrides
+ * @param {object} catalog
+ */
+export function applyOverridesToPlan(plan, overrides, catalog) {
+  if (!overrides || !plan?.length) return plan;
+  for (const item of plan) {
+    const ov = overrides[item.originalName];
+    if (ov) applyImportOverridesToPlanItem(item, ov, catalog);
+  }
+  return plan;
+}
+
+/**
+ * @param {object} opts
+ */
+export function buildWorkRecordsFromPlanItem(opts) {
+  const { workId, originalName, sortOrder, photoStatusCode, item } = opts;
+  const catalogueBasename = catalogueBasenameForWorkId(workId, originalName);
+  const imageExt = extFromFilename(originalName) || 'jpeg';
+  const mediaRel = `catalogue/${catalogueBasename}`;
+  const photoCode = photoStatusCode
+    ? String(photoStatusCode).trim().toUpperCase()
+    : null;
+
+  const dbRow = {
+    id: workId,
+    title: item.title || '',
+    filename_original: originalName,
+    year: item.year,
+    format_code: item.formatCode || null,
+    technique_code: item.techniqueCode || null,
+    publication_status_code: 'M',
+    collector_code: null,
+    width_cm: null,
+    height_cm: null,
+    sort_order: sortOrder,
+    image_ext: imageExt === 'jpg' ? 'jpeg' : imageExt,
+  };
+  if (photoCode) dbRow.photo_status_code = photoCode;
+
+  const seriesCodes = [...(item.seriesCodes || [])];
+  const jsonRow = {
+    id: workId,
+    media: mediaRel,
+    title: item.title || '',
+    series: seriesCodes,
+    publish: 'VAL',
+  };
+  if (photoCode) jsonRow.photo = photoCode;
+
+  return {
+    dbRow,
+    jsonRow,
+    seriesCodes,
+    mediaRel,
+  };
+}
+
+/**
  * @param {ImportMode} importMode
  * @param {Set<string>} existingIds ids déjà en base
  * @param {number} sequentialStart
