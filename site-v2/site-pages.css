@@ -1,9 +1,234 @@
-/* site-v2 — ajustements visuels (pages secondaires + accueil) */
+/* site-v2 — phase 1 : fond gris, header partenaires, navigation épurée */
+
+.site-v2,
+.site-v2-page {
+  --background: #f0f1f3;
+  --surface: #ffffff;
+  --primary: #1a1a1a;
+  --secondary: #5c5c66;
+  --accent: #3d6fc4;
+  --border: #e2e4e8;
+  --shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+}
+
+.site-v2,
+.site-v2-page,
+.site-v2 .site-grid,
+.site-v2-page .site-grid {
+  background: var(--background);
+}
+
+.site-v2 .main-header,
+.site-v2-page .main-header {
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border-bottom: 1px solid var(--border);
+}
+
+.site-v2 .header-content,
+.site-v2-page .header-content {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 20px;
+  padding: 20px 28px 14px 36px;
+  flex-wrap: wrap;
+}
+
+.site-v2 .site-header-logo img,
+.site-v2-page .site-header-logo img {
+  display: block;
+  height: auto;
+  max-height: 72px;
+  width: auto;
+}
+
+.site-v2 .main-nav,
+.site-v2-page .main-nav {
+  flex: 1;
+  gap: 8px;
+}
+
+.site-v2 .main-nav a,
+.site-v2-page .main-nav a {
+  font-size: 1.05rem;
+  font-weight: 600;
+  padding: 6px 12px;
+}
+
+.site-v2 .main-nav a:hover,
+.site-v2-page .main-nav a:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--primary);
+}
+
+.site-v2 .main-nav a.active,
+.site-v2-page .main-nav a.active {
+  background: transparent;
+  color: var(--accent);
+}
+
+.site-v2 .site-header-partners,
+.site-v2-page .site-header-partners {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.site-v2 .site-header-baseart,
+.site-v2-page .site-header-baseart {
+  line-height: 0;
+}
+
+.site-v2 .site-header-baseart-logo,
+.site-v2-page .site-header-baseart-logo,
+.site-v2 .site-header-adagp-logo,
+.site-v2-page .site-header-adagp-logo {
+  height: 34px;
+  width: auto;
+  max-width: 88px;
+  object-fit: contain;
+  opacity: 0.82;
+  vertical-align: middle;
+}
+
+.site-v2 .site-header-adagp,
+.site-v2-page .site-header-adagp {
+  line-height: 0;
+}
+
+.site-v2 .site-header-adagp:hover .site-header-adagp-logo,
+.site-v2-page .site-header-adagp:hover .site-header-adagp-logo {
+  opacity: 1;
+}
+
+.site-v2 .site-header-adagp:focus-visible,
+.site-v2-page .site-header-adagp:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+/* Menu séries — indicateur actif discret */
+.site-v2 .side-menu,
+.site-v2-page .side-menu {
+  background: var(--surface);
+  border-right-color: var(--border);
+  box-shadow: none;
+}
 
 .site-v2 .side-menu-title,
 .site-v2-page .side-menu-title {
-  color: #3771d7;
+  color: var(--accent);
 }
+
+.site-v2 #series-list a,
+.site-v2-page #series-list a {
+  border-radius: 0;
+  border-left: 3px solid transparent;
+  padding-left: 29px;
+}
+
+.site-v2 #series-list a:hover,
+.site-v2-page #series-list a:hover {
+  background: rgba(61, 111, 196, 0.06);
+  color: var(--accent);
+}
+
+.site-v2 #series-list a.active,
+.site-v2-page #series-list a.active {
+  background: rgba(61, 111, 196, 0.08);
+  color: var(--primary);
+  font-weight: 600;
+  border-left-color: var(--accent);
+}
+
+/* Accueil — hero allégé */
+.site-v2 .welcome {
+  background: var(--surface);
+  box-shadow: var(--shadow);
+  border: 1px solid var(--border);
+}
+
+.site-v2 .hero-overlay {
+  background: linear-gradient(
+    to bottom,
+    rgba(0, 0, 0, 0.22) 0%,
+    rgba(0, 0, 0, 0.04) 48%,
+    rgba(0, 0, 0, 0.52) 100%
+  );
+}
+
+.site-v2 .hero-text p {
+  font-size: 1rem;
+  line-height: 1.55;
+  max-width: 36rem;
+}
+
+.site-v2 .hero-bio-link {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45);
+  white-space: nowrap;
+}
+
+.site-v2 .hero-bio-link:hover {
+  border-bottom-color: rgba(255, 255, 255, 0.9);
+}
+
+.site-v2 footer,
+.site-v2-page footer {
+  color: var(--secondary);
+  border-top-color: var(--border);
+}
+
+@media (max-width: 900px) {
+  .site-v2 .header-content,
+  .site-v2-page .header-content {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 12px 10px 16px;
+  }
+
+  .site-v2 .site-header-partners,
+  .site-v2-page .site-header-partners {
+    margin-left: auto;
+    gap: 10px;
+  }
+
+  .site-v2 .site-header-baseart-logo,
+  .site-v2-page .site-header-baseart-logo,
+  .site-v2 .site-header-adagp-logo,
+  .site-v2-page .site-header-adagp-logo {
+    height: 28px;
+    max-width: 72px;
+  }
+
+  .site-v2 .site-header-logo img,
+  .site-v2-page .site-header-logo img {
+    max-height: 52px;
+  }
+
+  .site-v2 #series-list a,
+  .site-v2-page #series-list a {
+    border-left: none;
+    border-bottom: 2px solid transparent;
+    padding-left: 12px;
+    padding-right: 12px;
+    border-radius: 4px;
+  }
+
+  .site-v2 #series-list a.active,
+  .site-v2-page #series-list a.active {
+    border-left-color: transparent;
+    border-bottom-color: var(--accent);
+  }
+}
+
+/* site-v2 — ajustements visuels (pages secondaires + accueil) */
 
 .site-v2 .subtitle,
 .site-v2-page .subtitle {
