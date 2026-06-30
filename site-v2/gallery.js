@@ -5,11 +5,150 @@ document.addEventListener('DOMContentLoaded', () => {
   const seriesList = document.getElementById('series-list');
   let allSeries = {};
   let seriesNames = {};
+  let seriesMeta = {};
   let seriesIconWorkIds = {};
   let seriesIconCovers = {};
   let seriesOrder = [];
   let currentSeries = [];
+  let currentSeriesCode = '';
   let currentIndex = 0;
+
+  function formatSeriesYears(meta) {
+    if (!meta) return '';
+    const start = meta.year_start;
+    const end = meta.year_end;
+    const hasStart = start != null && !Number.isNaN(start);
+    const hasEnd = end != null && !Number.isNaN(end);
+    if (hasStart && hasEnd) {
+      return start === end ? ` ${start}` : ` ${start}-${end}`;
+    }
+    if (hasStart) return ` ${start}`;
+    if (hasEnd) return ` ${end}`;
+    return '';
+  }
+
+  function formatSeriesHeading(code) {
+    const name = seriesNames[code] || code;
+    const years = formatSeriesYears(seriesMeta[code]);
+    return `Série "${name}"${years}`;
+  }
+
+  function appendSeriesHeading(code) {
+    const header = document.createElement('h2');
+    header.className = 'series-gallery-heading';
+    header.textContent = formatSeriesHeading(code);
+    gallery.appendChild(header);
+  }
+
+  function orderedSeriesCodes() {
+    return seriesCodesForGallery({ seriesOrder, allSeries });
+  }
+
+  function isGalleryContextActive() {
+    const welcome = document.getElementById('welcome-section');
+    if (!welcome) return true;
+    return welcome.style.display === 'none';
+  }
+
+  function shouldHandleGalleryKeys(e) {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return false;
+    const tag = e.target && e.target.tagName;
+    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return false;
+    if (e.target && e.target.isContentEditable) return false;
+    if (!gallery) return false;
+    return isGalleryContextActive();
+  }
+
+  function isLightboxOpen() {
+    return lightbox && lightbox.style.display === 'flex';
+  }
+
+  function selectSeries(code, options) {
+    const opts = options || {};
+    const codes = orderedSeriesCodes();
+    if (!code || !codes.includes(code)) return;
+
+    const wasLightboxOpen = isLightboxOpen();
+    const startIndex =
+      opts.imageIndex != null
+        ? opts.imageIndex
+        : wasLightboxOpen
+          ? currentIndex
+          : 0;
+
+    currentSeriesCode = code;
+
+    if (seriesList) {
+      Array.from(seriesList.querySelectorAll('a')).forEach((a) => {
+        a.classList.toggle('active', a.getAttribute('href').replace('#', '') === code);
+      });
+      const menuItem = seriesList.querySelector(`a[href="#${code}"]`);
+      if (menuItem) menuItem.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    if (typeof showSection === 'function') showSection('gallery');
+    else {
+      const welcome = document.getElementById('welcome-section');
+      const overview = document.getElementById('series-overview');
+      if (welcome) welcome.style.display = 'none';
+      if (overview) overview.style.display = 'none';
+      if (gallery) gallery.style.display = '';
+    }
+
+    displaySeries(code, startIndex);
+
+    if (opts.openLightbox || wasLightboxOpen) {
+      showLightbox(currentIndex);
+    }
+  }
+
+  function navigateSeries(delta) {
+    const codes = orderedSeriesCodes();
+    if (!codes.length) return;
+    let idx = codes.indexOf(currentSeriesCode);
+    if (idx < 0) {
+      idx = delta > 0 ? 0 : codes.length - 1;
+    } else {
+      idx = (idx + delta + codes.length) % codes.length;
+    }
+    selectSeries(codes[idx], { imageIndex: 0, openLightbox: isLightboxOpen() });
+  }
+
+  function navigateImage(delta) {
+    if (!currentSeries.length) return;
+    if (!isLightboxOpen()) {
+      showLightbox(currentIndex + delta);
+      return;
+    }
+    showLightbox(currentIndex + delta);
+  }
+
+  function onGalleryKeydown(e) {
+    if (!shouldHandleGalleryKeys(e)) return;
+
+    if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
+      e.preventDefault();
+      navigateSeries(e.key === 'ArrowDown' ? 1 : -1);
+      return;
+    }
+
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+      const galleryEl = document.getElementById('gallery');
+      if (!galleryEl || galleryEl.style.display === 'none' || !currentSeries.length) return;
+      e.preventDefault();
+      navigateImage(e.key === 'ArrowRight' ? 1 : -1);
+      return;
+    }
+
+    if (e.key === 'Escape' && isLightboxOpen()) {
+      e.preventDefault();
+      lightbox.style.display = 'none';
+    }
+  }
+
+  window.selectSeries = selectSeries;
+  window.navigateSeries = navigateSeries;
+  window.navigateImage = navigateImage;
 
   function mediaSrc(filePath) {
     if (typeof WorksCatalog !== 'undefined' && typeof WorksCatalog.buildMediaUrl === 'function') {
@@ -78,19 +217,12 @@ document.addEventListener('DOMContentLoaded', () => {
     };
     lightboxPrev.onclick = (e) => {
       e.stopPropagation();
-      showLightbox(currentIndex - 1);
+      navigateImage(-1);
     };
     lightboxNext.onclick = (e) => {
       e.stopPropagation();
-      showLightbox(currentIndex + 1);
+      navigateImage(1);
     };
-    document.addEventListener('keydown', (e) => {
-      if (lightbox.style.display === 'flex') {
-        if (e.key === 'ArrowLeft') showLightbox(currentIndex - 1);
-        if (e.key === 'ArrowRight') showLightbox(currentIndex + 1);
-        if (e.key === 'Escape') lightbox.style.display = 'none';
-      }
-    });
   }
 
   function showLightbox(index) {
@@ -127,6 +259,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then((data) => {
         seriesOrder = data.seriesOrder || [];
         Object.assign(seriesNames, data.seriesNames);
+        Object.assign(seriesMeta, data.seriesMeta || {});
         Object.assign(seriesIconWorkIds, data.seriesIconWorkIds || {});
         Object.assign(seriesIconCovers, data.seriesIconCovers || {});
         Object.keys(data.allSeries).forEach((k) => {
@@ -143,25 +276,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target.tagName === 'A') {
         e.preventDefault();
         const code = e.target.getAttribute('href').replace('#', '');
-        if (typeof showSection === 'function') showSection('gallery');
-        else {
-          document.getElementById('welcome-section').style.display = 'none';
-          document.getElementById('series-overview').style.display = 'none';
-          document.getElementById('gallery').style.display = '';
-        }
-        displaySeries(code);
-        Array.from(seriesList.querySelectorAll('a')).forEach((a) => a.classList.remove('active'));
-        e.target.classList.add('active');
+        selectSeries(code);
       }
     });
   }
 
-  function displaySeries(code) {
+  function displaySeries(code, startIndex) {
+    const idx = startIndex == null ? 0 : startIndex;
     gallery.innerHTML = '';
+    currentSeriesCode = code;
     currentSeries = allSeries[code] || [];
+    appendSeriesHeading(code);
     if (!currentSeries.length) return;
+    currentIndex = Math.max(0, Math.min(idx, currentSeries.length - 1));
     if (window.innerWidth < 900) {
-      showLightbox(0);
+      showLightbox(currentIndex);
       return;
     }
     const paintingsContainer = document.createElement('div');
@@ -172,7 +301,10 @@ document.addEventListener('DOMContentLoaded', () => {
       img.alt = painting.title;
       img.className = 'painting-thumb';
       img.tabIndex = 0;
-      img.addEventListener('click', () => showLightbox(idx));
+      img.onclick = () => {
+        currentIndex = idx;
+        showLightbox(idx);
+      };
       paintingsContainer.appendChild(img);
     });
     gallery.appendChild(paintingsContainer);
@@ -203,17 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
       img.className = 'series-overview-img';
       img.style.cursor = 'pointer';
       img.onclick = () => {
-        if (typeof showSection === 'function') showSection('gallery');
-        else {
-          overview.style.display = 'none';
-          galleryEl.style.display = '';
-        }
-        displaySeries(code);
-        if (seriesList) {
-          Array.from(seriesList.querySelectorAll('a')).forEach((a) => a.classList.remove('active'));
-          const menuItem = seriesList.querySelector(`a[href="#${code}"]`);
-          if (menuItem) menuItem.classList.add('active');
-        }
+        selectSeries(code, { imageIndex: 0, openLightbox: window.innerWidth < 900 });
       };
       serieDiv.appendChild(title);
       serieDiv.appendChild(img);
@@ -222,4 +344,5 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 
   createLightbox();
+  document.addEventListener('keydown', onGalleryKeydown);
 });

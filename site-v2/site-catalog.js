@@ -134,7 +134,7 @@
 
     const [seriesRes, linksRes, formatsRes, techniquesRes] = await Promise.all([
       fetch(
-        base + '/rest/v1/series?select=code,label,sort_order,icon_work_id&order=sort_order.asc,code.asc',
+        base + '/rest/v1/series?select=code,label,sort_order,icon_work_id,year_start,year_end&order=sort_order.asc,code.asc',
         { headers, cache: 'no-store' }
       ),
       fetch(base + '/rest/v1/work_series?select=work_id,series_code', { headers, cache: 'no-store' }),
@@ -195,6 +195,8 @@
       label: s.label || s.code,
       sort_order: s.sort_order ?? 0,
       icon_work_id: s.icon_work_id || null,
+      year_start: s.year_start ?? null,
+      year_end: s.year_end ?? null,
     }));
 
     return {
@@ -254,6 +256,7 @@
   function buildFromPayload(payload, mediaMap) {
     const seriesOrder = [];
     const seriesNames = {};
+    const seriesMeta = {};
     const seriesIconWorkIds = {};
     const allSeries = {};
 
@@ -265,6 +268,10 @@
         if (!code) return;
         seriesOrder.push(code);
         seriesNames[code] = String(s.label || code).trim();
+        seriesMeta[code] = {
+          year_start: s.year_start != null ? Number(s.year_start) : null,
+          year_end: s.year_end != null ? Number(s.year_end) : null,
+        };
         allSeries[code] = [];
         if (s.icon_work_id) seriesIconWorkIds[code] = s.icon_work_id;
       });
@@ -357,6 +364,7 @@
     return {
       seriesOrder: filteredOrder,
       seriesNames,
+      seriesMeta,
       allSeries,
       works,
       galleryWorks,

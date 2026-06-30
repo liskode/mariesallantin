@@ -34,8 +34,15 @@
       a.onclick = function (e) {
         e.preventDefault();
         stopHeroRotation();
-        showSection('gallery');
-        window.scrollTo({ top: document.getElementById('gallery').offsetTop - 40, behavior: 'smooth' });
+        if (typeof window.selectSeries === 'function') {
+          window.selectSeries(code);
+        } else {
+          showSection('gallery');
+        }
+        var galleryEl = document.getElementById('gallery');
+        if (galleryEl) {
+          window.scrollTo({ top: galleryEl.offsetTop - 40, behavior: 'smooth' });
+        }
       };
       li.appendChild(a);
       ul.appendChild(li);
@@ -126,8 +133,12 @@
         var hash = window.location.hash.replace('#', '');
         if (hash && hash !== 'gallery') {
           setTimeout(function () {
-            var el = document.querySelector('#series-list a[href="#' + hash + '"]');
-            if (el) el.click();
+            if (typeof window.selectSeries === 'function') {
+              window.selectSeries(hash);
+            } else {
+              var el = document.querySelector('#series-list a[href="#' + hash + '"]');
+              if (el) el.click();
+            }
           }, 150);
         }
         clearInterval(interval);
@@ -171,8 +182,12 @@
         if (window.showSeriesOverview) {
           window.showSeriesOverview();
           setTimeout(function () {
-            var el = document.querySelector('#series-list a[href="#' + seriesCode + '"]');
-            if (el) el.click();
+            if (typeof window.selectSeries === 'function') {
+              window.selectSeries(seriesCode);
+            } else {
+              var el = document.querySelector('#series-list a[href="#' + seriesCode + '"]');
+              if (el) el.click();
+            }
           }, 100);
         }
       }

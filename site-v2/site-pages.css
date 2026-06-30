@@ -144,6 +144,21 @@
   border-left-color: var(--accent);
 }
 
+.site-v2 .series-gallery-heading {
+  margin: 0 0 1.25rem;
+  padding: 0 0 0.75rem;
+  border-bottom: 1px solid var(--border);
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+  line-height: 1.35;
+}
+
+.site-v2 .series-gallery {
+  padding-top: 1.25rem;
+}
+
 /* Accueil — hero allégé */
 .site-v2 .welcome {
   background: var(--surface);
