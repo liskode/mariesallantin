@@ -93,15 +93,19 @@
     const worksRaw = await worksRes.json();
     const publicIds = new Set(worksRaw.map((w) => w.id));
 
-    const [seriesRes, linksRes] = await Promise.all([
+    const [seriesRes, linksRes, formatsRes, techniquesRes] = await Promise.all([
       fetch(
         base + '/rest/v1/series?select=code,label,sort_order,icon_work_id&order=sort_order.asc,code.asc',
         { headers, cache: 'no-store' }
       ),
       fetch(base + '/rest/v1/work_series?select=work_id,series_code', { headers, cache: 'no-store' }),
+      fetch(base + '/rest/v1/formats?select=code,label&order=sort_order.asc', { headers, cache: 'no-store' }),
+      fetch(base + '/rest/v1/techniques?select=code,label&order=sort_order.asc', { headers, cache: 'no-store' }),
     ]);
     if (!seriesRes.ok) throw new Error('Lecture series Supabase : ' + seriesRes.status);
     if (!linksRes.ok) throw new Error('Lecture work_series Supabase : ' + linksRes.status);
+    if (!formatsRes.ok) throw new Error('Lecture formats Supabase : ' + formatsRes.status);
+    if (!techniquesRes.ok) throw new Error('Lecture techniques Supabase : ' + techniquesRes.status);
 
     const linksRaw = await linksRes.json();
     const seriesCodesWithWorks = new Set();
@@ -154,7 +158,37 @@
       icon_work_id: s.icon_work_id || null,
     }));
 
-    return { ok: true, series, works, icon_works: iconWorks };
+    return {
+      ok: true,
+      series,
+      works,
+      icon_works: iconWorks,
+      formats: await formatsRes.json(),
+      techniques: await techniquesRes.json(),
+    };
+  }
+
+  function buildLabelMaps(payload) {
+    const formatLabels = {};
+    const techniqueLabels = {};
+    (payload.formats || []).forEach((f) => {
+      const code = String(f.code || '').trim().toUpperCase();
+      if (code) formatLabels[code] = String(f.label || code).trim();
+    });
+    (payload.techniques || []).forEach((t) => {
+      const code = String(t.code || '').trim().toUpperCase();
+      if (code) techniqueLabels[code] = String(t.label || code).trim();
+    });
+    return { formatLabels, techniqueLabels };
+  }
+
+  function labelsForWork(w, formatLabels, techniqueLabels) {
+    const formatCode = w.format_code != null ? String(w.format_code).trim().toUpperCase() : '';
+    const techniqueCode = w.technique_code != null ? String(w.technique_code).trim().toUpperCase() : '';
+    return {
+      formatLabel: formatCode ? formatLabels[formatCode] || '' : '',
+      techniqueLabel: techniqueCode ? techniqueLabels[techniqueCode] || '' : '',
+    };
   }
 
   function buildFromPayload(payload, mediaMap) {
@@ -175,10 +209,13 @@
         if (s.icon_work_id) seriesIconWorkIds[code] = s.icon_work_id;
       });
 
+    const { formatLabels, techniqueLabels } = buildLabelMaps(payload);
+
     const works = (payload.works || []).map((w) => {
       const id = String(w.id).trim();
       const media = mediaPathForWork(id, w.image_ext, w.filename_original, mediaMap);
       const series = uniqSeriesCodes(w.series_codes || []);
+      const { formatLabel, techniqueLabel } = labelsForWork(w, formatLabels, techniqueLabels);
       return {
         id,
         media,
@@ -190,8 +227,10 @@
         dimensions: '',
         tailleMo: null,
         format: w.format_code != null ? String(w.format_code).trim().toUpperCase() : '',
-        year: w.year != null ? String(w.year).trim() : '',
+        formatLabel,
+        year: w.year != null && w.year !== '' ? String(w.year).trim() : '',
         technique: w.technique_code != null ? String(w.technique_code).trim().toUpperCase() : '',
+        techniqueLabel,
         sort_order: w.sort_order ?? 0,
       };
     });
@@ -206,8 +245,10 @@
         dimensions: w.dimensions,
         tailleMo: w.tailleMo,
         format: w.format,
+        formatLabel: w.formatLabel,
         year: w.year,
         technique: w.technique,
+        techniqueLabel: w.techniqueLabel,
         sort_order: w.sort_order,
       };
       w.series.forEach((code) => {

@@ -30,7 +30,24 @@ document.addEventListener('DOMContentLoaded', () => {
     return list[0];
   }
 
-  let lightbox, lightboxImg, lightboxTitle, lightboxClose, lightboxPrev, lightboxNext;
+  let lightbox, lightboxImg, lightboxCaption, lightboxWorkTitle, lightboxWorkMeta, lightboxClose, lightboxPrev, lightboxNext;
+
+  function workMetaLine(work) {
+    if (!work) return '';
+    const parts = [];
+    if (work.year) parts.push(work.year);
+    if (work.techniqueLabel) parts.push(work.techniqueLabel);
+    if (work.formatLabel) parts.push(work.formatLabel);
+    return parts.join(' · ');
+  }
+
+  function updateLightboxCaption(work) {
+    if (!lightboxWorkTitle || !lightboxWorkMeta) return;
+    lightboxWorkTitle.textContent = work && work.title ? work.title : '';
+    const meta = workMetaLine(work);
+    lightboxWorkMeta.textContent = meta;
+    lightboxWorkMeta.style.display = meta ? '' : 'none';
+  }
 
   function createLightbox() {
     lightbox = document.createElement('div');
@@ -40,12 +57,17 @@ document.addEventListener('DOMContentLoaded', () => {
       <span class="close">&times;</span>
       <span class="prev">&#10094;</span>
       <img src="" alt="" />
-      <div class="lightbox-title"></div>
+      <div class="lightbox-caption">
+        <div class="lightbox-work-title"></div>
+        <div class="lightbox-work-meta"></div>
+      </div>
       <span class="next">&#10095;</span>
     `;
     document.body.appendChild(lightbox);
     lightboxImg = lightbox.querySelector('img');
-    lightboxTitle = lightbox.querySelector('.lightbox-title');
+    lightboxCaption = lightbox.querySelector('.lightbox-caption');
+    lightboxWorkTitle = lightbox.querySelector('.lightbox-work-title');
+    lightboxWorkMeta = lightbox.querySelector('.lightbox-work-meta');
     lightboxClose = lightbox.querySelector('.close');
     lightboxPrev = lightbox.querySelector('.prev');
     lightboxNext = lightbox.querySelector('.next');
@@ -76,10 +98,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (index < 0) index = currentSeries.length - 1;
     if (index >= currentSeries.length) index = 0;
     currentIndex = index;
-    const { filePath, title } = currentSeries[index];
-    lightboxImg.src = mediaSrc(filePath);
-    lightboxImg.alt = title;
-    lightboxTitle.textContent = title;
+    const work = currentSeries[index];
+    lightboxImg.src = mediaSrc(work.filePath);
+    lightboxImg.alt = work.title;
+    updateLightboxCaption(work);
     lightbox.style.display = 'flex';
   }
 

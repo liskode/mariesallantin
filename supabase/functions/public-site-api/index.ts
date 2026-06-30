@@ -34,7 +34,7 @@ function createSupabase(): SupabaseClient {
 }
 
 async function fetchCatalog(supabase: SupabaseClient) {
-  const [worksRes, seriesRes, linksRes] = await Promise.all([
+  const [worksRes, seriesRes, linksRes, formatsRes, techniquesRes] = await Promise.all([
     supabase
       .from('works')
       .select(
@@ -49,11 +49,15 @@ async function fetchCatalog(supabase: SupabaseClient) {
       .order('sort_order', { ascending: true })
       .order('code', { ascending: true }),
     supabase.from('work_series').select('work_id, series_code'),
+    supabase.from('formats').select('code, label').order('sort_order', { ascending: true }),
+    supabase.from('techniques').select('code, label').order('sort_order', { ascending: true }),
   ]);
 
   if (worksRes.error) throw worksRes.error;
   if (seriesRes.error) throw seriesRes.error;
   if (linksRes.error) throw linksRes.error;
+  if (formatsRes.error) throw formatsRes.error;
+  if (techniquesRes.error) throw techniquesRes.error;
 
   const publicWorkIds = new Set((worksRes.data || []).map((w) => w.id));
   const seriesCodesWithWorks = new Set<string>();
@@ -117,7 +121,14 @@ async function fetchCatalog(supabase: SupabaseClient) {
     icon_work_id: s.icon_work_id || null,
   }));
 
-  return { ok: true, series, works, icon_works: iconWorks };
+  return {
+    ok: true,
+    series,
+    works,
+    icon_works: iconWorks,
+    formats: formatsRes.data || [],
+    techniques: techniquesRes.data || [],
+  };
 }
 
 Deno.serve(async (req) => {
