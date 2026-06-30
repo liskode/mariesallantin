@@ -1571,6 +1571,7 @@
       await loadWorks();
       setStatus('');
       updateLocalStudioUi();
+      await checkLocalApiCapabilities();
     } catch (e) {
       setStatus(String(e.message || e), true);
     }
@@ -2102,6 +2103,27 @@
     publishDialog.showModal();
   }
 
+  function formatLocalApiStaleError(context) {
+    return (
+      context +
+      ' — API locale obsolète : arrêtez le terminal (Ctrl+C), relancez npm run works:import, ou publiez avec npm run works:publish'
+    );
+  }
+
+  async function checkLocalApiCapabilities() {
+    if (!isLocalDevServer()) return;
+    try {
+      const r = await fetch(window.location.origin + '/api/health', { cache: 'no-store' });
+      if (!r.ok) return;
+      const j = await r.json();
+      if (j.ok && j.features && j.features.publish === false) {
+        setStatus(formatLocalApiStaleError('Publication indisponible'), true);
+      }
+    } catch {
+      /* ignore */
+    }
+  }
+
   async function runPublish({ workIds, message, closeDialog }) {
     if (!isLocalDevServer()) {
       throw new Error('publication réservée à l’API locale — npm run works:import');
@@ -2116,7 +2138,13 @@
       }),
     });
     const j = await r.json();
-    if (!r.ok || !j.ok) throw new Error(formatApiError(j.error) || 'publication échouée');
+    if (!r.ok || !j.ok) {
+      const err = formatApiError(j.error) || 'publication échouée';
+      if (r.status === 404 || err === 'not found') {
+        throw new Error(formatLocalApiStaleError('Publication impossible'));
+      }
+      throw new Error(err);
+    }
     if (closeDialog && publishDialog) publishDialog.close();
     return j;
   }

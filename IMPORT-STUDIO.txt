@@ -89,7 +89,13 @@ RAPPELS
   • L'import réel ne fonctionne qu'en local (npm run works:import).
   • Sans git push, les fiches sont en base Supabase mais les images ne sont
     pas sur le site public.
-  • Redémarrer l'API après une mise à jour du code : Ctrl+C puis relancer
-    npm run works:import.
+  • Redémarrer l'API après une mise à jour du code :
+      Ctrl+C dans le terminal, puis npm run works:import
+    (le studio redémarre automatiquement une API obsolète)
+
+  • Si la publication échoue après import :
+      npm run works:publish
+    ou avec des codes précis :
+      npm run works:publish -- MS0433 MS0434
 
 ================================================================================

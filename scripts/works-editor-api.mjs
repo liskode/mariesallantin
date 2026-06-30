@@ -499,7 +499,12 @@ const server = http.createServer(async (req, res) => {
     }
 
     if (req.method === 'GET' && url.pathname === '/api/health') {
-      sendJson(res, 200, { ok: true, service: 'works-editor-api' });
+      sendJson(res, 200, {
+        ok: true,
+        service: 'works-editor-api',
+        version: '20250630-publish',
+        features: { import: true, publish: true, delete: true },
+      });
       return;
     }
 
@@ -664,5 +669,5 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, '127.0.0.1', () => {
-  console.error(`works-editor-api → http://127.0.0.1:${PORT}/`);
+  console.error(`works-editor-api → http://127.0.0.1:${PORT}/  (import + publish git)`);
 });
