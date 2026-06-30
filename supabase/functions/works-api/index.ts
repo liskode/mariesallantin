@@ -279,6 +279,22 @@ Deno.serve(async (req) => {
       return jsonResponse(200, { ok: true, works, saved: ids.length });
     }
 
+    if (req.method === 'POST' && path === '/api/works/delete') {
+      const body = await req.json();
+      if (!checkToken(String(body.token || ''))) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      const workId = String(body.work_id || '').trim().toUpperCase();
+      if (!/^MS\d{4}$/.test(workId)) {
+        return jsonResponse(400, { ok: false, error: 'work_id invalide' });
+      }
+      const supabase = createSupabase();
+      const { error } = await supabase.from('works').delete().eq('id', workId);
+      if (error) throw error;
+      const works = await fetchWorksWithSeries(supabase);
+      return jsonResponse(200, { ok: true, works, deleted: workId });
+    }
+
     return jsonResponse(404, { ok: false, error: 'not found' });
   } catch (e) {
     console.error(e);

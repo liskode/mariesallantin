@@ -22,6 +22,7 @@ import {
   persistWorkImageUpdatesToSupabase,
   persistWorksToSupabase,
   planWorkImports,
+  removeWorksJsonEntries,
   resolveNextSequentialStart,
   writeCatalogueFile,
 } from './work-import.mjs';
@@ -578,6 +579,32 @@ const server = http.createServer(async (req, res) => {
       }
       const works = await fetchWorksWithSeries(supabase);
       sendJson(res, 200, { ok: true, works, saved: rows.length });
+      return;
+    }
+
+    if (req.method === 'POST' && url.pathname === '/api/works/delete') {
+      const body = JSON.parse(await readBody(req));
+      if (body.token !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      const workId = String(body.work_id || '').trim().toUpperCase();
+      if (!/^MS\d{4}$/.test(workId)) {
+        sendJson(res, 400, { ok: false, error: 'work_id invalide' });
+        return;
+      }
+      const supabase = createSupabase();
+      const { error } = await supabase.from('works').delete().eq('id', workId);
+      if (error) throw error;
+      const worksJsonPath = path.join(root, 'media', 'works.json');
+      const removedJson = removeWorksJsonEntries(worksJsonPath, [workId]);
+      const works = await fetchWorksWithSeries(supabase);
+      sendJson(res, 200, {
+        ok: true,
+        works,
+        deleted: workId,
+        works_json_removed: removedJson > 0,
+      });
       return;
     }
 

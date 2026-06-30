@@ -510,6 +510,18 @@ export function appendWorksJsonEntries(worksJsonPath, newEntries) {
   fs.writeFileSync(worksJsonPath, JSON.stringify(data, null, 2) + '\n', 'utf8');
 }
 
+export function removeWorksJsonEntries(worksJsonPath, ids) {
+  if (!Array.isArray(ids) || !ids.length) return 0;
+  if (!fs.existsSync(worksJsonPath)) return 0;
+  const data = JSON.parse(fs.readFileSync(worksJsonPath, 'utf8'));
+  if (!Array.isArray(data.works)) return 0;
+  const drop = new Set(ids.map((id) => String(id).trim().toUpperCase()).filter(Boolean));
+  const before = data.works.length;
+  data.works = data.works.filter((w) => !drop.has(String(w.id || '').toUpperCase()));
+  fs.writeFileSync(worksJsonPath, JSON.stringify(data, null, 2) + '\n', 'utf8');
+  return before - data.works.length;
+}
+
 export async function writeCatalogueFile(catalogueDir, basename, buffer) {
   const safe = path.basename(String(basename || ''));
   if (!safe || safe.includes('..')) throw new Error('nom de fichier invalide');

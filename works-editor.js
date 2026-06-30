@@ -44,6 +44,7 @@
   let seriesFilterText = '';
   let sortColumn = 'order';
   let currentPage = 0;
+  let deleteUnlocked = false;
 
   const loginEl = document.getElementById('works-login');
   const appEl = document.getElementById('works-app');
@@ -56,6 +57,8 @@
   const statusEl = document.getElementById('works-status');
   const saveBtn = document.getElementById('works-save-btn');
   const reloadBtn = document.getElementById('works-reload-btn');
+  const deleteLockBtn = document.getElementById('works-delete-lock-btn');
+  const deleteLockIcon = document.getElementById('works-delete-lock-icon');
   const filterEl = document.getElementById('works-filter-title');
   const seriesFilterEl = document.getElementById('works-filter-series');
   const paginationEl = document.getElementById('works-pagination');
@@ -482,6 +485,78 @@
       if (tdMeta && check.level === 'bad') {
         tdMeta.classList.add('works-import-meta-cell--format-mismatch');
       }
+    }
+  }
+
+  function updateDeleteLockUi() {
+    if (deleteLockBtn) {
+      deleteLockBtn.setAttribute('aria-pressed', deleteUnlocked ? 'true' : 'false');
+      deleteLockBtn.title = deleteUnlocked
+        ? 'Suppression activée — cliquer pour verrouiller'
+        : 'Suppression verrouillée — cliquer pour afficher les corbeilles';
+      deleteLockBtn.setAttribute(
+        'aria-label',
+        deleteUnlocked ? 'Verrouiller la suppression' : 'Déverrouiller la suppression'
+      );
+    }
+    if (deleteLockIcon) {
+      deleteLockIcon.src = deleteUnlocked
+        ? 'images/cadenas_open.png'
+        : 'images/cadenas_close.png';
+    }
+    if (appEl) {
+      appEl.classList.toggle('works-delete-unlocked', deleteUnlocked);
+    }
+  }
+
+  function createDeleteWorkButton(work, tr) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'works-delete-btn';
+    btn.setAttribute('aria-label', 'Supprimer ' + (work.id || ''));
+    btn.title = 'Supprimer l\'enregistrement ' + (work.id || '');
+    btn.innerHTML =
+      '<svg class="works-delete-btn-icon" viewBox="0 0 24 24" width="14" height="14" aria-hidden="true">' +
+      '<path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>' +
+      '</svg>';
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!deleteUnlocked) return;
+      deleteWork(work).catch((err) => setStatus(String(err.message || err), true));
+    });
+    return btn;
+  }
+
+  async function deleteWork(work) {
+    if (!work || !work.id || !deleteUnlocked) return;
+    const label = work.id + (work.title ? ' — ' + work.title : '');
+    const msg =
+      'Supprimer l\'œuvre ' +
+      label +
+      ' de la base ?\n\nLes fichiers image (catalogue) ne sont pas effacés du disque.';
+    if (!window.confirm(msg)) return;
+
+    setStatus('Suppression…');
+    try {
+      const r = await apiFetch('/api/works/delete', {
+        method: 'POST',
+        body: JSON.stringify({ token, work_id: work.id }),
+      });
+      const j = await r.json();
+      if (!r.ok || !j.ok) throw new Error(formatApiError(j.error) || 'suppression échouée');
+      worksList = j.works || worksList.filter((w) => w.id !== work.id);
+      dirtyIds.delete(work.id);
+      if (workMediaById) workMediaById.delete(work.id);
+      if (workImageDimensionsById) workImageDimensionsById.delete(work.id);
+      updateSaveBtn();
+      renderTable();
+      let statusMsg = 'Œuvre ' + work.id + ' supprimée.';
+      if (isLocalDevServer() && j.works_json_removed) {
+        statusMsg += ' Entrée retirée de works.json.';
+      }
+      setStatus(statusMsg);
+    } catch (e) {
+      setStatus(String(e.message || e), true);
     }
   }
 
@@ -1044,6 +1119,9 @@
   function createTitleCell(work, tr) {
     const td = document.createElement('td');
     td.className = 'works-title-cell';
+    const wrap = document.createElement('div');
+    wrap.className = 'works-title-cell-inner';
+    wrap.appendChild(createDeleteWorkButton(work, tr));
     const input = document.createElement('input');
     input.type = 'text';
     input.className = 'legend-input works-title-input';
@@ -1054,7 +1132,8 @@
       work.title = input.value;
       markDirty(work.id, tr);
     });
-    td.appendChild(input);
+    wrap.appendChild(input);
+    td.appendChild(wrap);
     return td;
   }
 
@@ -1444,6 +1523,8 @@
   async function enterApp() {
     loginEl.hidden = true;
     appEl.hidden = false;
+    deleteUnlocked = false;
+    updateDeleteLockUi();
     bindStickyHeaderOffset();
     requestAnimationFrame(() => updateWorksStickyOffset());
     setStatus('Chargement…');
@@ -1861,6 +1942,12 @@
     });
 
     saveBtn.addEventListener('click', () => saveWorks());
+
+    deleteLockBtn?.addEventListener('click', () => {
+      deleteUnlocked = !deleteUnlocked;
+      updateDeleteLockUi();
+      renderTable();
+    });
 
     importBtn?.addEventListener('click', () => {
       openImportDialog().catch((e) => setStatus(formatApiError(e), true));

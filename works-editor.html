@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250630-19" />
+  <link rel="stylesheet" href="catalogue.css?v=20250630-22" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -95,6 +95,23 @@
               </div>
             </div>
             <div class="catalogue-edit-tools works-editor-import-tools">
+              <button
+                type="button"
+                class="legend-editor-btn works-delete-lock-btn"
+                id="works-delete-lock-btn"
+                aria-pressed="false"
+                aria-label="Déverrouiller la suppression"
+                title="Suppression verrouillée — cliquer pour afficher les corbeilles"
+              >
+                <img
+                  src="images/cadenas_close.png"
+                  alt=""
+                  class="legend-editor-btn-picto works-delete-lock-icon"
+                  id="works-delete-lock-icon"
+                  width="18"
+                  height="18"
+                />
+              </button>
               <button type="button" class="legend-editor-btn works-import-toolbar-btn" id="works-import-btn" aria-label="Importer des œuvres" title="Importer des œuvres">
                 <img src="images/import.png" alt="" class="legend-editor-btn-picto" width="16" height="16" />
               </button>
@@ -263,7 +280,7 @@
     </div>
   </dialog>
 
-  <script src="editor-common.js?v=20250630-19"></script>
-  <script src="works-editor.js?v=20250630-19"></script>
+  <script src="editor-common.js?v=20250630-22"></script>
+  <script src="works-editor.js?v=20250630-22"></script>
 </body>
 </html>

@@ -1742,6 +1742,73 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 .works-editor-import-tools {
   margin-left: auto;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.works-delete-lock-btn {
+  flex-shrink: 0;
+  padding: 6px 7px;
+  line-height: 0;
+  opacity: 0.88;
+}
+
+.works-delete-lock-btn:hover {
+  opacity: 1;
+}
+
+.works-delete-lock-btn[aria-pressed='true'] {
+  opacity: 1;
+}
+
+.works-title-cell-inner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.works-delete-btn {
+  display: none;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 1px solid #fecaca;
+  border-radius: 5px;
+  background: #fef2f2;
+  color: #dc2626;
+  cursor: pointer;
+  line-height: 0;
+}
+
+.works-delete-unlocked .works-delete-btn {
+  display: inline-flex;
+}
+
+.works-delete-btn:hover {
+  background: #fee2e2;
+  border-color: #fca5a5;
+  color: #b91c1c;
+}
+
+.works-delete-btn:focus-visible {
+  outline: 2px solid #fca5a5;
+  outline-offset: 1px;
+}
+
+.works-delete-btn-icon {
+  display: block;
+}
+
+.works-thumb-th,
+.works-thumb-cell {
+  width: 52px;
+  padding-left: 10px;
+  padding-right: 8px;
 }
 
 .legend-editor-btn--with-picto {
@@ -1911,13 +1978,6 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   vertical-align: middle;
 }
 
-.works-thumb-th,
-.works-thumb-cell {
-  width: 52px;
-  padding-left: 10px;
-  padding-right: 8px;
-}
-
 .works-thumb-img {
   display: block;
   width: 44px;
@@ -1953,8 +2013,9 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 }
 
 .works-editor-table .works-title-input {
-  width: 100%;
+  flex: 1;
   min-width: 0;
+  width: auto;
   max-width: none;
   box-sizing: border-box;
   font-size: 0.8rem;
@@ -2048,7 +2109,7 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 }
 
 .works-format-ratio-dot--warn {
-  background: #b8860b;
+  background: #eab308;
 }
 
 .works-format-ratio-dot--bad {
@@ -2056,7 +2117,7 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 }
 
 .works-import-format-ratio--warn {
-  color: #92400e;
+  color: #a16207;
 }
 
 .works-import-format-ratio--bad {
