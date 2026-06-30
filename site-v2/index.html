@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Marie Sallantin – Artiste Peintre</title>
+  <meta name="description" content="Portfolio de Marie Sallantin, artiste peintre française. Découvrez ses séries thématiques et œuvres originales."/>
+  <link rel="stylesheet" href="../style.css"/>
+  <link rel="stylesheet" href="site-pages.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="../images/logo-artmajeur.png"/>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Marie Sallantin",
+    "jobTitle": "Artiste peintre",
+    "url": "https://www.artmajeur.com/marie-sallantin",
+    "sameAs": [
+      "https://www.artmajeur.com/marie-sallantin"
+    ]
+  }
+  </script>
+</head>
+<body class="site-v2">
+  <nav class="mobile-nav">
+    <a href="index.html?gallery" class="mobile-nav-link">Peintures</a>
+    <a href="pages/cv.html" class="mobile-nav-link">CV</a>
+    <a href="pages/liens.html" class="mobile-nav-link">Liens</a>
+  </nav>
+  <div class="site-grid">
+    <header class="main-header">
+      <div class="header-content">
+        <a href="index.html" id="logo-link">
+          <img src="../images/logoMS.png" alt="Logo du site" />
+        </a>
+        <nav class="main-nav">
+          <a href="index.html?gallery">Peintures</a>
+          <a href="pages/cv.html">CV</a>
+          <a href="pages/liens.html">Liens</a>
+          <a href="https://www.artmajeur.com/marie-sallantin" target="_blank" rel="noopener">
+            <img src="../images/logo-artmajeur.png" alt="ArtMajeur" class="nav-logo"/>
+          </a>
+        </nav>
+      </div>
+    </header>
+    <div class="layout">
+      <aside class="side-menu" id="side-menu">
+        <h2 class="side-menu-title">Séries</h2>
+        <ul id="series-list"></ul>
+      </aside>
+      <main>
+        <h1 class="visually-hidden">Marie Sallantin – Artiste peintre</h1>
+        <section class="welcome" id="welcome-section">
+          <div class="welcome-hero">
+            <div class="hero-image-container">
+              <img id="random-image" src="" alt="Œuvre de Marie Sallantin" class="hero-image"/>
+              <div class="hero-overlay">
+                <div class="hero-title">
+                  <h3 id="image-title">Chargement…</h3>
+                  <p id="image-series">extrait de la série <span id="series-name" class="clickable-series">Série <span class="link-indicator">→</span></span></p>
+                </div>
+                <div class="hero-text">
+                  <p>
+                    Bienvenue sur le site de Marie Sallantin, artiste peintre française née en 1946 à Paris.<br>
+                    Formée à l'École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle vit et travaille à Paris.<br>
+                    Son œuvre explore des thèmes classiques et contemporains à travers des séries thématiques : Anges musiciens, Grandes baigneuses, Dame et licorne, Étangs et Reflets, Forêt, Mini formats, Masque Miroir et Statuette, La toilette d'après Corot, et d'autres.<br>
+                    Chaque série propose une vision singulière, entre figuration et abstraction, où la couleur et la lumière occupent une place centrale.<br>
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <section class="series-gallery" id="gallery" style="display:none;"></section>
+        <section class="series-overview" id="series-overview" style="display:none;"></section>
+      </main>
+    </div>
+  </div>
+
+  <footer>
+    &copy; 2025 Marie Sallantin. Tous droits réservés.
+  </footer>
+
+  <script src="site-catalog.js?v=20250630-3"></script>
+  <script src="gallery.js?v=20250630-3"></script>
+  <script src="site-app.js?v=20250630-3"></script>
+</body>
+</html>

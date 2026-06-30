@@ -1,0 +1,264 @@
+/* site-v2 — ajustements visuels (pages secondaires + accueil) */
+
+.site-v2 .side-menu-title,
+.site-v2-page .side-menu-title {
+  color: #3771d7;
+}
+
+.site-v2 .subtitle,
+.site-v2-page .subtitle {
+  color: #3771d7;
+  font-weight: 600;
+}
+
+.visually-hidden {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.site-v2-page main {
+  padding-bottom: 2rem;
+}
+
+.site-v2-page .page-intro {
+  margin: 0 0 1.5rem;
+  max-width: 52rem;
+}
+
+.site-v2-page .page-intro h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.75rem;
+  font-weight: 600;
+  color: var(--primary);
+  letter-spacing: -0.02em;
+}
+
+.site-v2-page .page-intro p {
+  margin: 0;
+  color: var(--secondary);
+  line-height: 1.6;
+}
+
+/* Liens — cartes */
+.site-v2-page .links-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+  max-width: 52rem;
+}
+
+.site-v2-page .links-grid li {
+  margin: 0;
+}
+
+.site-v2-page .link-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.site-v2-page .link-card:hover {
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.08);
+  transform: translateY(-1px);
+}
+
+.site-v2-page .link-card img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex-shrink: 0;
+  background: #f0f0f0;
+}
+
+.site-v2-page .link-card a {
+  color: var(--primary);
+  font-weight: 500;
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+.site-v2-page .link-card a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+/* CV */
+.site-v2-page .cv-bio-maquette {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 2rem;
+  margin: 2rem 0 1.5rem;
+}
+
+.site-v2-page .cv-bio-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.site-v2-page .cv-bio-photo {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.site-v2-page .cv-bio-text {
+  font-size: 1.1rem;
+  color: var(--secondary);
+  line-height: 1.65;
+  max-width: 28rem;
+}
+
+.site-v2-page .cv-icons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  max-width: 28rem;
+}
+
+.site-v2-page .cv-icon {
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.25rem 0.75rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: box-shadow 0.2s, transform 0.2s;
+  aspect-ratio: 1;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.site-v2-page .cv-icon:hover {
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.site-v2-page .cv-icon-symbol {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+
+.site-v2-page .cv-icon-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--primary);
+  text-align: center;
+  line-height: 1.25;
+}
+
+.site-v2-page .cv-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.site-v2-page .cv-overlay-content {
+  background: #fff;
+  border-radius: 1rem;
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
+  padding: 2rem 1.5rem 1.5rem;
+  max-width: min(90vw, 42rem);
+  max-height: 80vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.site-v2-page .cv-overlay-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--secondary);
+}
+
+.site-v2-page .cv-overlay-content h2 {
+  margin-top: 0;
+  color: var(--accent);
+}
+
+.site-v2-page .cv-overlay-content ul {
+  padding-left: 1.25rem;
+  line-height: 1.55;
+}
+
+/* FAP */
+.site-v2-page .fap-panel {
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+  max-width: 52rem;
+  margin: 2rem 0 1rem;
+  background: var(--surface);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  flex-wrap: wrap;
+}
+
+.site-v2-page .fap-panel img.fap-logo {
+  width: 180px;
+  border-radius: var(--radius);
+  object-fit: cover;
+}
+
+.site-v2-page .fap-panel .fap-body {
+  flex: 1;
+  min-width: 16rem;
+  color: var(--secondary);
+  line-height: 1.65;
+}
+
+.site-v2-page .fap-panel h2 {
+  margin: 0 0 1rem;
+  color: var(--accent);
+  font-size: 1.75rem;
+}
+
+.site-v2-page .fap-panel h3 {
+  margin: 1.5rem 0 0.5rem;
+  color: var(--primary);
+  font-size: 1.15rem;
+}
+
+@media (max-width: 900px) {
+  .site-v2-page .cv-bio-maquette {
+    flex-direction: column;
+  }
+
+  .site-v2-page .cv-icons-grid,
+  .site-v2-page .cv-bio-text {
+    max-width: 100%;
+  }
+
+  .site-v2-page .fap-panel {
+    flex-direction: column;
+    align-items: center;
+    text-align: left;
+  }
+}

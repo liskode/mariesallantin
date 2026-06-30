@@ -12,3 +12,6 @@ verify_jwt = false
 
 [functions.works-api]
 verify_jwt = false
+
+[functions.public-site-api]
+verify_jwt = false

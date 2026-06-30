@@ -8,7 +8,7 @@ Projet : `https://leezsypadtvypdgqgvtk.supabase.co`
 - **Seed des codes** uniquement (séries, formats, techniques, statuts publication/photo, types de médias)
 - Table `works` **vide** — pas d’import des anciennes œuvres
 - Dimensions physiques : `width_cm`, `height_cm` (décimales, optionnelles)
-- Publication : table `publication_statuses` (`N`, `C`, `W`) → FK `works.publication_status_code`
+- Publication : table `publication_statuses` (`N`, `C`, `W`, `G`) → FK `works.publication_status_code`
 - Photo : table `photo_statuses` (`OK`, `HQ`, `LQ`, `REDO`) → FK `works.photo_status_code`
 - Médias liés : `related_media` + liaisons `related_media_works` / `related_media_series`
 - Clé œuvre stable : `MS####` ; image : `{id}.jpeg`
@@ -145,6 +145,19 @@ supabase functions deploy codes-api --no-verify-jwt --project-ref leezsypadtvypd
 Deux panneaux côte à côte : formats (code, libellé, hauteur/largeur cm) et techniques (code, libellé). Boutons **+ Nouveau** pour ajouter un code vide puis compléter la ligne.
 
 Développement local : `npm run codes:api` → http://127.0.0.1:47834/
+
+### Site public v2 (`site-v2/`)
+
+1. Exécuter `migrations/20250617200000_publication_status_gallery.sql` (statut **G** = galerie d'accueil + publié comme **W**)
+2. Déployer l'API lecture seule :
+
+```bash
+supabase functions deploy public-site-api --no-verify-jwt --project-ref leezsypadtvypdgqgvtk
+```
+
+3. Prévisualiser : **https://mariesallantin.art/site-v2/** (ou serveur local à la racine du dépôt)
+
+Œuvres visibles : `publication_status_code` **W** ou **G**. La galerie photo de l'accueil n'affiche que les œuvres **G**.
 
 ## Prochaines étapes
 
