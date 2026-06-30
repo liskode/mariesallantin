@@ -4960,6 +4960,67 @@
       ],
       "publish": "VAL",
       "photo": "OK"
+    },
+    {
+      "id": "MS0433",
+      "media": "catalogue/MS0433.jpeg",
+      "title": "SANS TITRE 220 x 130cm",
+      "series": [
+        "ABSTR"
+      ],
+      "publish": "VAL",
+      "photo": "OK"
+    },
+    {
+      "id": "MS0434",
+      "media": "catalogue/MS0434.jpeg",
+      "title": "SANS TITRE 205x130cm (1)",
+      "series": [
+        "ABSTR"
+      ],
+      "publish": "VAL",
+      "photo": "OK"
+    },
+    {
+      "id": "MS0435",
+      "media": "catalogue/MS0435.jpeg",
+      "title": "GRANDE ABSTRACTION sans titre 300 x 220cm",
+      "series": [
+        "ABSTR"
+      ],
+      "publish": "VAL",
+      "photo": "OK"
+    },
+    {
+      "id": "MS0436",
+      "media": "catalogue/MS0436.jpeg",
+      "title": "SANS TITRE 205 x 130cm",
+      "series": [
+        "ABSTR"
+      ],
+      "publish": "VAL",
+      "photo": "OK"
+    },
+    {
+      "id": "MS0437",
+      "media": "catalogue/MS0437.jpeg",
+      "title": "Variation rouge de Bergues N°2 210 x 130cm acrylique sur toile libre",
+      "series": [
+        "ROUGE",
+        "ABSTR"
+      ],
+      "publish": "VAL",
+      "photo": "OK"
+    },
+    {
+      "id": "MS0438",
+      "media": "catalogue/MS0438.jpeg",
+      "title": "Variation rouge de Bergues N°1 , 210 x 130cm acrylique sur toile libre",
+      "series": [
+        "ABSTR"
+      ],
+      "publish": "VAL",
+      "photo": "OK"
     }
   ]
 }
