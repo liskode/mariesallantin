@@ -33,11 +33,11 @@ document.addEventListener('DOMContentLoaded', () => {
     return `Série "${name}"${years}`;
   }
 
-  function appendSeriesHeading(code) {
-    const header = document.createElement('h2');
-    header.className = 'series-gallery-heading';
-    header.textContent = formatSeriesHeading(code);
-    gallery.appendChild(header);
+  function updateLightboxSeriesHeading() {
+    if (!lightboxSeriesHeading) return;
+    const text = currentSeriesCode ? formatSeriesHeading(currentSeriesCode) : '';
+    lightboxSeriesHeading.textContent = text;
+    lightboxSeriesHeading.style.display = text ? '' : 'none';
   }
 
   function orderedSeriesCodes() {
@@ -169,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
     return list[0];
   }
 
-  let lightbox, lightboxImg, lightboxCaption, lightboxWorkTitle, lightboxWorkMeta, lightboxClose, lightboxPrev, lightboxNext;
+  let lightbox, lightboxImg, lightboxCaption, lightboxSeriesHeading, lightboxWorkTitle, lightboxWorkMeta, lightboxClose, lightboxPrev, lightboxNext;
 
   function workMetaLine(work) {
     if (!work) return '';
@@ -195,16 +195,20 @@ document.addEventListener('DOMContentLoaded', () => {
     lightbox.innerHTML = `
       <span class="close">&times;</span>
       <span class="prev">&#10094;</span>
-      <img src="" alt="" />
-      <div class="lightbox-caption">
-        <div class="lightbox-work-title"></div>
-        <div class="lightbox-work-meta"></div>
+      <div class="lightbox-stage">
+        <div class="lightbox-series-heading" aria-live="polite"></div>
+        <img src="" alt="" />
+        <div class="lightbox-caption">
+          <div class="lightbox-work-title"></div>
+          <div class="lightbox-work-meta"></div>
+        </div>
       </div>
       <span class="next">&#10095;</span>
     `;
     document.body.appendChild(lightbox);
-    lightboxImg = lightbox.querySelector('img');
+    lightboxImg = lightbox.querySelector('.lightbox-stage img');
     lightboxCaption = lightbox.querySelector('.lightbox-caption');
+    lightboxSeriesHeading = lightbox.querySelector('.lightbox-series-heading');
     lightboxWorkTitle = lightbox.querySelector('.lightbox-work-title');
     lightboxWorkMeta = lightbox.querySelector('.lightbox-work-meta');
     lightboxClose = lightbox.querySelector('.close');
@@ -233,6 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const work = currentSeries[index];
     lightboxImg.src = mediaSrc(work.filePath);
     lightboxImg.alt = work.title;
+    updateLightboxSeriesHeading();
     updateLightboxCaption(work);
     lightbox.style.display = 'flex';
   }
@@ -286,7 +291,6 @@ document.addEventListener('DOMContentLoaded', () => {
     gallery.innerHTML = '';
     currentSeriesCode = code;
     currentSeries = allSeries[code] || [];
-    appendSeriesHeading(code);
     if (!currentSeries.length) return;
     currentIndex = Math.max(0, Math.min(idx, currentSeries.length - 1));
     if (window.innerWidth < 900) {
