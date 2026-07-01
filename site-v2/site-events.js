@@ -173,11 +173,15 @@
       const fromApi = await fetchEventsApi(cfg);
       if (fromApi && fromApi.items.length) {
         cache = fromApi;
+        cache._source = 'api';
         return cache;
       }
       try {
         cache = await fetchEventsDirect(cfg);
-        if (cache.items.length) return cache;
+        if (cache.items.length) {
+          cache._source = 'supabase';
+          return cache;
+        }
       } catch (e) {
         console.warn('Repli Supabase événements indisponible', e);
       }
@@ -185,6 +189,7 @@
       console.warn('Chargement événements via API/config', e);
     }
     cache = fallbackStatic();
+    cache._source = 'static';
     return cache;
   }
 

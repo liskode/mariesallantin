@@ -220,6 +220,9 @@
 
   function render(data) {
     eventsData = data;
+    if (data && data._source) {
+      document.documentElement.setAttribute('data-events-source', data._source);
+    }
     if (!data.items || !data.items.length) {
       showEmpty();
       return;
