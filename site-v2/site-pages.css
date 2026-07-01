@@ -455,6 +455,11 @@
   color: #8a8f98;
 }
 
+.site-v2 .site-footer-credit strong,
+.site-v2-page .site-footer-credit strong {
+  font-weight: 600;
+}
+
 @media (max-width: 900px) {
   .site-v2 .header-content,
   .site-v2-page .header-content {
