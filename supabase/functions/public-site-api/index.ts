@@ -39,7 +39,7 @@ async function fetchResources(supabase: SupabaseClient) {
     supabase
       .from('related_media')
       .select(
-        'id, media_type_code, title, media_date, source, description, url, thumbnail_path, file_path, internal_path, duration_seconds, publication_status_code, sort_order'
+        'id, media_type_code, title, media_date, source, description, url, thumbnail_path, file_path, internal_path, duration_seconds, publication_status_code, sort_order, is_essential'
       )
       .in('publication_status_code', PUBLIC_STATUSES)
       .order('sort_order', { ascending: true })
@@ -83,6 +83,7 @@ async function fetchResources(supabase: SupabaseClient) {
     duration_seconds: row.duration_seconds ?? null,
     publication_status_code: row.publication_status_code,
     sort_order: row.sort_order ?? 0,
+    is_essential: Boolean(row.is_essential),
     series_codes: [...new Set(seriesByMedia.get(String(row.id)) || [])].sort(),
     work_ids: [...new Set(worksByMedia.get(String(row.id)) || [])].sort(),
   }));
@@ -90,6 +91,81 @@ async function fetchResources(supabase: SupabaseClient) {
   return {
     ok: true,
     media_types: typesRes.data || [],
+    items,
+  };
+}
+
+async function fetchEvents(supabase: SupabaseClient) {
+  const [typesRes, rolesRes, eventsRes, linksRes, mediaRes] = await Promise.all([
+    supabase.from('event_types').select('code, label, sort_order').order('sort_order', { ascending: true }),
+    supabase.from('event_roles').select('code, label, sort_order').order('sort_order', { ascending: true }),
+    supabase
+      .from('artist_events')
+      .select(
+        'id, event_type_code, role_code, date_label, sort_date, sort_date_end, label, note, publication_status_code, sort_order'
+      )
+      .in('publication_status_code', PUBLIC_STATUSES)
+      .order('sort_date', { ascending: false })
+      .order('sort_order', { ascending: true }),
+    supabase.from('artist_event_media').select('event_id, media_id'),
+    supabase
+      .from('related_media')
+      .select('id, media_type_code, title, url, file_path, internal_path')
+      .in('publication_status_code', PUBLIC_STATUSES),
+  ]);
+
+  if (typesRes.error) throw typesRes.error;
+  if (rolesRes.error) throw rolesRes.error;
+  if (eventsRes.error) throw eventsRes.error;
+  if (linksRes.error) throw linksRes.error;
+  if (mediaRes.error) throw mediaRes.error;
+
+  const mediaById = new Map<string, Record<string, unknown>>();
+  for (const row of mediaRes.data || []) {
+    mediaById.set(String(row.id), {
+      id: row.id,
+      media_type_code: row.media_type_code,
+      title: row.title || '',
+      url: row.url || '',
+      file_path: row.file_path || '',
+      internal_path: row.internal_path || '',
+    });
+  }
+
+  const mediaByEvent = new Map<string, Array<Record<string, unknown>>>();
+  for (const link of linksRes.data || []) {
+    const eventId = String(link.event_id);
+    const media = mediaById.get(String(link.media_id));
+    if (!media) continue;
+    const list = mediaByEvent.get(eventId) || [];
+    list.push(media);
+    mediaByEvent.set(eventId, list);
+  }
+
+  const items = (eventsRes.data || []).map((row) => {
+    const media = [...(mediaByEvent.get(String(row.id)) || [])].sort((a, b) =>
+      String(a.title).localeCompare(String(b.title), 'fr')
+    );
+    return {
+      id: row.id,
+      event_type_code: row.event_type_code,
+      role_code: row.role_code,
+      date_label: row.date_label || '',
+      sort_date: row.sort_date,
+      sort_date_end: row.sort_date_end,
+      label: row.label || '',
+      note: row.note || '',
+      publication_status_code: row.publication_status_code,
+      sort_order: row.sort_order ?? 0,
+      media_ids: media.map((m) => m.id),
+      media,
+    };
+  });
+
+  return {
+    ok: true,
+    event_types: typesRes.data || [],
+    event_roles: rolesRes.data || [],
     items,
   };
 }
@@ -214,6 +290,18 @@ Deno.serve(async (req) => {
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       console.error('public-site-api resources:', message);
+      return jsonResponse(500, { ok: false, error: message });
+    }
+  }
+
+  if (path === '/api/events') {
+    try {
+      const supabase = createSupabase();
+      const events = await fetchEvents(supabase);
+      return jsonResponse(200, events);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.error('public-site-api events:', message);
       return jsonResponse(500, { ok: false, error: message });
     }
   }

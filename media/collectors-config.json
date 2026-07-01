@@ -2,6 +2,8 @@
   "supabaseUrl": "https://leezsypadtvypdgqgvtk.supabase.co",
   "collectorsApiUrl": "https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/collectors-api",
   "seriesApiUrl": "https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/series-api",
+  "resourcesApiUrl": "https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/resources-api",
+  "eventsApiUrl": "https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/events-api",
   "codesApiUrl": "https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/codes-api",
   "worksApiUrl": "https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api",
   "publicSiteApiUrl": "https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/public-site-api",

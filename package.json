@@ -13,6 +13,8 @@
     "supabase:migrate-square-formats": "node scripts/migrate-square-format-codes.mjs",
     "collectors:api": "node scripts/collectors-editor-api.mjs",
     "series:api": "node scripts/series-editor-api.mjs",
+    "resources:api": "node scripts/resources-editor-api.mjs",
+    "events:api": "node scripts/events-editor-api.mjs",
     "codes:api": "node scripts/codes-editor-api.mjs",
     "works:api": "node scripts/works-editor-api.mjs",
     "works:import": "node scripts/works-import-studio.mjs",

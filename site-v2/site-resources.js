@@ -54,6 +54,7 @@
       duration_seconds: row.duration_seconds != null ? Number(row.duration_seconds) : null,
       publication_status_code: String(row.publication_status_code || 'N').trim().toUpperCase(),
       sort_order: row.sort_order != null ? Number(row.sort_order) : 0,
+      is_essential: Boolean(row.is_essential),
       series_codes: [...(seriesByMedia.get(id) || [])].sort(),
       work_ids: [...(worksByMedia.get(id) || [])].sort(),
     };
@@ -108,7 +109,7 @@
     const headers = { apikey: key, Authorization: 'Bearer ' + key };
     const statusFilter = 'publication_status_code=in.(' + PUBLIC_STATUSES.join(',') + ')';
     const select =
-      'id,media_type_code,title,media_date,source,description,url,thumbnail_path,file_path,internal_path,duration_seconds,publication_status_code,sort_order';
+      'id,media_type_code,title,media_date,source,description,url,thumbnail_path,file_path,internal_path,duration_seconds,publication_status_code,sort_order,is_essential';
 
     const [typesRes, mediaRes, seriesRes, worksRes] = await Promise.all([
       fetch(base + '/rest/v1/media_types?select=code,label,sort_order&order=sort_order.asc', {

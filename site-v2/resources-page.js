@@ -1,46 +1,53 @@
 /**
- * Page Ressources — rendu par sections et filtres.
+ * Page Ressources — filtres par catégorie (un seul affichage à la fois).
  */
 (function () {
-  const SECTION_DEFS = [
+  const FILTER_DEFS = [
+    { id: 'recent', label: 'Récents', kind: 'recent' },
+    { id: 'essential', label: 'Essentiels', kind: 'essential' },
     {
-      id: 'resources-web',
-      title: 'Sur le web',
+      id: 'web',
+      label: 'Sur le web',
       match: function (item) {
         return !item.internal_path && item.media_type_code === 'WEB';
       },
     },
     {
-      id: 'resources-press',
-      title: 'Presse',
+      id: 'press',
+      label: 'Presse',
       match: function (item) {
         return !item.internal_path && item.media_type_code === 'PRESS';
       },
     },
     {
-      id: 'resources-video',
-      title: 'Vidéos & interviews',
+      id: 'video',
+      label: 'Vidéos & interviews',
       match: function (item) {
         return !item.internal_path && item.media_type_code === 'VIDEO';
       },
     },
     {
-      id: 'resources-audio',
-      title: 'Audio',
+      id: 'audio',
+      label: 'Audio',
+      optional: true,
       match: function (item) {
         return !item.internal_path && item.media_type_code === 'AUDIO';
       },
     },
     {
-      id: 'resources-pub',
-      title: 'Catalogues & livres',
+      id: 'pub',
+      label: 'Catalogues & livres',
+      optional: true,
       match: function (item) {
-        return !item.internal_path && (item.media_type_code === 'EXCAT' || item.media_type_code === 'BOOK');
+        return (
+          !item.internal_path &&
+          (item.media_type_code === 'EXCAT' || item.media_type_code === 'BOOK')
+        );
       },
     },
     {
-      id: 'resources-site',
-      title: 'Sur ce site',
+      id: 'site',
+      label: 'Sur ce site',
       match: function (item) {
         return Boolean(item.internal_path);
       },
@@ -55,6 +62,10 @@
     EXCAT: 'Catalogue',
     BOOK: 'Livre',
   };
+
+  /** @type {Array<object>} */
+  let allItems = [];
+  let activeFilterId = 'recent';
 
   function escapeHtml(text) {
     return String(text || '')
@@ -160,86 +171,130 @@
     );
   }
 
-  function sectionsFromItems(items) {
-    return SECTION_DEFS.map(function (def) {
-      const sectionItems = items.filter(def.match);
-      return { id: def.id, title: def.title, items: sectionItems };
-    }).filter(function (section) {
-      return section.items.length > 0;
+  function sortRecent(items) {
+    return items.slice().sort(function (a, b) {
+      const da = a.media_date ? String(a.media_date) : '';
+      const db = b.media_date ? String(b.media_date) : '';
+      if (da !== db) {
+        if (!da) return 1;
+        if (!db) return -1;
+        return db.localeCompare(da);
+      }
+      return (a.sort_order || 0) - (b.sort_order || 0);
     });
   }
 
-  function renderJumpNav(sections) {
-    return sections
-      .map(function (section) {
+  function sortDefault(items) {
+    return items.slice().sort(function (a, b) {
+      const order = (a.sort_order || 0) - (b.sort_order || 0);
+      if (order !== 0) return order;
+      const da = a.media_date ? String(a.media_date) : '';
+      const db = b.media_date ? String(b.media_date) : '';
+      return db.localeCompare(da);
+    });
+  }
+
+  function visibleFilters() {
+    return FILTER_DEFS.filter(function (def) {
+      if (!def.optional) return true;
+      if (def.kind === 'recent' || def.kind === 'essential') return true;
+      return allItems.some(def.match);
+    });
+  }
+
+  function itemsForFilter(filterId) {
+    const def = FILTER_DEFS.find(function (f) {
+      return f.id === filterId;
+    });
+    if (!def) return [];
+
+    if (def.kind === 'recent') return sortRecent(allItems);
+    if (def.kind === 'essential') {
+      return sortDefault(allItems.filter(function (item) {
+        return Boolean(item.is_essential);
+      }));
+    }
+    return sortDefault(
+      allItems.filter(function (item) {
+        return def.match(item);
+      })
+    );
+  }
+
+  function renderFilterNav() {
+    const jump = document.getElementById('resources-jump');
+    if (!jump) return;
+
+    const filters = visibleFilters();
+    if (!filters.some(function (f) {
+      return f.id === activeFilterId;
+    })) {
+      activeFilterId = 'recent';
+    }
+
+    jump.innerHTML = filters
+      .map(function (def) {
+        const active = def.id === activeFilterId ? ' is-active' : '';
         return (
-          '<a class="resources-jump-link" href="#' +
-          section.id +
+          '<button type="button" class="resources-jump-link resources-filter-btn' +
+          active +
+          '" data-filter="' +
+          escapeHtml(def.id) +
+          '" aria-pressed="' +
+          (def.id === activeFilterId ? 'true' : 'false') +
           '">' +
-          escapeHtml(section.title) +
-          '</a>'
+          escapeHtml(def.label) +
+          '</button>'
         );
       })
       .join('');
   }
 
-  function renderSections(sections) {
-    return sections
-      .map(function (section) {
-        return (
-          '<section class="resources-section" id="' +
-          section.id +
-          '" aria-labelledby="' +
-          section.id +
-          '-title">' +
-          '<h3 class="resources-section-title" id="' +
-          section.id +
-          '-title">' +
-          escapeHtml(section.title) +
-          '</h3>' +
-          '<ul class="resources-grid">' +
-          section.items.map(renderCard).join('') +
-          '</ul>' +
-          '</section>'
-        );
-      })
-      .join('');
+  function renderGrid() {
+    const root = document.getElementById('resources-root');
+    if (!root) return;
+
+    const items = itemsForFilter(activeFilterId);
+    if (!items.length) {
+      const def = FILTER_DEFS.find(function (f) {
+        return f.id === activeFilterId;
+      });
+      const label = def ? def.label.toLowerCase() : 'cette catégorie';
+      root.innerHTML = '<p class="resources-empty">Aucun média dans « ' + escapeHtml(label) + ' ».</p>';
+      return;
+    }
+
+    root.innerHTML = '<ul class="resources-grid">' + items.map(renderCard).join('') + '</ul>';
   }
 
-  function wireJumpNav() {
-    document.querySelectorAll('.resources-jump-link').forEach(function (link) {
-      link.addEventListener('click', function (e) {
-        const id = link.getAttribute('href');
-        if (!id || id.charAt(0) !== '#') return;
-        const target = document.querySelector(id);
-        if (!target) return;
-        e.preventDefault();
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function wireFilterNav() {
+    document.querySelectorAll('.resources-filter-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const id = btn.getAttribute('data-filter');
+        if (!id || id === activeFilterId) return;
+        activeFilterId = id;
+        renderFilterNav();
+        renderGrid();
       });
     });
   }
 
   function showEmpty() {
+    const jump = document.getElementById('resources-jump');
     const root = document.getElementById('resources-root');
-    if (!root) return;
-    root.innerHTML = '<p class="resources-empty">Aucune ressource publiée pour le moment.</p>';
+    if (jump) jump.innerHTML = '';
+    if (root) root.innerHTML = '<p class="resources-empty">Aucune ressource publiée pour le moment.</p>';
   }
 
   function render(data) {
-    const jump = document.getElementById('resources-jump');
-    const root = document.getElementById('resources-root');
-    if (!root) return;
-
-    const sections = sectionsFromItems(data.items || []);
-    if (!sections.length) {
-      if (jump) jump.innerHTML = '';
+    allItems = data.items || [];
+    if (!allItems.length) {
       showEmpty();
       return;
     }
-
-    if (jump) jump.innerHTML = renderJumpNav(sections);
-    root.innerHTML = renderSections(sections);
-    wireJumpNav();
+    renderFilterNav();
+    renderGrid();
+    wireFilterNav();
   }
 
   function init() {

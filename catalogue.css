@@ -2603,3 +2603,122 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   width: 100%;
   box-sizing: border-box;
 }
+
+/* Éditeur ressources site public */
+.resources-editor-table {
+  font-size: 0.78rem;
+}
+
+.resources-editor-table th,
+.resources-editor-table td {
+  padding: 4px 6px;
+  vertical-align: top;
+}
+
+.resources-editor-table .legend-input,
+.resources-editor-table .legend-select {
+  min-width: 0;
+  max-width: none;
+  padding: 3px 5px;
+  font-size: 0.78rem;
+}
+
+.resources-editor-table .resources-title-input {
+  min-width: 10rem;
+}
+
+.resources-editor-table .resources-url-input {
+  min-width: 12rem;
+}
+
+.resources-editor-table .resources-path-input {
+  min-width: 8rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+}
+
+.resources-editor-table .resources-date-input {
+  width: 6.5rem;
+}
+
+.resources-editor-table .resources-order-input {
+  width: 4rem;
+  text-align: right;
+}
+
+.resources-editor-table .resources-series-input {
+  min-width: 7rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+}
+
+.resources-editor-table .resources-essential-checkbox {
+  width: 1rem;
+  height: 1rem;
+  cursor: pointer;
+}
+
+.resources-editor-table .resources-desc-textarea {
+  width: 12rem;
+  min-height: 2.5rem;
+  resize: vertical;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}
+
+.events-editor-table {
+  font-size: 0.78rem;
+}
+
+.events-editor-table th,
+.events-editor-table td {
+  padding: 4px 6px;
+  vertical-align: top;
+}
+
+.events-editor-table .legend-input,
+.events-editor-table .legend-select {
+  min-width: 0;
+  max-width: none;
+  padding: 3px 5px;
+  font-size: 0.78rem;
+}
+
+.events-editor-table .events-label-input {
+  min-width: 14rem;
+}
+
+.events-editor-table .events-date-input {
+  width: 6.5rem;
+}
+
+.events-editor-table .events-date-label-input {
+  width: 7rem;
+}
+
+.events-editor-table .events-order-input {
+  width: 4rem;
+  text-align: right;
+}
+
+.events-editor-table .events-media-input {
+  min-width: 9rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.72rem;
+}
+
+.events-editor-table .events-note-textarea {
+  width: 10rem;
+  min-height: 2.5rem;
+  resize: vertical;
+  padding: 4px 6px;
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.75rem;
+  line-height: 1.35;
+}

@@ -1,8 +1,11 @@
 /**
- * Page L'Artiste — rendu des sections et interactions.
+ * Page L'Artiste — parcours depuis SiteEvents (filtre par type d'événement).
  */
 (function () {
   const PREVIEW_COUNT = 12;
+  let activeTypeCode = '';
+  /** @type {{ event_types: Array<object>, items: Array<object> }} */
+  let eventsData = null;
 
   function escapeHtml(text) {
     return String(text || '')
@@ -12,14 +15,62 @@
       .replace(/"/g, '&quot;');
   }
 
-  function renderEntry(entry) {
+  function mediaHref(media) {
+    if (typeof SiteResources !== 'undefined') {
+      if (media.internal_path) return SiteResources.resolveInternalPath(media.internal_path);
+      if (media.file_path) return SiteResources.resolveMediaPath(media.file_path);
+    }
+    return media.url || '#';
+  }
+
+  function mediaExternal(media) {
+    return !media.internal_path && Boolean(media.url) && !media.file_path;
+  }
+
+  function renderMediaLinks(mediaList) {
+    if (!mediaList || !mediaList.length) return '';
+    const links = mediaList
+      .map(function (media) {
+        const href = mediaHref(media);
+        const external = mediaExternal(media);
+        const rel = external ? ' rel="noopener noreferrer"' : '';
+        const target = external ? ' target="_blank"' : '';
+        const title = escapeHtml(media.title || 'Ressource');
+        return (
+          '<a class="artist-entry-media-link" href="' +
+          escapeHtml(href) +
+          '"' +
+          target +
+          rel +
+          ' title="' +
+          title +
+          '"><span class="artist-entry-media-link-label">' +
+          title +
+          '</span><span class="artist-entry-media-link-icon" aria-hidden="true">↗</span></a>'
+        );
+      })
+      .join('');
+    return '<span class="artist-entry-media">' + links + '</span>';
+  }
+
+  function renderEntry(item) {
+    const year = SiteEvents.displayDate(item);
+    const note = item.note
+      ? '<p class="artist-entry-note">' + escapeHtml(item.note) + '</p>'
+      : '';
+    const media = renderMediaLinks(item.media);
+
     return (
       '<li class="artist-entry">' +
       '<span class="artist-entry-year">' +
-      escapeHtml(entry.year) +
+      escapeHtml(year) +
       '</span>' +
+      '<span class="artist-entry-body">' +
       '<span class="artist-entry-label">' +
-      escapeHtml(entry.label) +
+      escapeHtml(item.label) +
+      '</span>' +
+      note +
+      media +
       '</span>' +
       '</li>'
     );
@@ -30,8 +81,33 @@
     return '<ol class="' + cls + '">' + entries.map(renderEntry).join('') + '</ol>';
   }
 
-  function renderSection(section) {
-    const entries = section.entries || [];
+  function visibleTypes() {
+    if (!eventsData) return [];
+    const codesWithItems = new Set(
+      (eventsData.items || []).map(function (item) {
+        return item.event_type_code;
+      })
+    );
+    return (eventsData.event_types || []).filter(function (t) {
+      return codesWithItems.has(t.code);
+    });
+  }
+
+  function itemsForType(typeCode) {
+    return (eventsData.items || []).filter(function (item) {
+      return item.event_type_code === typeCode;
+    });
+  }
+
+  function typeLabel(typeCode) {
+    const t = (eventsData.event_types || []).find(function (x) {
+      return x.code === typeCode;
+    });
+    return t ? t.label : typeCode;
+  }
+
+  function renderSection(typeCode) {
+    const entries = itemsForType(typeCode);
     const hasMore = entries.length > PREVIEW_COUNT;
     const visible = hasMore ? entries.slice(0, PREVIEW_COUNT) : entries;
     const hidden = hasMore ? entries.slice(PREVIEW_COUNT) : [];
@@ -42,29 +118,27 @@
         ? '<div class="artist-timeline-more-wrap" hidden>' +
           renderTimeline(hidden, 'artist-timeline-more') +
           '</div>' +
-          '<button type="button" class="artist-show-more" data-section="' +
-          section.id +
+          '<button type="button" class="artist-show-more" data-type="' +
+          escapeHtml(typeCode) +
           '">Voir toutes les entrées (' +
           entries.length +
           ')</button>'
         : '');
 
     return (
-      '<section class="artist-panel" id="' +
-      section.id +
-      '" aria-labelledby="' +
-      section.id +
+      '<section class="artist-panel" id="artist-type-' +
+      escapeHtml(typeCode) +
+      '" aria-labelledby="artist-type-' +
+      escapeHtml(typeCode) +
       '-title">' +
-      '<details class="artist-details" open>' +
-      '<summary class="artist-panel-title" id="' +
-      section.id +
+      '<h3 class="artist-panel-title" id="artist-type-' +
+      escapeHtml(typeCode) +
       '-title">' +
-      escapeHtml(section.title) +
-      '</summary>' +
+      escapeHtml(typeLabel(typeCode)) +
+      '</h3>' +
       '<div class="artist-panel-body">' +
       body +
       '</div>' +
-      '</details>' +
       '</section>'
     );
   }
@@ -77,26 +151,37 @@
     }).join('');
   }
 
-  function fillJumpNav() {
+  function fillFilterNav() {
     const nav = document.getElementById('artist-jump');
-    if (!nav || !window.ArtistData) return;
-    nav.innerHTML = ArtistData.sections
-      .map(function (section) {
+    const types = visibleTypes();
+    if (!nav || !types.length) return;
+
+    if (!activeTypeCode || !types.some(function (t) { return t.code === activeTypeCode; })) {
+      activeTypeCode = types[0].code;
+    }
+
+    nav.innerHTML = types
+      .map(function (type) {
+        const active = type.code === activeTypeCode ? ' is-active' : '';
         return (
-          '<a class="artist-jump-link" href="#' +
-          section.id +
+          '<button type="button" class="artist-jump-link artist-filter-btn' +
+          active +
+          '" data-type="' +
+          escapeHtml(type.code) +
+          '" aria-pressed="' +
+          (type.code === activeTypeCode ? 'true' : 'false') +
           '">' +
-          escapeHtml(section.title) +
-          '</a>'
+          escapeHtml(type.label) +
+          '</button>'
         );
       })
       .join('');
   }
 
-  function fillSections() {
+  function fillActiveSection() {
     const container = document.getElementById('artist-sections');
-    if (!container || !window.ArtistData) return;
-    container.innerHTML = ArtistData.sections.map(renderSection).join('');
+    if (!container || !activeTypeCode) return;
+    container.innerHTML = renderSection(activeTypeCode);
   }
 
   function wireShowMore() {
@@ -111,49 +196,53 @@
     });
   }
 
-  function wireJumpNav() {
-    document.querySelectorAll('.artist-jump-link').forEach(function (link) {
-      link.addEventListener('click', function (e) {
-        const id = link.getAttribute('href');
-        if (!id || id.charAt(0) !== '#') return;
-        const target = document.querySelector(id);
-        if (!target) return;
-        e.preventDefault();
-        const details = target.querySelector('.artist-details');
-        if (details) details.open = true;
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        if (window.innerWidth < 900) closeOtherDetails(details);
+  function wireFilterNav() {
+    document.querySelectorAll('.artist-filter-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        const code = btn.getAttribute('data-type');
+        if (!code || code === activeTypeCode) return;
+        activeTypeCode = code;
+        fillFilterNav();
+        fillActiveSection();
+        wireShowMore();
       });
     });
   }
 
-  function closeOtherDetails(openDetails) {
-    if (!openDetails) return;
-    document.querySelectorAll('.artist-details').forEach(function (d) {
-      if (d !== openDetails) d.open = false;
-    });
+  function showEmpty() {
+    const nav = document.getElementById('artist-jump');
+    const container = document.getElementById('artist-sections');
+    if (nav) nav.innerHTML = '';
+    if (container) {
+      container.innerHTML = '<p class="artist-empty">Parcours indisponible pour le moment.</p>';
+    }
   }
 
-  function wireAccordionMobile() {
-    const isMobile = window.innerWidth < 900;
-    const detailsList = document.querySelectorAll('.artist-details');
-    detailsList.forEach(function (details, index) {
-      details.open = !isMobile || index === 0;
-      details.addEventListener('toggle', function () {
-        if (window.innerWidth >= 900 || !details.open) return;
-        closeOtherDetails(details);
-      });
-    });
+  function render(data) {
+    eventsData = data;
+    if (!data.items || !data.items.length) {
+      showEmpty();
+      return;
+    }
+    fillFilterNav();
+    fillActiveSection();
+    wireShowMore();
+    wireFilterNav();
   }
 
   function init() {
-    if (!window.ArtistData) return;
     fillBio();
-    fillJumpNav();
-    fillSections();
-    wireShowMore();
-    wireJumpNav();
-    wireAccordionMobile();
+    if (typeof SiteEvents === 'undefined') {
+      console.error('Charger site-events.js avant artist-page.js');
+      showEmpty();
+      return;
+    }
+    SiteEvents.load()
+      .then(render)
+      .catch(function (err) {
+        console.error('Parcours artiste:', err);
+        showEmpty();
+      });
   }
 
   if (document.readyState === 'loading') {

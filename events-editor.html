@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="events-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/events-api" />
+  <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
+  <title>Événements — édition</title>
+  <link rel="stylesheet" href="catalogue.css?v=20250630-28" />
+  <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+</head>
+<body class="catalogue-standalone" data-editor-tab="events">
+  <header class="catalogue-standalone-header">
+    <div class="catalogue-standalone-inner catalogue-standalone-header-inner catalogue-standalone-header-inner--logos">
+      <a class="catalogue-header-ms" href="index.html" title="Marie Sallantin — accueil">
+        <img class="catalogue-header-ms-logo" src="images/logoMS.png" alt="Marie Sallantin" width="240" height="96" />
+      </a>
+      <div class="catalogue-header-text catalogue-header-text--center">
+        <h1>Événements</h1>
+        <p class="catalogue-header-subtitle">Parcours artistique — édition privée</p>
+      </div>
+      <div class="catalogue-header-partners">
+        <span class="catalogue-header-baseart" title="BaseArt">
+          <img class="catalogue-header-baseart-logo" src="images/Logo-BaseArt.jpeg" alt="BaseArt" width="120" height="48" />
+        </span>
+        <a class="catalogue-header-adagp" href="https://www.adagp.fr" target="_blank" rel="noopener noreferrer" title="ADAGP">
+          <img class="catalogue-header-adagp-logo" src="images/ADAGP_logo.png" alt="ADAGP" width="120" height="48" />
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <div id="editor-tabs-mount"></div>
+
+  <div id="events-login" class="catalogue-login">
+    <div class="catalogue-login-box">
+      <h1 class="catalogue-login-title">Événements</h1>
+      <p class="catalogue-intro" style="margin-bottom: 16px;">
+        Gestion du parcours artistique affiché sur la page L’artiste du site public.
+      </p>
+      <label class="catalogue-login-label" for="events-pass">Mot de passe</label>
+      <input type="password" id="events-pass" class="catalogue-login-input" autocomplete="current-password" />
+      <button type="button" id="events-login-btn" class="catalogue-login-submit">Ouvrir l’éditeur</button>
+      <p id="events-login-error" class="catalogue-login-error" hidden></p>
+      <p class="legend-editor-api-hint" id="events-api-hint"></p>
+    </div>
+  </div>
+
+  <div id="events-app" class="catalogue-app" hidden>
+    <main class="catalogue-page">
+      <div class="catalogue-standalone-inner catalogue-standalone-main">
+        <p class="catalogue-intro" id="events-intro">
+          Statut <strong>W</strong> = visible sur le site. Tri : <code>sort_date</code> (AAAA ou AAAA-MM-JJ).
+          Fin optionnelle : <code>sort_date_end</code>. Médias : UUIDs séparés par des virgules.
+        </p>
+
+        <div class="legend-editor-toolbar">
+          <p class="catalogue-count" id="events-count" aria-live="polite">0 événement(s)</p>
+          <div class="catalogue-edit-tools">
+            <button type="button" class="legend-editor-btn" id="events-add-btn">+ Nouvel événement</button>
+            <button type="button" class="legend-editor-btn legend-editor-btn--save legend-editor-btn--save-clean" id="events-save-btn" disabled>
+              Modifications enregistrées
+            </button>
+            <button type="button" class="legend-editor-btn" id="events-reload-btn">Recharger</button>
+          </div>
+        </div>
+
+        <p id="events-status" class="legend-editor-api-hint" aria-live="polite"></p>
+
+        <div class="legend-editor-table-wrap">
+          <table class="catalogue-table legend-editor-table events-editor-table">
+            <thead>
+              <tr>
+                <th scope="col">Type</th>
+                <th scope="col">Rôle</th>
+                <th scope="col">Date affichée</th>
+                <th scope="col">Tri</th>
+                <th scope="col">Fin</th>
+                <th scope="col">Libellé</th>
+                <th scope="col">Note</th>
+                <th scope="col">Médias</th>
+                <th scope="col">Statut</th>
+                <th scope="col">Ordre</th>
+                <th scope="col" class="editor-action-th"><span class="visually-hidden">Supprimer</span></th>
+              </tr>
+            </thead>
+            <tbody id="events-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="editor-common.js?v=20250630-28"></script>
+  <script src="events-editor.js?v=20250630-28"></script>
+</body>
+</html>
