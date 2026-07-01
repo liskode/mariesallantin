@@ -3,8 +3,13 @@
  * Expose la même interface que WorksCatalog pour gallery.js.
  */
 (function (global) {
-  const MEDIA_PREFIX = '../media/';
-  const CONFIG_URL = '../media/collectors-config.json';
+  function mediaPrefix() {
+    const path = window.location.pathname || '';
+    if (/\/site-v2\/pages\//.test(path)) return '../../media/';
+    if (path.includes('/site-v2')) return '../media/';
+    return 'media/';
+  }
+
   let cache = null;
   let configCache = null;
   let workMediaById = null;
@@ -25,7 +30,7 @@
     if (workMediaById) return workMediaById;
     workMediaById = new Map();
     try {
-      const r = await fetch(MEDIA_PREFIX + 'works.json', { cache: 'no-store' });
+      const r = await fetch(mediaPrefix() + 'works.json', { cache: 'no-store' });
       if (!r.ok) return workMediaById;
       const j = await r.json();
       for (const w of j.works || []) {
@@ -54,7 +59,7 @@
 
   async function loadConfig() {
     if (configCache) return configCache;
-    const r = await fetch(CONFIG_URL, { cache: 'no-store' });
+    const r = await fetch(mediaPrefix() + 'collectors-config.json', { cache: 'no-store' });
     if (!r.ok) throw new Error('Impossible de charger collectors-config.json');
     configCache = await r.json();
     return configCache;
@@ -437,7 +442,7 @@
       .replace(/\\/g, '/');
     if (!p) return '';
     const withoutMedia = p.replace(/^media\//, '');
-    const full = MEDIA_PREFIX + withoutMedia;
+    const full = mediaPrefix() + withoutMedia;
     return full
       .split('/')
       .map((seg, i) =>
