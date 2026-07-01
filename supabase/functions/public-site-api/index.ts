@@ -33,6 +33,67 @@ function createSupabase(): SupabaseClient {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
+async function fetchResources(supabase: SupabaseClient) {
+  const [typesRes, mediaRes, seriesRes, worksRes] = await Promise.all([
+    supabase.from('media_types').select('code, label, sort_order').order('sort_order', { ascending: true }),
+    supabase
+      .from('related_media')
+      .select(
+        'id, media_type_code, title, media_date, source, description, url, thumbnail_path, file_path, internal_path, duration_seconds, publication_status_code, sort_order'
+      )
+      .in('publication_status_code', PUBLIC_STATUSES)
+      .order('sort_order', { ascending: true })
+      .order('media_date', { ascending: false }),
+    supabase.from('related_media_series').select('media_id, series_code'),
+    supabase.from('related_media_works').select('media_id, work_id'),
+  ]);
+
+  if (typesRes.error) throw typesRes.error;
+  if (mediaRes.error) throw mediaRes.error;
+  if (seriesRes.error) throw seriesRes.error;
+  if (worksRes.error) throw worksRes.error;
+
+  const seriesByMedia = new Map<string, string[]>();
+  for (const row of seriesRes.data || []) {
+    const id = String(row.media_id);
+    const list = seriesByMedia.get(id) || [];
+    list.push(String(row.series_code));
+    seriesByMedia.set(id, list);
+  }
+
+  const worksByMedia = new Map<string, string[]>();
+  for (const row of worksRes.data || []) {
+    const id = String(row.media_id);
+    const list = worksByMedia.get(id) || [];
+    list.push(String(row.work_id));
+    worksByMedia.set(id, list);
+  }
+
+  const items = (mediaRes.data || []).map((row) => ({
+    id: row.id,
+    media_type_code: row.media_type_code,
+    title: row.title || '',
+    media_date: row.media_date,
+    source: row.source || '',
+    description: row.description || '',
+    url: row.url || '',
+    thumbnail_path: row.thumbnail_path || '',
+    file_path: row.file_path || '',
+    internal_path: row.internal_path || '',
+    duration_seconds: row.duration_seconds ?? null,
+    publication_status_code: row.publication_status_code,
+    sort_order: row.sort_order ?? 0,
+    series_codes: [...new Set(seriesByMedia.get(String(row.id)) || [])].sort(),
+    work_ids: [...new Set(worksByMedia.get(String(row.id)) || [])].sort(),
+  }));
+
+  return {
+    ok: true,
+    media_types: typesRes.data || [],
+    items,
+  };
+}
+
 async function fetchCatalog(supabase: SupabaseClient) {
   const [worksRes, seriesRes, linksRes, formatsRes, techniquesRes] = await Promise.all([
     supabase
@@ -143,6 +204,18 @@ Deno.serve(async (req) => {
 
   if (req.method !== 'GET') {
     return jsonResponse(405, { ok: false, error: 'Méthode non autorisée' });
+  }
+
+  if (path === '/api/resources') {
+    try {
+      const supabase = createSupabase();
+      const resources = await fetchResources(supabase);
+      return jsonResponse(200, resources);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      console.error('public-site-api resources:', message);
+      return jsonResponse(500, { ok: false, error: message });
+    }
   }
 
   if (path !== '/' && path !== '/api/catalog') {
