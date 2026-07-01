@@ -97,6 +97,48 @@
     return payload;
   }
 
+  async function enrichPayloadSeriesMeta(payload, cfg) {
+    if (!Array.isArray(payload.series) || !payload.series.length) return payload;
+    const needsMeta = payload.series.some((s) => s.description == null || s.description === undefined);
+    if (!needsMeta) return payload;
+    const base = String(cfg.supabaseUrl || '').replace(/\/$/, '');
+    const key = String(cfg.anonKey || '').trim();
+    if (!base || !key) return payload;
+    try {
+      const headers = { apikey: key, Authorization: 'Bearer ' + key };
+      const r = await fetch(
+        base + '/rest/v1/series?select=code,description,year_start,year_end',
+        { headers, cache: 'no-store' }
+      );
+      if (!r.ok) return payload;
+      const rows = await r.json();
+      const byCode = new Map(
+        rows.map((s) => [
+          String(s.code).trim(),
+          {
+            description: String(s.description || '').trim(),
+            year_start: s.year_start ?? null,
+            year_end: s.year_end ?? null,
+          },
+        ])
+      );
+      payload.series = payload.series.map((s) => {
+        const code = String(s.code).trim();
+        const extra = byCode.get(code);
+        if (!extra) return s;
+        return {
+          ...s,
+          description: s.description != null ? String(s.description).trim() : extra.description,
+          year_start: s.year_start ?? extra.year_start,
+          year_end: s.year_end ?? extra.year_end,
+        };
+      });
+    } catch (e) {
+      console.warn('Complément descriptions séries indisponible', e);
+    }
+    return payload;
+  }
+
   async function fetchCatalogPayload() {
     const cfg = await loadConfig();
     const apiUrl = String(cfg.publicSiteApiUrl || '').trim();
@@ -106,7 +148,8 @@
       if (r.ok) {
         const data = await r.json();
         if (data && data.ok !== false && Array.isArray(data.works)) {
-          return enrichPayloadCodeTables(data, cfg);
+          const enriched = await enrichPayloadCodeTables(data, cfg);
+          return enrichPayloadSeriesMeta(enriched, cfg);
         }
       }
       console.warn('public-site-api indisponible, repli Supabase direct');

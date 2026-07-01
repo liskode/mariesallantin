@@ -473,6 +473,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxImg,
     lightboxCaption,
     lightboxSeriesHeading,
+    lightboxSeriesDescription,
     lightboxWorkTitle,
     lightboxWorkMeta,
     lightboxIntro,
@@ -536,6 +537,18 @@ document.addEventListener('DOMContentLoaded', () => {
   function showSeriesIntro() {
     showLightbox(SERIES_INTRO_INDEX);
   }
+  function updateLightboxSeriesDescription(code) {
+    if (!lightboxSeriesDescription) return;
+    const desc = seriesDescription(code);
+    if (!desc || isMobileGallery()) {
+      lightboxSeriesDescription.innerHTML = '';
+      lightboxSeriesDescription.hidden = true;
+      return;
+    }
+    fillDescriptionBody(lightboxSeriesDescription, desc);
+    lightboxSeriesDescription.hidden = false;
+  }
+
   function updateLightboxCaption(work) {
     if (!lightboxWorkTitle || !lightboxWorkMeta) return;
     lightboxWorkTitle.textContent = work && work.title ? work.title : '';
@@ -553,6 +566,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="lightbox-stage">
         <div class="lightbox-work-view">
           <div class="lightbox-series-heading" aria-live="polite"></div>
+          <div class="lightbox-series-description" hidden></div>
           <img src="" alt="" decoding="async" />
           <div class="lightbox-caption">
             <div class="lightbox-work-title"></div>
@@ -577,6 +591,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxImg = lightboxWorkView.querySelector('img');
     lightboxCaption = lightbox.querySelector('.lightbox-caption');
     lightboxSeriesHeading = lightbox.querySelector('.lightbox-series-heading');
+    lightboxSeriesDescription = lightbox.querySelector('.lightbox-series-description');
     lightboxWorkTitle = lightbox.querySelector('.lightbox-work-title');
     lightboxWorkMeta = lightbox.querySelector('.lightbox-work-meta');
     lightboxIntro = lightbox.querySelector('.lightbox-series-intro');
@@ -625,6 +640,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxImg.src = mediaSrc(work.filePath);
     lightboxImg.alt = work.title;
     updateLightboxSeriesHeading();
+    updateLightboxSeriesDescription(currentSeriesCode);
     updateLightboxCaption(work);
     openLightboxDisplay();
     syncGalleryUrl();

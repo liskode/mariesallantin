@@ -942,6 +942,26 @@
   text-shadow: 0 2px 10px rgba(0, 0, 0, 0.45);
 }
 
+.site-v2 .lightbox .lightbox-series-description {
+  margin: -0.5rem 0 1rem;
+  max-width: min(90vw, 38rem);
+  max-height: min(28vh, 220px);
+  overflow-y: auto;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
+}
+
+.site-v2 .lightbox .lightbox-series-description p {
+  margin: 0 0 0.5rem;
+}
+
+.site-v2 .lightbox .lightbox-series-description p:last-child {
+  margin-bottom: 0;
+}
+
 .site-v2 .lightbox .lightbox-stage img {
   max-width: 100%;
   max-height: min(68vh, 720px);
