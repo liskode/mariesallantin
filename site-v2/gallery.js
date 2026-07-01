@@ -26,8 +26,8 @@ document.addEventListener('DOMContentLoaded', () => {
     return meta && meta.description ? String(meta.description).trim() : '';
   }
 
-  function seriesHasMobileIntro(code) {
-    return isMobileGallery() && Boolean(seriesDescription(code));
+  function seriesHasIntro(code) {
+    return Boolean(seriesDescription(code));
   }
 
   function isShowingSeriesIntro() {
@@ -48,22 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
       para.textContent = p;
       container.appendChild(para);
     });
-  }
-
-  function appendSeriesDescriptionBlock(parent, code) {
-    const desc = seriesDescription(code);
-    if (!desc) return;
-    const block = document.createElement('div');
-    block.className = 'series-description';
-    const heading = document.createElement('h2');
-    heading.className = 'series-description-heading';
-    heading.textContent = formatSeriesHeading(code);
-    block.appendChild(heading);
-    const body = document.createElement('div');
-    body.className = 'series-description-body';
-    fillDescriptionBody(body, desc);
-    block.appendChild(body);
-    parent.appendChild(block);
   }
 
   function stripAccents(s) {
@@ -340,7 +324,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (opts.openLightbox || wasLightboxOpen) {
       if (!isMobileGallery()) {
-        showLightbox(currentIndex);
+        showLightbox(currentIndex, { skipIntro: opts.skipIntro });
       }
     } else if (!opts.skipUrlSync) {
       syncGalleryUrl();
@@ -362,20 +346,22 @@ document.addEventListener('DOMContentLoaded', () => {
   function navigateImage(delta) {
     if (!currentSeries.length) return;
     if (!isLightboxOpen()) {
-      if (isShowingSeriesIntro() || currentIndex >= 0) {
-        showLightbox(currentIndex + delta);
+      if (delta > 0 && seriesHasIntro(currentSeriesCode)) {
+        showSeriesIntro();
+      } else {
+        showLightbox(currentIndex + delta, { skipIntro: true });
       }
       return;
     }
     if (isShowingSeriesIntro()) {
-      if (delta > 0) showLightbox(0);
+      if (delta > 0) showLightbox(0, { skipIntro: true });
       return;
     }
-    if (delta < 0 && currentIndex === 0 && seriesHasMobileIntro(currentSeriesCode)) {
+    if (delta < 0 && currentIndex === 0 && seriesHasIntro(currentSeriesCode)) {
       showSeriesIntro();
       return;
     }
-    showLightbox(currentIndex + delta);
+    showLightbox(currentIndex + delta, { skipIntro: true });
   }
 
   function onGalleryKeydown(e) {
@@ -450,7 +436,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.appendChild(img);
     btn.onclick = () => {
       currentIndex = idx;
-      showLightbox(idx, { skipIntro: true });
+      showLightbox(idx, { skipIntro: idx > 0 });
     };
     return btn;
   }
@@ -473,7 +459,6 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxImg,
     lightboxCaption,
     lightboxSeriesHeading,
-    lightboxSeriesDescription,
     lightboxWorkTitle,
     lightboxWorkMeta,
     lightboxIntro,
@@ -537,17 +522,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function showSeriesIntro() {
     showLightbox(SERIES_INTRO_INDEX);
   }
-  function updateLightboxSeriesDescription(code) {
-    if (!lightboxSeriesDescription) return;
-    const desc = seriesDescription(code);
-    if (!desc || isMobileGallery()) {
-      lightboxSeriesDescription.innerHTML = '';
-      lightboxSeriesDescription.hidden = true;
-      return;
-    }
-    fillDescriptionBody(lightboxSeriesDescription, desc);
-    lightboxSeriesDescription.hidden = false;
-  }
 
   function updateLightboxCaption(work) {
     if (!lightboxWorkTitle || !lightboxWorkMeta) return;
@@ -566,7 +540,6 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="lightbox-stage">
         <div class="lightbox-work-view">
           <div class="lightbox-series-heading" aria-live="polite"></div>
-          <div class="lightbox-series-description" hidden></div>
           <img src="" alt="" decoding="async" />
           <div class="lightbox-caption">
             <div class="lightbox-work-title"></div>
@@ -580,6 +553,10 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="lightbox-intro-overlay">
             <h2 class="lightbox-intro-heading"></h2>
             <div class="lightbox-intro-body"></div>
+            <p class="lightbox-intro-hint">
+              <span class="lightbox-intro-hint-arrow" aria-hidden="true">→</span>
+              <span class="lightbox-intro-hint-text">Flèche droite pour voir les tableaux</span>
+            </p>
           </div>
         </div>
       </div>
@@ -591,7 +568,6 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxImg = lightboxWorkView.querySelector('img');
     lightboxCaption = lightbox.querySelector('.lightbox-caption');
     lightboxSeriesHeading = lightbox.querySelector('.lightbox-series-heading');
-    lightboxSeriesDescription = lightbox.querySelector('.lightbox-series-description');
     lightboxWorkTitle = lightbox.querySelector('.lightbox-work-title');
     lightboxWorkMeta = lightbox.querySelector('.lightbox-work-meta');
     lightboxIntro = lightbox.querySelector('.lightbox-series-intro');
@@ -620,15 +596,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const opts = options || {};
     if (!currentSeries.length) return;
 
-    if (index === SERIES_INTRO_INDEX) {
-      if (!seriesHasMobileIntro(currentSeriesCode) || opts.skipIntro) {
-        showLightbox(0, opts);
-        return;
-      }
+    const wantsIntro =
+      (index === SERIES_INTRO_INDEX || (index === 0 && !opts.skipIntro)) &&
+      seriesHasIntro(currentSeriesCode);
+
+    if (wantsIntro) {
       currentIndex = SERIES_INTRO_INDEX;
       renderLightboxIntro();
       openLightboxDisplay();
       syncGalleryUrl();
+      return;
+    }
+
+    if (index === SERIES_INTRO_INDEX) {
+      showLightbox(0, { ...opts, skipIntro: true });
       return;
     }
 
@@ -640,7 +621,6 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxImg.src = mediaSrc(work.filePath);
     lightboxImg.alt = work.title;
     updateLightboxSeriesHeading();
-    updateLightboxSeriesDescription(currentSeriesCode);
     updateLightboxCaption(work);
     openLightboxDisplay();
     syncGalleryUrl();
@@ -699,14 +679,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!currentSeries.length) return;
     currentIndex = Math.max(0, Math.min(idx, currentSeries.length - 1));
     if (isMobileGallery()) {
-      if (seriesHasMobileIntro(code) && !opts.skipIntro && idx === 0) {
-        showSeriesIntro();
-      } else {
-        showLightbox(currentIndex, { skipIntro: opts.skipIntro });
-      }
+      showLightbox(currentIndex, { skipIntro: opts.skipIntro });
       return;
     }
-    appendSeriesDescriptionBlock(gallery, code);
     const paintingsContainer = document.createElement('div');
     paintingsContainer.className = 'paintings-container';
     currentSeries.forEach((painting, paintingIdx) => {
