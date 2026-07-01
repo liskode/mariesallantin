@@ -554,10 +554,16 @@ document.addEventListener('DOMContentLoaded', () => {
             </div>
             <div class="lightbox-intro-card">
               <div class="lightbox-intro-body"></div>
-              <p class="lightbox-intro-hint">
-                <span class="lightbox-intro-hint-arrow" aria-hidden="true">→</span>
-                <span class="lightbox-intro-hint-text">Flèche droite pour voir les tableaux</span>
-              </p>
+              <div class="lightbox-intro-hints">
+                <p class="lightbox-intro-hint">
+                  <span class="lightbox-intro-hint-arrow" aria-hidden="true">→</span>
+                  <span>Flèche droite pour voir les tableaux</span>
+                </p>
+                <p class="lightbox-intro-hint">
+                  <span class="lightbox-intro-hint-arrow lightbox-intro-hint-arrow--down" aria-hidden="true">↓</span>
+                  <span>Flèche du bas pour la série suivante</span>
+                </p>
+              </div>
             </div>
           </div>
         </div>
