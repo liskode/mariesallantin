@@ -652,7 +652,7 @@
 
 .site-v2-page .artist-hero {
   display: grid;
-  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 18rem) minmax(0, 1fr);
   gap: 1.75rem;
   align-items: start;
   margin-bottom: 1.75rem;
@@ -668,8 +668,7 @@
   width: 100%;
   height: auto;
   border-radius: 8px;
-  object-fit: cover;
-  aspect-ratio: 4 / 5;
+  object-fit: contain;
   background: #e8eaed;
 }
 
@@ -880,8 +879,7 @@
   }
 
   .site-v2-page .artist-hero-photo {
-    max-width: 16rem;
-    margin: 0 auto;
+    max-width: 100%;
   }
 
   .site-v2-page .artist-jump {
