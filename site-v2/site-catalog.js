@@ -134,7 +134,7 @@
 
     const [seriesRes, linksRes, formatsRes, techniquesRes] = await Promise.all([
       fetch(
-        base + '/rest/v1/series?select=code,label,sort_order,icon_work_id,year_start,year_end&order=sort_order.asc,code.asc',
+        base + '/rest/v1/series?select=code,label,sort_order,icon_work_id,year_start,year_end,description&order=sort_order.asc,code.asc',
         { headers, cache: 'no-store' }
       ),
       fetch(base + '/rest/v1/work_series?select=work_id,series_code', { headers, cache: 'no-store' }),
@@ -197,6 +197,7 @@
       icon_work_id: s.icon_work_id || null,
       year_start: s.year_start ?? null,
       year_end: s.year_end ?? null,
+      description: String(s.description || '').trim(),
     }));
 
     return {
@@ -271,6 +272,7 @@
         seriesMeta[code] = {
           year_start: s.year_start != null ? Number(s.year_start) : null,
           year_end: s.year_end != null ? Number(s.year_end) : null,
+          description: String(s.description || '').trim(),
         };
         allSeries[code] = [];
         if (s.icon_work_id) seriesIconWorkIds[code] = s.icon_work_id;

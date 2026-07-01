@@ -45,7 +45,7 @@ async function fetchCatalog(supabase: SupabaseClient) {
       .order('id', { ascending: true }),
     supabase
       .from('series')
-      .select('code, label, sort_order, icon_work_id, year_start, year_end')
+      .select('code, label, sort_order, icon_work_id, year_start, year_end, description')
       .order('sort_order', { ascending: true })
       .order('code', { ascending: true }),
     supabase.from('work_series').select('work_id, series_code'),
@@ -121,6 +121,7 @@ async function fetchCatalog(supabase: SupabaseClient) {
     icon_work_id: s.icon_work_id || null,
     year_start: s.year_start ?? null,
     year_end: s.year_end ?? null,
+    description: String(s.description || '').trim(),
   }));
 
   return {

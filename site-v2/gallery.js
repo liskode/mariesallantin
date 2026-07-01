@@ -15,6 +15,56 @@ document.addEventListener('DOMContentLoaded', () => {
   let worksSearchIndex = [];
   let suppressUrlSync = false;
   let searchDebounceTimer = null;
+  const SERIES_INTRO_INDEX = -1;
+
+  function isMobileGallery() {
+    return window.innerWidth < 900;
+  }
+
+  function seriesDescription(code) {
+    const meta = seriesMeta[code];
+    return meta && meta.description ? String(meta.description).trim() : '';
+  }
+
+  function seriesHasMobileIntro(code) {
+    return isMobileGallery() && Boolean(seriesDescription(code));
+  }
+
+  function isShowingSeriesIntro() {
+    return currentIndex === SERIES_INTRO_INDEX;
+  }
+
+  function descriptionParagraphs(text) {
+    return String(text || '')
+      .split(/\n+/)
+      .map((p) => p.trim())
+      .filter(Boolean);
+  }
+
+  function fillDescriptionBody(container, text) {
+    container.innerHTML = '';
+    descriptionParagraphs(text).forEach((p) => {
+      const para = document.createElement('p');
+      para.textContent = p;
+      container.appendChild(para);
+    });
+  }
+
+  function appendSeriesDescriptionBlock(parent, code) {
+    const desc = seriesDescription(code);
+    if (!desc) return;
+    const block = document.createElement('div');
+    block.className = 'series-description';
+    const heading = document.createElement('h2');
+    heading.className = 'series-description-heading';
+    heading.textContent = formatSeriesHeading(code);
+    block.appendChild(heading);
+    const body = document.createElement('div');
+    body.className = 'series-description-body';
+    fillDescriptionBody(body, desc);
+    block.appendChild(body);
+    parent.appendChild(block);
+  }
 
   function stripAccents(s) {
     return String(s).normalize('NFD').replace(/\p{M}/gu, '');
@@ -55,7 +105,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     if (!currentSeriesCode) return;
     const opts = { serie: currentSeriesCode };
-    if (isLightboxOpen() && currentSeries[currentIndex]) {
+    if (isLightboxOpen() && !isShowingSeriesIntro() && currentSeries[currentIndex]) {
       opts.oeuvre = currentSeries[currentIndex].id;
     }
     history.replaceState(null, '', buildGalleryUrl(opts));
@@ -85,6 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
       imageIndex: placement.index,
       openLightbox: true,
       skipUrlSync: opts.skipUrlSync,
+      skipIntro: true,
     });
     return true;
   }
@@ -285,10 +336,12 @@ document.addEventListener('DOMContentLoaded', () => {
       if (gallery) gallery.style.display = '';
     }
 
-    displaySeries(code, startIndex);
+    displaySeries(code, startIndex, { skipIntro: opts.skipIntro });
 
     if (opts.openLightbox || wasLightboxOpen) {
-      showLightbox(currentIndex);
+      if (!isMobileGallery()) {
+        showLightbox(currentIndex);
+      }
     } else if (!opts.skipUrlSync) {
       syncGalleryUrl();
     }
@@ -309,7 +362,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function navigateImage(delta) {
     if (!currentSeries.length) return;
     if (!isLightboxOpen()) {
-      showLightbox(currentIndex + delta);
+      if (isShowingSeriesIntro() || currentIndex >= 0) {
+        showLightbox(currentIndex + delta);
+      }
+      return;
+    }
+    if (isShowingSeriesIntro()) {
+      if (delta > 0) showLightbox(0);
+      return;
+    }
+    if (delta < 0 && currentIndex === 0 && seriesHasMobileIntro(currentSeriesCode)) {
+      showSeriesIntro();
       return;
     }
     showLightbox(currentIndex + delta);
@@ -387,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
     btn.appendChild(img);
     btn.onclick = () => {
       currentIndex = idx;
-      showLightbox(idx);
+      showLightbox(idx, { skipIntro: true });
     };
     return btn;
   }
@@ -404,7 +467,21 @@ document.addEventListener('DOMContentLoaded', () => {
     return list[0];
   }
 
-  let lightbox, lightboxImg, lightboxCaption, lightboxSeriesHeading, lightboxWorkTitle, lightboxWorkMeta, lightboxClose, lightboxPrev, lightboxNext;
+  let lightbox,
+    lightboxStage,
+    lightboxWorkView,
+    lightboxImg,
+    lightboxCaption,
+    lightboxSeriesHeading,
+    lightboxWorkTitle,
+    lightboxWorkMeta,
+    lightboxIntro,
+    lightboxIntroBgImg,
+    lightboxIntroHeading,
+    lightboxIntroBody,
+    lightboxClose,
+    lightboxPrev,
+    lightboxNext;
 
   function workMetaLine(work) {
     if (!work) return '';
@@ -418,7 +495,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function closeLightbox() {
     if (!lightbox) return;
     lightbox.style.display = 'none';
-    lightbox.classList.remove('is-open');
+    lightbox.classList.remove('is-open', 'is-series-intro');
     syncGalleryUrl();
   }
 
@@ -427,6 +504,38 @@ document.addEventListener('DOMContentLoaded', () => {
     requestAnimationFrame(() => lightbox.classList.add('is-open'));
   }
 
+  function setLightboxView(mode) {
+    if (!lightbox) return;
+    const isIntro = mode === 'intro';
+    lightbox.classList.toggle('is-series-intro', isIntro);
+    if (lightboxWorkView) lightboxWorkView.hidden = isIntro;
+    if (lightboxIntro) lightboxIntro.hidden = !isIntro;
+  }
+
+  function renderLightboxIntro() {
+    const code = currentSeriesCode;
+    const cover = overviewImageForSeries(code);
+    if (lightboxIntroBgImg) {
+      if (cover && cover.filePath) {
+        lightboxIntroBgImg.src = mediaSrc(cover.filePath);
+        lightboxIntroBgImg.alt = '';
+      } else {
+        lightboxIntroBgImg.removeAttribute('src');
+        lightboxIntroBgImg.alt = '';
+      }
+    }
+    if (lightboxIntroHeading) {
+      lightboxIntroHeading.textContent = formatSeriesHeading(code);
+    }
+    if (lightboxIntroBody) {
+      fillDescriptionBody(lightboxIntroBody, seriesDescription(code));
+    }
+    setLightboxView('intro');
+  }
+
+  function showSeriesIntro() {
+    showLightbox(SERIES_INTRO_INDEX);
+  }
   function updateLightboxCaption(work) {
     if (!lightboxWorkTitle || !lightboxWorkMeta) return;
     lightboxWorkTitle.textContent = work && work.title ? work.title : '';
@@ -434,30 +543,46 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxWorkMeta.textContent = meta;
     lightboxWorkMeta.style.display = meta ? '' : 'none';
   }
-
   function createLightbox() {
     lightbox = document.createElement('div');
     lightbox.className = 'lightbox';
     lightbox.style.display = 'none';
     lightbox.innerHTML = `
       <button type="button" class="close" aria-label="Fermer">&times;</button>
-      <button type="button" class="prev" aria-label="Œuvre précédente">&#10094;</button>
+      <button type="button" class="prev" aria-label="Précédent">&#10094;</button>
       <div class="lightbox-stage">
-        <div class="lightbox-series-heading" aria-live="polite"></div>
-        <img src="" alt="" decoding="async" />
-        <div class="lightbox-caption">
-          <div class="lightbox-work-title"></div>
-          <div class="lightbox-work-meta"></div>
+        <div class="lightbox-work-view">
+          <div class="lightbox-series-heading" aria-live="polite"></div>
+          <img src="" alt="" decoding="async" />
+          <div class="lightbox-caption">
+            <div class="lightbox-work-title"></div>
+            <div class="lightbox-work-meta"></div>
+          </div>
+        </div>
+        <div class="lightbox-series-intro" hidden>
+          <div class="lightbox-intro-bg" aria-hidden="true">
+            <img src="" alt="" decoding="async" />
+          </div>
+          <div class="lightbox-intro-overlay">
+            <h2 class="lightbox-intro-heading"></h2>
+            <div class="lightbox-intro-body"></div>
+          </div>
         </div>
       </div>
-      <button type="button" class="next" aria-label="Œuvre suivante">&#10095;</button>
+      <button type="button" class="next" aria-label="Suivant">&#10095;</button>
     `;
     document.body.appendChild(lightbox);
-    lightboxImg = lightbox.querySelector('.lightbox-stage img');
+    lightboxStage = lightbox.querySelector('.lightbox-stage');
+    lightboxWorkView = lightbox.querySelector('.lightbox-work-view');
+    lightboxImg = lightboxWorkView.querySelector('img');
     lightboxCaption = lightbox.querySelector('.lightbox-caption');
     lightboxSeriesHeading = lightbox.querySelector('.lightbox-series-heading');
     lightboxWorkTitle = lightbox.querySelector('.lightbox-work-title');
     lightboxWorkMeta = lightbox.querySelector('.lightbox-work-meta');
+    lightboxIntro = lightbox.querySelector('.lightbox-series-intro');
+    lightboxIntroBgImg = lightbox.querySelector('.lightbox-intro-bg img');
+    lightboxIntroHeading = lightbox.querySelector('.lightbox-intro-heading');
+    lightboxIntroBody = lightbox.querySelector('.lightbox-intro-body');
     lightboxClose = lightbox.querySelector('.close');
     lightboxPrev = lightbox.querySelector('.prev');
     lightboxNext = lightbox.querySelector('.next');
@@ -476,12 +601,27 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  function showLightbox(index) {
+  function showLightbox(index, options) {
+    const opts = options || {};
     if (!currentSeries.length) return;
+
+    if (index === SERIES_INTRO_INDEX) {
+      if (!seriesHasMobileIntro(currentSeriesCode) || opts.skipIntro) {
+        showLightbox(0, opts);
+        return;
+      }
+      currentIndex = SERIES_INTRO_INDEX;
+      renderLightboxIntro();
+      openLightboxDisplay();
+      syncGalleryUrl();
+      return;
+    }
+
     if (index < 0) index = currentSeries.length - 1;
     if (index >= currentSeries.length) index = 0;
     currentIndex = index;
     const work = currentSeries[index];
+    setLightboxView('work');
     lightboxImg.src = mediaSrc(work.filePath);
     lightboxImg.alt = work.title;
     updateLightboxSeriesHeading();
@@ -534,21 +674,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function displaySeries(code, startIndex) {
+  function displaySeries(code, startIndex, options) {
+    const opts = options || {};
     const idx = startIndex == null ? 0 : startIndex;
     gallery.innerHTML = '';
     currentSeriesCode = code;
     currentSeries = allSeries[code] || [];
     if (!currentSeries.length) return;
     currentIndex = Math.max(0, Math.min(idx, currentSeries.length - 1));
-    if (window.innerWidth < 900) {
-      showLightbox(currentIndex);
+    if (isMobileGallery()) {
+      if (seriesHasMobileIntro(code) && !opts.skipIntro && idx === 0) {
+        showSeriesIntro();
+      } else {
+        showLightbox(currentIndex, { skipIntro: opts.skipIntro });
+      }
       return;
     }
+    appendSeriesDescriptionBlock(gallery, code);
     const paintingsContainer = document.createElement('div');
     paintingsContainer.className = 'paintings-container';
-    currentSeries.forEach((painting, idx) => {
-      paintingsContainer.appendChild(createPaintingThumb(painting, idx));
+    currentSeries.forEach((painting, paintingIdx) => {
+      paintingsContainer.appendChild(createPaintingThumb(painting, paintingIdx));
     });
     gallery.appendChild(paintingsContainer);
   }
