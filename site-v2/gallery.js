@@ -667,7 +667,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (e.target.tagName === 'A') {
         e.preventDefault();
         const code = e.target.getAttribute('href').replace('#', '');
-        selectSeries(code);
+        selectSeries(code, { openLightbox: seriesHasIntro(code) });
       }
     });
   }
@@ -718,7 +718,10 @@ document.addEventListener('DOMContentLoaded', () => {
       img.style.cursor = 'pointer';
       attachLazyImage(img, cover.filePath);
       img.onclick = () => {
-        selectSeries(code, { imageIndex: 0, openLightbox: window.innerWidth < 900 });
+        selectSeries(code, {
+          imageIndex: 0,
+          openLightbox: seriesHasIntro(code) || isMobileGallery(),
+        });
       };
       serieDiv.appendChild(title);
       serieDiv.appendChild(img);
