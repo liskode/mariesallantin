@@ -438,6 +438,21 @@
 .site-v2-page footer {
   color: var(--secondary);
   border-top-color: var(--border);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.site-v2 footer p,
+.site-v2-page footer p {
+  margin: 0;
+}
+
+.site-v2 .site-footer-credit,
+.site-v2-page .site-footer-credit {
+  margin-top: 0.45rem;
+  font-size: 0.68rem;
+  line-height: 1.4;
+  color: #8a8f98;
 }
 
 @media (max-width: 900px) {
