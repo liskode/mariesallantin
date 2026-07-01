@@ -123,31 +123,6 @@
     }, 100);
   }
 
-  function initGalleryRoute() {
-    if (!window.location.search.includes('gallery') && window.location.hash !== '#gallery') return;
-    showSection('series-overview');
-    var tries = 0;
-    var interval = setInterval(function () {
-      if (window.showSeriesOverview) {
-        window.showSeriesOverview();
-        var hash = window.location.hash.replace('#', '');
-        if (hash && hash !== 'gallery') {
-          setTimeout(function () {
-            if (typeof window.selectSeries === 'function') {
-              window.selectSeries(hash);
-            } else {
-              var el = document.querySelector('#series-list a[href="#' + hash + '"]');
-              if (el) el.click();
-            }
-          }, 150);
-        }
-        clearInterval(interval);
-      }
-      tries++;
-      if (tries > 30) clearInterval(interval);
-    }, 100);
-  }
-
   window.onCatalogReady = function (data) {
     buildSeriesMenu(data);
     var welcomeVisible =
@@ -159,8 +134,6 @@
   openGalleryFromUrl();
 
   document.addEventListener('DOMContentLoaded', function () {
-    initGalleryRoute();
-
     document.querySelectorAll('.main-nav a, .mobile-nav a').forEach(function (a) {
       if (a.textContent.trim().toLowerCase() === 'peintures') {
         a.addEventListener('click', function (e) {
@@ -169,6 +142,7 @@
           stopHeroRotation();
           showSection('series-overview');
           if (window.showSeriesOverview) window.showSeriesOverview();
+          history.replaceState(null, '', window.location.pathname + '?gallery');
         });
       }
     });
@@ -178,17 +152,8 @@
         var seriesCode = e.target.dataset.seriesCode;
         if (!seriesCode) return;
         stopHeroRotation();
-        showSection('series-overview');
-        if (window.showSeriesOverview) {
-          window.showSeriesOverview();
-          setTimeout(function () {
-            if (typeof window.selectSeries === 'function') {
-              window.selectSeries(seriesCode);
-            } else {
-              var el = document.querySelector('#series-list a[href="#' + seriesCode + '"]');
-              if (el) el.click();
-            }
-          }, 100);
+        if (typeof window.selectSeries === 'function') {
+          window.selectSeries(seriesCode);
         }
       }
     });

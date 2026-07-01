@@ -12,6 +12,196 @@ document.addEventListener('DOMContentLoaded', () => {
   let currentSeries = [];
   let currentSeriesCode = '';
   let currentIndex = 0;
+  let worksSearchIndex = [];
+  let suppressUrlSync = false;
+  let searchDebounceTimer = null;
+
+  function stripAccents(s) {
+    return String(s).normalize('NFD').replace(/\p{M}/gu, '');
+  }
+
+  function normalizeForSearch(s) {
+    return stripAccents(String(s || '')).toLowerCase();
+  }
+
+  function parseGalleryLocation() {
+    const sp = new URLSearchParams(window.location.search);
+    const hasGallery = sp.has('gallery') || window.location.hash === '#gallery';
+    let serie = sp.get('serie') || sp.get('series') || '';
+    let oeuvre = sp.get('oeuvre') || sp.get('work') || '';
+    const hash = window.location.hash.replace('#', '').trim();
+    if (!serie && hash && hash !== 'gallery') {
+      if (/^MS\d{4}$/i.test(hash)) oeuvre = hash;
+      else serie = hash;
+    }
+    if (oeuvre) oeuvre = String(oeuvre).trim().toUpperCase();
+    if (serie) serie = String(serie).trim().toUpperCase();
+    return { hasGallery, serie, oeuvre };
+  }
+
+  function buildGalleryUrl(opts) {
+    const parts = ['gallery'];
+    if (opts && opts.serie) parts.push('serie=' + encodeURIComponent(opts.serie));
+    if (opts && opts.oeuvre) parts.push('oeuvre=' + encodeURIComponent(opts.oeuvre));
+    return window.location.pathname + '?' + parts.join('&');
+  }
+
+  function syncGalleryUrl() {
+    if (suppressUrlSync) return;
+    const overview = document.getElementById('series-overview');
+    if (overview && overview.style.display !== 'none') {
+      history.replaceState(null, '', buildGalleryUrl(null));
+      return;
+    }
+    if (!currentSeriesCode) return;
+    const opts = { serie: currentSeriesCode };
+    if (isLightboxOpen() && currentSeries[currentIndex]) {
+      opts.oeuvre = currentSeries[currentIndex].id;
+    }
+    history.replaceState(null, '', buildGalleryUrl(opts));
+  }
+
+  function findWorkPlacement(workId, preferredSerie) {
+    const id = String(workId || '').trim().toUpperCase();
+    if (!id) return null;
+    const pref = preferredSerie ? String(preferredSerie).trim().toUpperCase() : '';
+    if (pref && allSeries[pref]) {
+      const idx = allSeries[pref].findIndex((w) => w.id === id);
+      if (idx >= 0) return { serie: pref, index: idx };
+    }
+    for (const code of orderedSeriesCodes()) {
+      const list = allSeries[code] || [];
+      const idx = list.findIndex((w) => w.id === id);
+      if (idx >= 0) return { serie: code, index: idx };
+    }
+    return null;
+  }
+
+  function openWorkById(workId, options) {
+    const opts = options || {};
+    const placement = findWorkPlacement(workId, opts.serie);
+    if (!placement) return false;
+    selectSeries(placement.serie, {
+      imageIndex: placement.index,
+      openLightbox: true,
+      skipUrlSync: opts.skipUrlSync,
+    });
+    return true;
+  }
+
+  function applyGalleryRouteFromUrl() {
+    const loc = parseGalleryLocation();
+    if (!loc.hasGallery) return;
+    suppressUrlSync = true;
+    if (loc.oeuvre) {
+      if (!openWorkById(loc.oeuvre, { serie: loc.serie, skipUrlSync: true })) {
+        if (loc.serie && orderedSeriesCodes().includes(loc.serie)) {
+          selectSeries(loc.serie, { skipUrlSync: true });
+        } else {
+          showSeriesOverview({ skipUrlSync: true });
+        }
+      }
+    } else if (loc.serie && orderedSeriesCodes().includes(loc.serie)) {
+      selectSeries(loc.serie, { skipUrlSync: true });
+    } else {
+      showSeriesOverview({ skipUrlSync: true });
+    }
+    suppressUrlSync = false;
+    syncGalleryUrl();
+  }
+
+  function rebuildSearchIndex() {
+    const seen = new Set();
+    worksSearchIndex = [];
+    orderedSeriesCodes().forEach((code) => {
+      (allSeries[code] || []).forEach((work) => {
+        if (seen.has(work.id)) return;
+        seen.add(work.id);
+        worksSearchIndex.push({
+          id: work.id,
+          title: work.title || work.id,
+          serie: code,
+          serieName: seriesNames[code] || code,
+          normTitle: normalizeForSearch(work.title || ''),
+          normId: normalizeForSearch(work.id),
+        });
+      });
+    });
+  }
+
+  function hideSearchResults() {
+    const results = document.getElementById('series-search-results');
+    if (results) results.hidden = true;
+  }
+
+  function clearSearchInput() {
+    const input = document.getElementById('series-search-input');
+    if (input) input.value = '';
+    hideSearchResults();
+  }
+
+  function renderSearchResults(query) {
+    const results = document.getElementById('series-search-results');
+    if (!results) return;
+    const q = normalizeForSearch(query.trim());
+    results.innerHTML = '';
+    if (!q) {
+      results.hidden = true;
+      return;
+    }
+    const matches = worksSearchIndex
+      .filter((w) => w.normTitle.includes(q) || w.normId.includes(q))
+      .slice(0, 12);
+    if (!matches.length) {
+      const li = document.createElement('li');
+      li.className = 'series-search-empty';
+      li.textContent = 'Aucune œuvre trouvée.';
+      results.appendChild(li);
+      results.hidden = false;
+      return;
+    }
+    matches.forEach((match) => {
+      const li = document.createElement('li');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.innerHTML =
+        '<span class="series-search-result-title"></span>' +
+        '<span class="series-search-result-meta"></span>';
+      btn.querySelector('.series-search-result-title').textContent = match.title;
+      btn.querySelector('.series-search-result-meta').textContent =
+        match.id + ' · ' + match.serieName;
+      btn.onclick = () => {
+        clearSearchInput();
+        openWorkById(match.id, { serie: match.serie });
+        const galleryEl = document.getElementById('gallery');
+        if (galleryEl) {
+          window.scrollTo({ top: galleryEl.offsetTop - 40, behavior: 'smooth' });
+        }
+      };
+      li.appendChild(btn);
+      results.appendChild(li);
+    });
+    results.hidden = false;
+  }
+
+  function initWorkSearch() {
+    const input = document.getElementById('series-search-input');
+    const wrap = document.getElementById('series-search-wrap');
+    if (!input) return;
+    input.addEventListener('input', () => {
+      clearTimeout(searchDebounceTimer);
+      searchDebounceTimer = setTimeout(() => renderSearchResults(input.value), 120);
+    });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        clearSearchInput();
+        input.blur();
+      }
+    });
+    document.addEventListener('click', (e) => {
+      if (wrap && !wrap.contains(e.target)) hideSearchResults();
+    });
+  }
 
   function formatSeriesYears(meta) {
     if (!meta) return '';
@@ -99,6 +289,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (opts.openLightbox || wasLightboxOpen) {
       showLightbox(currentIndex);
+    } else if (!opts.skipUrlSync) {
+      syncGalleryUrl();
     }
   }
 
@@ -149,6 +341,9 @@ document.addEventListener('DOMContentLoaded', () => {
   window.selectSeries = selectSeries;
   window.navigateSeries = navigateSeries;
   window.navigateImage = navigateImage;
+  window.openWorkById = openWorkById;
+  window.parseGalleryLocation = parseGalleryLocation;
+  window.applyGalleryRouteFromUrl = applyGalleryRouteFromUrl;
 
   function mediaSrc(filePath) {
     if (typeof WorksCatalog !== 'undefined' && typeof WorksCatalog.buildMediaUrl === 'function') {
@@ -224,6 +419,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!lightbox) return;
     lightbox.style.display = 'none';
     lightbox.classList.remove('is-open');
+    syncGalleryUrl();
   }
 
   function openLightboxDisplay() {
@@ -291,6 +487,7 @@ document.addEventListener('DOMContentLoaded', () => {
     updateLightboxSeriesHeading();
     updateLightboxCaption(work);
     openLightboxDisplay();
+    syncGalleryUrl();
   }
 
   function seriesCodesForGallery(data) {
@@ -303,9 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function isGalleryRoute() {
-    if (window.location.search.includes('gallery')) return true;
-    const hash = window.location.hash.replace('#', '').trim();
-    return hash.length > 0;
+    return parseGalleryLocation().hasGallery;
   }
 
   if (typeof WorksCatalog === 'undefined') {
@@ -322,7 +517,9 @@ document.addEventListener('DOMContentLoaded', () => {
           allSeries[k] = data.allSeries[k];
         });
         if (typeof window.onCatalogReady === 'function') window.onCatalogReady(data);
-        if (window.showSeriesOverview && isGalleryRoute()) window.showSeriesOverview();
+        rebuildSearchIndex();
+        initWorkSearch();
+        if (isGalleryRoute()) applyGalleryRouteFromUrl();
       })
       .catch((err) => console.error('Chargement du catalogue œuvres:', err));
   }
@@ -356,7 +553,8 @@ document.addEventListener('DOMContentLoaded', () => {
     gallery.appendChild(paintingsContainer);
   }
 
-  window.showSeriesOverview = function () {
+  window.showSeriesOverview = function (options) {
+    const opts = options || {};
     const overview = document.getElementById('series-overview');
     const galleryEl = document.getElementById('gallery');
     overview.innerHTML = '';
@@ -387,8 +585,13 @@ document.addEventListener('DOMContentLoaded', () => {
       serieDiv.appendChild(img);
       overview.appendChild(serieDiv);
     });
+    if (!opts.skipUrlSync) syncGalleryUrl();
   };
 
   createLightbox();
   document.addEventListener('keydown', onGalleryKeydown);
+  window.addEventListener('popstate', () => {
+    if (!isGalleryRoute()) return;
+    applyGalleryRouteFromUrl();
+  });
 });

@@ -6,7 +6,7 @@
   <title>Marie Sallantin – Artiste Peintre</title>
   <meta name="description" content="Portfolio de Marie Sallantin, artiste peintre française. Découvrez ses séries thématiques et œuvres originales."/>
   <link rel="stylesheet" href="../style.css"/>
-  <link rel="stylesheet" href="site-pages.css?v=20250630-11"/>
+  <link rel="stylesheet" href="site-pages.css?v=20250630-12"/>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <link rel="icon" type="image/png" href="../images/logo-artmajeur.png"/>
   <script type="application/ld+json">
@@ -55,6 +55,18 @@
     <div class="layout">
       <aside class="side-menu" id="side-menu">
         <h2 class="side-menu-title">Séries</h2>
+        <div class="series-search" id="series-search-wrap">
+          <label for="series-search-input" class="visually-hidden">Rechercher une œuvre</label>
+          <input
+            type="search"
+            id="series-search-input"
+            class="series-search-input"
+            placeholder="Rechercher une œuvre…"
+            autocomplete="off"
+            enterkeyhint="search"
+          />
+          <ul id="series-search-results" class="series-search-results" hidden></ul>
+        </div>
         <ul id="series-list"></ul>
       </aside>
       <main>
@@ -89,8 +101,8 @@
     &copy; 2025 Marie Sallantin. Tous droits réservés.
   </footer>
 
-  <script src="site-catalog.js?v=20250630-11"></script>
-  <script src="gallery.js?v=20250630-11"></script>
-  <script src="site-app.js?v=20250630-11"></script>
+  <script src="site-catalog.js?v=20250630-12"></script>
+  <script src="gallery.js?v=20250630-12"></script>
+  <script src="site-app.js?v=20250630-12"></script>
 </body>
 </html>

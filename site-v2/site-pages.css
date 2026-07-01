@@ -144,6 +144,111 @@
   border-left-color: var(--accent);
 }
 
+/* Phase 3 — recherche d’œuvres */
+.site-v2 .series-search,
+.site-v2-page .series-search {
+  padding: 0 1rem 0.75rem;
+  position: relative;
+}
+
+.site-v2 .series-search-input,
+.site-v2-page .series-search-input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.88rem;
+  color: var(--primary);
+  background: var(--background);
+}
+
+.site-v2 .series-search-input:focus,
+.site-v2-page .series-search-input:focus {
+  outline: 2px solid rgba(61, 111, 196, 0.35);
+  outline-offset: 1px;
+  border-color: var(--accent);
+}
+
+.site-v2 .series-search-input::placeholder,
+.site-v2-page .series-search-input::placeholder {
+  color: var(--secondary);
+  opacity: 0.85;
+}
+
+.site-v2 .series-search-results,
+.site-v2-page .series-search-results {
+  list-style: none;
+  margin: 0.35rem 0 0;
+  padding: 0;
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  z-index: 20;
+  max-height: min(50vh, 320px);
+  overflow-y: auto;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.1);
+}
+
+.site-v2 .series-search-results li,
+.site-v2-page .series-search-results li {
+  margin: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.site-v2 .series-search-results li:last-child,
+.site-v2-page .series-search-results li:last-child {
+  border-bottom: none;
+}
+
+.site-v2 .series-search-results button,
+.site-v2-page .series-search-results button {
+  display: block;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: none;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font: inherit;
+  color: var(--primary);
+}
+
+.site-v2 .series-search-results button:hover,
+.site-v2-page .series-search-results button:hover,
+.site-v2 .series-search-results button:focus-visible,
+.site-v2-page .series-search-results button:focus-visible {
+  background: rgba(61, 111, 196, 0.06);
+  outline: none;
+}
+
+.site-v2 .series-search-result-title,
+.site-v2-page .series-search-result-title {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.site-v2 .series-search-result-meta,
+.site-v2-page .series-search-result-meta {
+  display: block;
+  margin-top: 0.15rem;
+  font-size: 0.75rem;
+  color: var(--secondary);
+}
+
+.site-v2 .series-search-empty,
+.site-v2-page .series-search-empty {
+  padding: 0.65rem 0.7rem;
+  font-size: 0.82rem;
+  color: var(--secondary);
+}
+
 .site-v2 .series-gallery {
   padding-top: 1.25rem;
   max-width: 980px;
