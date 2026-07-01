@@ -633,117 +633,206 @@
   text-decoration: underline;
 }
 
-/* CV */
-.site-v2-page .cv-bio-maquette {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  gap: 2rem;
-  margin: 2rem 0 1.5rem;
+/* L'Artiste — page parcours */
+.site-v2-page .artist-page {
+  max-width: 52rem;
+  padding-top: 0.25rem;
 }
 
-.site-v2-page .cv-bio-left {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
+.site-v2-page .artist-intro-header {
+  margin-bottom: 1.5rem;
 }
 
-.site-v2-page .cv-bio-photo {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.site-v2-page .cv-bio-text {
-  font-size: 1.1rem;
+.site-v2-page .artist-subtitle {
+  margin: 0.35rem 0 0;
   color: var(--secondary);
-  line-height: 1.65;
-  max-width: 28rem;
+  font-size: 1rem;
+  font-weight: 400;
 }
 
-.site-v2-page .cv-icons-grid {
+.site-v2-page .artist-hero {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
-  max-width: 28rem;
+  grid-template-columns: minmax(0, 14rem) minmax(0, 1fr);
+  gap: 1.75rem;
+  align-items: start;
+  margin-bottom: 1.75rem;
+  padding: 1.35rem 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
 }
 
-.site-v2-page .cv-icon {
+.site-v2-page .artist-hero-photo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  object-fit: cover;
+  aspect-ratio: 4 / 5;
+  background: #e8eaed;
+}
+
+.site-v2-page .artist-hero-text {
+  color: var(--secondary);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.site-v2-page .artist-hero-text p {
+  margin: 0 0 0.85rem;
+}
+
+.site-v2-page .artist-hero-text p:last-child {
+  margin-bottom: 0;
+}
+
+.site-v2-page .artist-jump {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.55rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.site-v2-page .artist-jump-link {
+  display: inline-block;
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
   background: var(--surface);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 1.25rem 0.75rem;
+  border: 1px solid var(--border);
+  color: var(--secondary);
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+}
+
+.site-v2-page .artist-jump-link:hover,
+.site-v2-page .artist-jump-link:focus-visible {
+  color: var(--accent);
+  border-color: rgba(61, 111, 196, 0.35);
+  background: rgba(61, 111, 196, 0.06);
+  outline: none;
+}
+
+.site-v2-page .artist-sections {
   display: flex;
   flex-direction: column;
+  gap: 0.75rem;
+}
+
+.site-v2-page .artist-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.site-v2-page .artist-details {
+  margin: 0;
+}
+
+.site-v2-page .artist-panel-title {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: box-shadow 0.2s, transform 0.2s;
-  aspect-ratio: 1;
-  border: 1px solid rgba(0, 0, 0, 0.04);
-}
-
-.site-v2-page .cv-icon:hover {
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-  transform: translateY(-2px);
-}
-
-.site-v2-page .cv-icon-symbol {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.site-v2-page .cv-icon-title {
-  font-size: 0.95rem;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--primary);
-  text-align: center;
-  line-height: 1.25;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
 }
 
-.site-v2-page .cv-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
+.site-v2-page .artist-panel-title::-webkit-details-marker {
+  display: none;
+}
+
+.site-v2-page .artist-panel-title::after {
+  content: '+';
+  flex-shrink: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
-}
-
-.site-v2-page .cv-overlay-content {
-  background: #fff;
-  border-radius: 1rem;
-  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.2);
-  padding: 2rem 1.5rem 1.5rem;
-  max-width: min(90vw, 42rem);
-  max-height: 80vh;
-  overflow-y: auto;
-  position: relative;
-}
-
-.site-v2-page .cv-overlay-close {
-  position: absolute;
-  top: 0.75rem;
-  right: 1rem;
-  background: none;
-  border: none;
-  font-size: 2rem;
-  line-height: 1;
-  cursor: pointer;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.04);
   color: var(--secondary);
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.15s ease;
 }
 
-.site-v2-page .cv-overlay-content h2 {
-  margin-top: 0;
+.site-v2-page .artist-details[open] .artist-panel-title::after {
+  content: '−';
+}
+
+.site-v2-page .artist-panel-body {
+  padding: 0 1.1rem 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.site-v2-page .artist-timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0.75rem 0 0;
+}
+
+.site-v2-page .artist-timeline-more {
+  padding-top: 0;
+}
+
+.site-v2-page .artist-entry {
+  display: grid;
+  grid-template-columns: 3.75rem minmax(0, 1fr);
+  gap: 0.65rem 1rem;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.site-v2-page .artist-entry:last-child {
+  border-bottom: none;
+}
+
+.site-v2-page .artist-entry-year {
+  font-size: 0.82rem;
+  font-weight: 600;
   color: var(--accent);
+  line-height: 1.4;
 }
 
-.site-v2-page .cv-overlay-content ul {
-  padding-left: 1.25rem;
-  line-height: 1.55;
+.site-v2-page .artist-entry-label {
+  font-size: 0.9rem;
+  color: var(--primary);
+  line-height: 1.45;
+}
+
+.site-v2-page .artist-show-more {
+  display: block;
+  width: 100%;
+  margin-top: 0.65rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.site-v2-page .artist-show-more:hover,
+.site-v2-page .artist-show-more:focus-visible {
+  background: rgba(61, 111, 196, 0.06);
+  outline: none;
 }
 
 /* FAP */
@@ -786,13 +875,22 @@
 }
 
 @media (max-width: 900px) {
-  .site-v2-page .cv-bio-maquette {
-    flex-direction: column;
+  .site-v2-page .artist-hero {
+    grid-template-columns: 1fr;
   }
 
-  .site-v2-page .cv-icons-grid,
-  .site-v2-page .cv-bio-text {
-    max-width: 100%;
+  .site-v2-page .artist-hero-photo {
+    max-width: 16rem;
+    margin: 0 auto;
+  }
+
+  .site-v2-page .artist-jump {
+    gap: 0.35rem;
+  }
+
+  .site-v2-page .artist-entry {
+    grid-template-columns: 3.25rem minmax(0, 1fr);
+    gap: 0.5rem 0.75rem;
   }
 
   .site-v2-page .fap-panel {

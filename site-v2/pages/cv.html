@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CV de Marie Sallantin – Artiste Peintre</title>
-  <meta name="description" content="Parcours artistique, expositions et biographie de Marie Sallantin, artiste peintre contemporaine à Paris." />
+  <title>L'Artiste — Marie Sallantin, peintre</title>
+  <meta name="description" content="Biographie, parcours et expositions de Marie Sallantin, artiste peintre contemporaine à Paris." />
   <link rel="stylesheet" href="../../style.css">
-  <link rel="stylesheet" href="../site-pages.css?v=20250630-23">
+  <link rel="stylesheet" href="../site-pages.css?v=20250630-24">
   <link rel="icon" type="image/png" href="../../images/logo-artmajeur.png"/>
 </head>
 <body class="site-v2-page">
@@ -18,7 +18,7 @@
         </a>
         <nav class="main-nav">
           <a href="../index.html?gallery">Peintures</a>
-          <a href="cv.html" class="active">CV</a>
+          <a href="cv.html" class="active">L'Artiste</a>
           <a href="liens.html">Liens</a>
           <a href="https://www.artmajeur.com/marie-sallantin" target="_blank" rel="noopener">
             <img src="../../images/logo-artmajeur.png" alt="ArtMajeur" class="nav-logo"/>
@@ -39,42 +39,23 @@
         <h2 class="side-menu-title">Séries</h2>
         <ul id="series-list"></ul>
       </aside>
-      <main>
-        <h1 class="visually-hidden">CV de Marie Sallantin</h1>
-        <section class="cv-bio cv-bio-maquette">
-          <div class="cv-bio-left">
-            <div class="cv-bio-text">
-              <p>Marie Sallantin est née en 1946 à Paris. Formée à l'École Nationale des Beaux-Arts de Paris sous la direction de Jean Bertholle et Louis Nallard, elle vit et travaille à Paris et en Bourgogne.</p>
-            </div>
-            <div class="cv-icons-grid">
-              <div class="cv-icon" data-overlay="perso" role="button" tabindex="0">
-                <span class="cv-icon-symbol" aria-hidden="true">🎨</span>
-                <span class="cv-icon-title">Expositions<br>personnelles</span>
-              </div>
-              <div class="cv-icon" data-overlay="coll" role="button" tabindex="0">
-                <span class="cv-icon-symbol" aria-hidden="true">👥</span>
-                <span class="cv-icon-title">Expositions<br>collectives</span>
-              </div>
-              <div class="cv-icon" data-overlay="pub" role="button" tabindex="0">
-                <span class="cv-icon-symbol" aria-hidden="true">🏛️</span>
-                <span class="cv-icon-title">Collections<br>publiques</span>
-              </div>
-              <div class="cv-icon" data-overlay="orga" role="button" tabindex="0">
-                <span class="cv-icon-symbol" aria-hidden="true">🎪</span>
-                <span class="cv-icon-title">Organisation<br>d'expositions</span>
-              </div>
-            </div>
+      <main class="artist-page">
+        <header class="page-intro artist-intro-header">
+          <h1>L'Artiste</h1>
+          <p class="artist-subtitle">Marie Sallantin — peintre</p>
+        </header>
+
+        <section class="artist-hero" id="artist-parcours" aria-labelledby="artist-parcours-title">
+          <h2 class="visually-hidden" id="artist-parcours-title">Parcours</h2>
+          <div class="artist-hero-photo">
+            <img src="../../images/cv-bio.jpg" alt="Portrait de Marie Sallantin" width="480" height="360" decoding="async" />
           </div>
-          <div class="cv-bio-photo">
-            <img src="../../images/cv-bio.jpg" alt="Marie Sallantin" class="cv-img-horiz" />
-          </div>
+          <div class="artist-hero-text" id="artist-bio-text"></div>
         </section>
-        <div id="cv-overlay" class="cv-overlay" style="display:none;" role="dialog" aria-modal="true">
-          <div class="cv-overlay-content">
-            <button type="button" class="cv-overlay-close" onclick="closeCvOverlay()" aria-label="Fermer">×</button>
-            <div id="cv-overlay-text"></div>
-          </div>
-        </div>
+
+        <nav class="artist-jump" id="artist-jump" aria-label="Sections du parcours"></nav>
+
+        <div class="artist-sections" id="artist-sections"></div>
       </main>
     </div>
   </div>
@@ -82,44 +63,11 @@
     <p class="site-footer-legal">&copy; 2026 Marie Sallantin. Tous droits d'auteur réservés. Toute reproduction des œuvres sans autorisation est interdite.</p>
     <p class="site-footer-credit">Site basé sur le logiciel de gestion de catalogue personnalisé <strong>Base</strong>Art développé par Etienne Renard</p>
   </footer>
-  <script src="../site-catalog.js?v=20250630-2"></script>
-  <script src="../site-nav.js?v=20250630-2"></script>
+  <script src="../artist-data.js?v=20250630-24"></script>
+  <script src="../artist-page.js?v=20250630-24"></script>
+  <script src="../site-catalog.js?v=20250630-24"></script>
+  <script src="../site-nav.js?v=20250630-24"></script>
   <script>
-    const cvOverlayTexts = {
-      perso: `<h2>Expositions personnelles (sélection)</h2><ul><li>2017 Galerie La Capitale Paris «la fin des temps»</li><li>2014 Marais Chrétien, Eglise Saint Denys, Paris 3ème</li><li>2010 mairie du 3ème "L'enfer et le Paradis" Marais chrétien</li><li>2006, Hôtel de Sauroy, Paris.</li><li>2004, Hôtel des Chartreux, Paris.</li><li>2004, Galerie Peinture Fraîche, Paris.</li><li>2001, Association Philomuses, Paris.</li><li>1999, Maison de la Grèce, Paris.</li><li>1997, Galerie Nicole Ferry, Paris.</li><li>1995, Galerie Nicole Ferry, Paris.</li><li>1994, Galerie Image, Athènes.</li><li>1994, Maison de Chypre, Athènes.</li><li>1994, Galerie Nicole Ferry, Paris.</li><li>1992, Galerie Nicole Ferry, Paris.</li><li>1990, Galerie du Haut Pavé, Paris.</li><li>1990, Galerie Nicole Ferry, Paris.</li><li>1989, Abbaye de Mondaye, Calvados.</li><li>1988, Galerie Nicole Ferry, Paris.</li></ul>`,
-      coll: `<h2>Expositions collectives (sélection)</h2><ul><li>2016 Galerie «Peinture fraîche» trois peintres de Face à l'Art</li><li>2016 Fort Rammekens Pays Bas «treize peintres»</li><li>2016 Villa A des Arts Paris «trois peintres»</li><li>2016 Bourges Chateau d'eau «treize peintres»</li><li>2009 FID (Foire internationale du dessin du XXIème siècle) Paris</li><li>2009 Musée Rignault, Saint Cirq Lapopie (Lot)</li><li>2008, Galerie Nicole Ferry Paris</li><li>2007, Galerie Nicole Ferry Paris, "les vingt ans"</li><li>2007, Carte blanche à Anne Malherbe, Galerie Defrost Paris</li><li>2007, Galerie Nicole Ferry Paris, "Rouge"</li><li>2005, « Noir &amp; Blanc », Musée Saint-Germain, Auxerre.</li><li>2005, « Les messagers de l'invisible », Musée Saint-Germain, Auxerre.</li><li>2002, « Tête », Europ'Art, Genève.</li><li>2002, « Tête », Espace Beaurepaire, Paris.</li><li>1997, 4° Salon International des Arts Plastiques, Valognes.</li><li>1995, Galerie Area, Paris.</li><li>1994, Salon des Réalités Nouvelles, Paris.</li><li>1993, Musée de Toulon, Donation Alin Avila.</li><li>1993, Saga Galerie AREA, Edition Alin Avila : Le bain d'Aphrodite.</li><li>1991, Salon Découvertes, Grand Palais.</li><li>1991, Reg'Art, Belfort.</li><li>1991, Salon de Montrouge (peinture).</li><li>1990, Triennale d'Osaka Japon.</li><li>1988 et 1989 Salon Jeune Peinture.</li><li>1988 à 1999, régulièrement à la Galerie Nicole Ferry.</li><li>1987, Galerie Beau Lézard, Paris.</li><li>1986, Salon de Montrouge (peinture).</li><li>1984, Salon de Montrouge (peinture).</li><li>1984, XVI° Festival International de Peinture Musée de Cagnes-sur-mer (sélection Brigitte Hedelsamson).</li><li>1982, Galerie Peinture Fraîche, Paris.</li><li>1979, Maison des Beaux Arts, Paris, « 4 élèves de Jean Bertholle ».</li></ul>`,
-      pub: `<h2>Collections publiques</h2><ul><li>1993, Musée de Toulon, Donation Alin Avila.</li><li>1986, Ville de Paris.</li><li>1985, Fondation Art et Dialogue.</li><li>1983, Fonds National d'Art Contemporain.</li></ul>`,
-      orga: `<h2>Organisation d'expositions</h2><ul><li>2005, Exposition « Noir et Blanc », Musée-abbaye Saint-Germain, avec le parrainage de Micheline Durand, conservateur des musées d'Auxerre.</li><li>2003, Exposition « Animal et Territoire », Orangerie du Sénat, ARSENAT.</li><li>2002, Exposition « TETE. Vingt-cinq peintres de Face à l'Art ». EUROP'ART, Genève.</li><li>2002, Exposition « TETE », Espace Beaurepaire, Paris.</li></ul>`
-    };
-
-    function openCvOverlay(key) {
-      document.getElementById('cv-overlay-text').innerHTML = cvOverlayTexts[key];
-      document.getElementById('cv-overlay').style.display = 'flex';
-    }
-
-    function closeCvOverlay() {
-      document.getElementById('cv-overlay').style.display = 'none';
-    }
-
-    document.querySelectorAll('.cv-icon').forEach(function (icon) {
-      icon.addEventListener('click', function () {
-        openCvOverlay(this.getAttribute('data-overlay'));
-      });
-      icon.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault();
-          openCvOverlay(this.getAttribute('data-overlay'));
-        }
-      });
-    });
-
-    document.getElementById('cv-overlay').addEventListener('click', function (e) {
-      if (e.target === this) closeCvOverlay();
-    });
-    document.addEventListener('keydown', function (e) {
-      if (e.key === 'Escape') closeCvOverlay();
-    });
-
     SiteNav.initSecondaryPage('../index.html?gallery#');
   </script>
 </body>
