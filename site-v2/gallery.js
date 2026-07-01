@@ -462,7 +462,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxWorkTitle,
     lightboxWorkMeta,
     lightboxIntro,
-    lightboxIntroBgImg,
+    lightboxIntroCover,
     lightboxIntroHeading,
     lightboxIntroBody,
     lightboxClose,
@@ -501,13 +501,13 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderLightboxIntro() {
     const code = currentSeriesCode;
     const cover = overviewImageForSeries(code);
-    if (lightboxIntroBgImg) {
+    if (lightboxIntroCover) {
       if (cover && cover.filePath) {
-        lightboxIntroBgImg.src = mediaSrc(cover.filePath);
-        lightboxIntroBgImg.alt = '';
+        lightboxIntroCover.src = mediaSrc(cover.filePath);
+        lightboxIntroCover.alt = '';
       } else {
-        lightboxIntroBgImg.removeAttribute('src');
-        lightboxIntroBgImg.alt = '';
+        lightboxIntroCover.removeAttribute('src');
+        lightboxIntroCover.alt = '';
       }
     }
     if (lightboxIntroHeading) {
@@ -547,16 +547,18 @@ document.addEventListener('DOMContentLoaded', () => {
           </div>
         </div>
         <div class="lightbox-series-intro" hidden>
-          <div class="lightbox-intro-bg" aria-hidden="true">
-            <img src="" alt="" decoding="async" />
-          </div>
-          <div class="lightbox-intro-overlay">
-            <h2 class="lightbox-intro-heading"></h2>
-            <div class="lightbox-intro-body"></div>
-            <p class="lightbox-intro-hint">
-              <span class="lightbox-intro-hint-arrow" aria-hidden="true">→</span>
-              <span class="lightbox-intro-hint-text">Flèche droite pour voir les tableaux</span>
-            </p>
+          <img class="lightbox-intro-cover" src="" alt="" decoding="async" />
+          <div class="lightbox-intro-layout">
+            <div class="lightbox-intro-header">
+              <h2 class="lightbox-intro-heading"></h2>
+            </div>
+            <div class="lightbox-intro-card">
+              <div class="lightbox-intro-body"></div>
+              <p class="lightbox-intro-hint">
+                <span class="lightbox-intro-hint-arrow" aria-hidden="true">→</span>
+                <span class="lightbox-intro-hint-text">Flèche droite pour voir les tableaux</span>
+              </p>
+            </div>
           </div>
         </div>
       </div>
@@ -571,7 +573,7 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxWorkTitle = lightbox.querySelector('.lightbox-work-title');
     lightboxWorkMeta = lightbox.querySelector('.lightbox-work-meta');
     lightboxIntro = lightbox.querySelector('.lightbox-series-intro');
-    lightboxIntroBgImg = lightbox.querySelector('.lightbox-intro-bg img');
+    lightboxIntroCover = lightbox.querySelector('.lightbox-intro-cover');
     lightboxIntroHeading = lightbox.querySelector('.lightbox-intro-heading');
     lightboxIntroBody = lightbox.querySelector('.lightbox-intro-body');
     lightboxClose = lightbox.querySelector('.close');
