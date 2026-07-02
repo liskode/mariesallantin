@@ -12,8 +12,6 @@
   /** @type {Array<object>} */
   let eventTypes = [];
   /** @type {Array<object>} */
-  let eventRoles = [];
-  /** @type {Array<object>} */
   let publicationStatuses = [];
   const dirtyIds = new Set();
   let token = '';
@@ -123,13 +121,6 @@
     updateSaveBtn();
   }
 
-  function displayDate(value) {
-    if (!value) return '';
-    const s = String(value);
-    if (/^\d{4}-01-01$/.test(s)) return s.slice(0, 4);
-    return s;
-  }
-
   function parseMediaIds(raw) {
     return String(raw || '')
       .split(/[,;\s]+/)
@@ -158,32 +149,21 @@
     if (dirtyIds.has(row.id)) tr.classList.add('legend-editor-row--dirty');
 
     const tdType = document.createElement('td');
+    tdType.className = 'events-type-cell';
     const typeSel = document.createElement('select');
-    typeSel.className = 'legend-select legend-select--compact';
+    typeSel.className = 'legend-select legend-select--compact events-type-select';
     eventTypes.forEach((t) => {
       const opt = document.createElement('option');
       opt.value = t.code;
-      opt.textContent = t.label || t.code;
+      opt.textContent = t.code + ' — ' + (t.label || t.code);
       if (row.event_type_code === t.code) opt.selected = true;
       typeSel.appendChild(opt);
     });
     bindSelect(typeSel, row, 'event_type_code', tr);
+    const currentType = eventTypes.find((t) => t.code === row.event_type_code);
+    typeSel.title = currentType ? currentType.label || currentType.code : row.event_type_code || '';
     tdType.appendChild(typeSel);
     tr.appendChild(tdType);
-
-    const tdRole = document.createElement('td');
-    const roleSel = document.createElement('select');
-    roleSel.className = 'legend-select legend-select--compact';
-    eventRoles.forEach((r) => {
-      const opt = document.createElement('option');
-      opt.value = r.code;
-      opt.textContent = r.label || r.code;
-      if (row.role_code === r.code) opt.selected = true;
-      roleSel.appendChild(opt);
-    });
-    bindSelect(roleSel, row, 'role_code', tr);
-    tdRole.appendChild(roleSel);
-    tr.appendChild(tdRole);
 
     const tdDateLabel = document.createElement('td');
     const dateLabelInput = document.createElement('input');
@@ -194,34 +174,6 @@
     bindInput(dateLabelInput, row, 'date_label', tr);
     tdDateLabel.appendChild(dateLabelInput);
     tr.appendChild(tdDateLabel);
-
-    const tdSortDate = document.createElement('td');
-    const sortDateInput = document.createElement('input');
-    sortDateInput.type = 'text';
-    sortDateInput.className = 'legend-input events-date-input';
-    sortDateInput.placeholder = 'AAAA ou AAAA-MM-JJ';
-    sortDateInput.value = displayDate(row.sort_date);
-    sortDateInput.addEventListener('input', () => {
-      row.sort_date = sortDateInput.value.trim() || null;
-      markDirty(row.id);
-      tr.classList.add('legend-editor-row--dirty');
-    });
-    tdSortDate.appendChild(sortDateInput);
-    tr.appendChild(tdSortDate);
-
-    const tdSortDateEnd = document.createElement('td');
-    const sortDateEndInput = document.createElement('input');
-    sortDateEndInput.type = 'text';
-    sortDateEndInput.className = 'legend-input events-date-input';
-    sortDateEndInput.placeholder = 'AAAA ou AAAA-MM-JJ';
-    sortDateEndInput.value = displayDate(row.sort_date_end);
-    sortDateEndInput.addEventListener('input', () => {
-      row.sort_date_end = sortDateEndInput.value.trim() || null;
-      markDirty(row.id);
-      tr.classList.add('legend-editor-row--dirty');
-    });
-    tdSortDateEnd.appendChild(sortDateEndInput);
-    tr.appendChild(tdSortDateEnd);
 
     const tdLabel = document.createElement('td');
     const labelInput = document.createElement('input');
@@ -308,7 +260,6 @@
   function applyPayload(data) {
     itemsList = data.items || [];
     eventTypes = data.event_types || [];
-    eventRoles = data.event_roles || [];
     publicationStatuses = data.publication_statuses || [];
     dirtyIds.clear();
     updateSaveBtn();

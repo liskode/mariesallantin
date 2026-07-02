@@ -2696,12 +2696,17 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   font-size: 0.78rem;
 }
 
-.events-editor-table .events-label-input {
-  min-width: 14rem;
+.events-editor-table .events-type-select {
+  width: 3.1rem;
+  min-width: 3.1rem;
 }
 
-.events-editor-table .events-date-input {
-  width: 6.5rem;
+.events-editor-table .events-type-cell {
+  width: 3.3rem;
+}
+
+.events-editor-table .events-label-input {
+  min-width: 14rem;
 }
 
 .events-editor-table .events-date-label-input {

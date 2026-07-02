@@ -25,10 +25,7 @@
     return {
       id,
       event_type_code: String(row.event_type_code || '').trim().toUpperCase(),
-      role_code: String(row.role_code || '').trim().toUpperCase(),
       date_label: String(row.date_label || '').trim(),
-      sort_date: row.sort_date || null,
-      sort_date_end: row.sort_date_end || null,
       label: String(row.label || '').trim(),
       note: String(row.note || '').trim(),
       publication_status_code: String(row.publication_status_code || 'N').trim().toUpperCase(),
@@ -45,18 +42,9 @@
         label: String(t.label || t.code).trim(),
         sort_order: t.sort_order != null ? Number(t.sort_order) : 0,
       })),
-      event_roles: (eventRoles || []).map((r) => ({
-        code: String(r.code).trim(),
-        label: String(r.label || r.code).trim(),
-        sort_order: r.sort_order != null ? Number(r.sort_order) : 0,
-      })),
       items: (items || [])
         .filter((item) => PUBLIC_STATUSES.includes(item.publication_status_code))
-        .sort(
-          (a, b) =>
-            String(b.sort_date || '').localeCompare(String(a.sort_date || '')) ||
-            a.sort_order - b.sort_order
-        ),
+        .sort((a, b) => a.sort_order - b.sort_order),
     };
   }
 
@@ -102,7 +90,7 @@
     if (!r.ok) return null;
     const data = await r.json();
     if (!data || data.ok === false || !Array.isArray(data.items)) return null;
-    return buildPayload(data.event_types, data.event_roles, data.items);
+    return buildPayload(data.event_types, null, data.items);
   }
 
   async function fetchEventsDirect(cfg) {
@@ -112,16 +100,11 @@
 
     const headers = { apikey: key, Authorization: 'Bearer ' + key };
     const statusFilter = 'publication_status_code=in.(' + PUBLIC_STATUSES.join(',') + ')';
-    const eventSelect =
-      'id,event_type_code,role_code,date_label,sort_date,sort_date_end,label,note,publication_status_code,sort_order';
+    const eventSelect = 'id,event_type_code,date_label,label,note,publication_status_code,sort_order';
     const mediaSelect = 'id,media_type_code,title,url,file_path,internal_path';
 
-    const [typesRes, rolesRes, eventsRes, linksRes, mediaRes] = await Promise.all([
+    const [typesRes, eventsRes, linksRes, mediaRes] = await Promise.all([
       fetch(base + '/rest/v1/event_types?select=code,label,sort_order&order=sort_order.asc', {
-        headers,
-        cache: 'no-store',
-      }),
-      fetch(base + '/rest/v1/event_roles?select=code,label,sort_order&order=sort_order.asc', {
         headers,
         cache: 'no-store',
       }),
@@ -131,7 +114,7 @@
           eventSelect +
           '&' +
           statusFilter +
-          '&order=sort_date.desc,sort_order.asc',
+          '&order=sort_order.asc',
         { headers, cache: 'no-store' }
       ),
       fetch(base + '/rest/v1/artist_event_media?select=event_id,media_id', {
@@ -149,21 +132,20 @@
     ]);
 
     if (!typesRes.ok) throw new Error('Lecture event_types : ' + typesRes.status);
-    if (!rolesRes.ok) throw new Error('Lecture event_roles : ' + rolesRes.status);
     if (!eventsRes.ok) throw new Error('Lecture artist_events : ' + eventsRes.status);
     if (!linksRes.ok) throw new Error('Lecture artist_event_media : ' + linksRes.status);
     if (!mediaRes.ok) throw new Error('Lecture related_media : ' + mediaRes.status);
 
     const { mediaByEvent } = linksMaps(await linksRes.json(), await mediaRes.json());
     const items = (await eventsRes.json()).map((row) => normalizeItem(row, mediaByEvent));
-    return buildPayload(await typesRes.json(), await rolesRes.json(), items);
+    return buildPayload(await typesRes.json(), null, items);
   }
 
   function fallbackStatic() {
     if (!global.EventsData) throw new Error('events-data.js manquant');
     const { mediaByEvent } = linksMaps([], []);
     const items = (global.EventsData.items || []).map((row) => normalizeItem(row, mediaByEvent));
-    return buildPayload(global.EventsData.event_types, global.EventsData.event_roles, items);
+    return buildPayload(global.EventsData.event_types, null, items);
   }
 
   async function load() {
@@ -195,14 +177,7 @@
 
   function displayDate(item) {
     const label = String(item.date_label || '').trim();
-    if (label) return label;
-    const d = String(item.sort_date || '').trim();
-    if (!d) return '';
-    if (/^\d{4}-\d{2}-\d{2}$/.test(d)) {
-      const [y, m, day] = d.split('-');
-      return day === '01' && m === '01' ? y : new Date(d + 'T12:00:00').toLocaleDateString('fr-FR');
-    }
-    return d;
+    return label;
   }
 
   global.SiteEvents = {

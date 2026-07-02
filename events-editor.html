@@ -52,8 +52,8 @@
     <main class="catalogue-page">
       <div class="catalogue-standalone-inner catalogue-standalone-main">
         <p class="catalogue-intro" id="events-intro">
-          Statut <strong>W</strong> = visible sur le site. Tri : <code>sort_date</code> (AAAA ou AAAA-MM-JJ).
-          Fin optionnelle : <code>sort_date_end</code>. Médias : UUIDs séparés par des virgules.
+          Statut <strong>W</strong> = visible sur le site. Type : <code>P</code>, <code>C</code>, <code>Q</code>, <code>O</code>.
+          Médias : UUIDs séparés par des virgules. Le tri public suit <code>sort_order</code>.
         </p>
 
         <div class="legend-editor-toolbar">
@@ -74,10 +74,7 @@
             <thead>
               <tr>
                 <th scope="col">Type</th>
-                <th scope="col">Rôle</th>
                 <th scope="col">Date affichée</th>
-                <th scope="col">Tri</th>
-                <th scope="col">Fin</th>
                 <th scope="col">Libellé</th>
                 <th scope="col">Note</th>
                 <th scope="col">Médias</th>
@@ -94,6 +91,6 @@
   </div>
 
   <script src="editor-common.js?v=20250702-1"></script>
-  <script src="events-editor.js?v=20250702-1"></script>
+  <script src="events-editor.js?v=20250702-3"></script>
 </body>
 </html>

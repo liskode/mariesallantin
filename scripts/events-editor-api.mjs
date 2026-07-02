@@ -99,26 +99,13 @@ function createSupabase() {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
-function parseDate(v) {
-  if (v === '' || v == null) return null;
-  const s = String(v).trim();
-  if (/^\d{4}$/.test(s)) return s + '-01-01';
-  if (/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
-  return null;
-}
-
 function normalizeEventInput(raw) {
   const id = String(raw.id || '').trim();
-  const sort_date = parseDate(raw.sort_date);
-  if (!sort_date) throw new Error('sort_date invalide pour ' + (id || '(nouveau)'));
 
   return {
     id,
-    event_type_code: String(raw.event_type_code || 'SOLO').trim().toUpperCase(),
-    role_code: String(raw.role_code || 'ARTIST').trim().toUpperCase(),
+    event_type_code: String(raw.event_type_code || 'P').trim().toUpperCase(),
     date_label: String(raw.date_label || '').trim(),
-    sort_date,
-    sort_date_end: parseDate(raw.sort_date_end),
     label: String(raw.label || '').trim(),
     note: String(raw.note || '').trim(),
     publication_status_code: String(raw.publication_status_code || 'N').trim().toUpperCase(),
@@ -139,16 +126,14 @@ async function syncMediaLinks(supabase, eventId, mediaIds) {
 }
 
 async function fetchEditorPayload(supabase) {
-  const [typesRes, rolesRes, statusesRes, eventsRes, linksRes, mediaRes] = await Promise.all([
+  const [typesRes, statusesRes, eventsRes, linksRes, mediaRes] = await Promise.all([
     supabase.from('event_types').select('code, label, sort_order').order('sort_order', { ascending: true }),
-    supabase.from('event_roles').select('code, label, sort_order').order('sort_order', { ascending: true }),
     supabase.from('publication_statuses').select('code, label, sort_order').order('sort_order', { ascending: true }),
     supabase
       .from('artist_events')
       .select(
-        'id, event_type_code, role_code, date_label, sort_date, sort_date_end, label, note, publication_status_code, sort_order, created_at, updated_at'
+        'id, event_type_code, date_label, label, note, publication_status_code, sort_order, created_at, updated_at'
       )
-      .order('sort_date', { ascending: false })
       .order('sort_order', { ascending: true }),
     supabase.from('artist_event_media').select('event_id, media_id'),
     supabase
@@ -159,7 +144,6 @@ async function fetchEditorPayload(supabase) {
   ]);
 
   if (typesRes.error) throw typesRes.error;
-  if (rolesRes.error) throw rolesRes.error;
   if (statusesRes.error) throw statusesRes.error;
   if (eventsRes.error) throw eventsRes.error;
   if (linksRes.error) throw linksRes.error;
@@ -180,7 +164,6 @@ async function fetchEditorPayload(supabase) {
 
   return {
     event_types: typesRes.data || [],
-    event_roles: rolesRes.data || [],
     publication_statuses: statusesRes.data || [],
     media_options: mediaRes.data || [],
     items,
@@ -266,10 +249,8 @@ const server = http.createServer(async (req, res) => {
       const sort_order = (last?.sort_order ?? 0) + 10;
       const year = new Date().getFullYear();
       const { error } = await supabase.from('artist_events').insert({
-        event_type_code: 'SOLO',
-        role_code: 'ARTIST',
+        event_type_code: 'P',
         date_label: String(year),
-        sort_date: `${year}-01-01`,
         label: 'Nouvel événement',
         note: '',
         publication_status_code: 'N',
@@ -296,6 +277,7 @@ const server = http.createServer(async (req, res) => {
       const normalized = rows.map((r) => {
         const item = normalizeEventInput(r);
         if (!item.id) throw new Error('id manquant');
+        if (!item.date_label) throw new Error('date affichée manquante pour ' + item.id);
         if (!item.label) throw new Error('libellé manquant pour ' + item.id);
         return item;
       });

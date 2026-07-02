@@ -96,16 +96,14 @@ async function fetchResources(supabase: SupabaseClient) {
 }
 
 async function fetchEvents(supabase: SupabaseClient) {
-  const [typesRes, rolesRes, eventsRes, linksRes, mediaRes] = await Promise.all([
+  const [typesRes, eventsRes, linksRes, mediaRes] = await Promise.all([
     supabase.from('event_types').select('code, label, sort_order').order('sort_order', { ascending: true }),
-    supabase.from('event_roles').select('code, label, sort_order').order('sort_order', { ascending: true }),
     supabase
       .from('artist_events')
       .select(
-        'id, event_type_code, role_code, date_label, sort_date, sort_date_end, label, note, publication_status_code, sort_order'
+        'id, event_type_code, date_label, label, note, publication_status_code, sort_order'
       )
       .in('publication_status_code', PUBLIC_STATUSES)
-      .order('sort_date', { ascending: false })
       .order('sort_order', { ascending: true }),
     supabase.from('artist_event_media').select('event_id, media_id'),
     supabase
@@ -115,7 +113,6 @@ async function fetchEvents(supabase: SupabaseClient) {
   ]);
 
   if (typesRes.error) throw typesRes.error;
-  if (rolesRes.error) throw rolesRes.error;
   if (eventsRes.error) throw eventsRes.error;
   if (linksRes.error) throw linksRes.error;
   if (mediaRes.error) throw mediaRes.error;
@@ -149,10 +146,7 @@ async function fetchEvents(supabase: SupabaseClient) {
     return {
       id: row.id,
       event_type_code: row.event_type_code,
-      role_code: row.role_code,
       date_label: row.date_label || '',
-      sort_date: row.sort_date,
-      sort_date_end: row.sort_date_end,
       label: row.label || '',
       note: row.note || '',
       publication_status_code: row.publication_status_code,
@@ -165,7 +159,6 @@ async function fetchEvents(supabase: SupabaseClient) {
   return {
     ok: true,
     event_types: typesRes.data || [],
-    event_roles: rolesRes.data || [],
     items,
   };
 }
