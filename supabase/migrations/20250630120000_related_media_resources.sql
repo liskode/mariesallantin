@@ -1,7 +1,7 @@
--- Ressources site public : champs fichier/vignette + type WEB + seed initial
+-- Ressources site public : champs fichier/vignette + types courts + seed initial
 
 insert into public.media_types (code, label, sort_order) values
-  ('WEB', 'Lien web', 5)
+  ('W', 'Lien web', 5)
 on conflict (code) do update set
   label = excluded.label,
   sort_order = excluded.sort_order,
@@ -33,7 +33,7 @@ insert into public.related_media (
 ) values
   (
     'c1000001-0000-4000-8000-000000000001',
-    'PRESS',
+    'P',
     'Marie Sallantin met la pression',
     null,
     'Sur la peinture',
@@ -47,7 +47,7 @@ insert into public.related_media (
   ),
   (
     'c1000002-0000-4000-8000-000000000002',
-    'WEB',
+    'W',
     'Exposition à La Capitale Galerie',
     null,
     'La Capitale Galerie',
@@ -61,7 +61,7 @@ insert into public.related_media (
   ),
   (
     'c1000003-0000-4000-8000-000000000003',
-    'WEB',
+    'W',
     'Galerie Peinture Fraîche',
     null,
     'Galerie Peinture Fraîche',
@@ -75,7 +75,7 @@ insert into public.related_media (
   ),
   (
     'c1000004-0000-4000-8000-000000000004',
-    'VIDEO',
+    'V',
     'Interview avec David Foenkinos',
     null,
     'KTOTV',
@@ -89,7 +89,7 @@ insert into public.related_media (
   ),
   (
     'c1000005-0000-4000-8000-000000000005',
-    'WEB',
+    'W',
     'Face à l''Art — salon virtuel de peintres',
     null,
     'Face à l''Art',

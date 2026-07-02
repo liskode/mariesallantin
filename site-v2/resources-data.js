@@ -4,17 +4,17 @@
 (function (global) {
   global.ResourcesData = {
     media_types: [
-      { code: 'WEB', label: 'Lien web', sort_order: 5 },
-      { code: 'PRESS', label: 'Article de presse', sort_order: 10 },
-      { code: 'EXCAT', label: "Catalogue d'exposition", sort_order: 20 },
-      { code: 'BOOK', label: 'Livre', sort_order: 30 },
-      { code: 'VIDEO', label: 'Vidéo', sort_order: 40 },
-      { code: 'AUDIO', label: 'Enregistrement audio', sort_order: 50 },
+      { code: 'W', label: 'Lien web', sort_order: 5 },
+      { code: 'P', label: 'Article de presse', sort_order: 10 },
+      { code: 'X', label: "Exposition / entretien d'exposition", sort_order: 20 },
+      { code: 'C', label: 'Catalogue / livre', sort_order: 30 },
+      { code: 'V', label: 'Vidéo', sort_order: 40 },
+      { code: 'A', label: 'Enregistrement audio', sort_order: 50 },
     ],
     items: [
       {
         id: 'c1000001-0000-4000-8000-000000000001',
-        media_type_code: 'PRESS',
+        media_type_code: 'P',
         title: 'Marie Sallantin met la pression',
         media_date: null,
         source: 'Sur la peinture',
@@ -32,7 +32,7 @@
       },
       {
         id: 'c1000002-0000-4000-8000-000000000002',
-        media_type_code: 'WEB',
+        media_type_code: 'W',
         title: 'Exposition à La Capitale Galerie',
         media_date: null,
         source: 'La Capitale Galerie',
@@ -50,7 +50,7 @@
       },
       {
         id: 'c1000003-0000-4000-8000-000000000003',
-        media_type_code: 'WEB',
+        media_type_code: 'W',
         title: 'Galerie Peinture Fraîche',
         media_date: null,
         source: 'Galerie Peinture Fraîche',
@@ -68,7 +68,7 @@
       },
       {
         id: 'c1000004-0000-4000-8000-000000000004',
-        media_type_code: 'VIDEO',
+        media_type_code: 'V',
         title: 'Interview avec David Foenkinos',
         media_date: null,
         source: 'KTOTV',
@@ -86,7 +86,7 @@
       },
       {
         id: 'c1000005-0000-4000-8000-000000000005',
-        media_type_code: 'WEB',
+        media_type_code: 'W',
         title: "Face à l'Art — salon virtuel de peintres",
         media_date: null,
         source: "Face à l'Art",

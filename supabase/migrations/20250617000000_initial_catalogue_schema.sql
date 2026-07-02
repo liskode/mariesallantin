@@ -87,7 +87,7 @@ create table public.photo_statuses (
 );
 
 create table public.media_types (
-  code text primary key check (code ~ '^[A-Z0-9]{2,12}$'),
+  code text primary key check (code ~ '^[A-Z0-9]{1,12}$'),
   label text not null default '',
   sort_order int not null default 0,
   created_at timestamptz not null default now(),
@@ -280,11 +280,12 @@ on conflict (code) do update set
   updated_at = now();
 
 insert into public.media_types (code, label, sort_order) values
-  ('PRESS', 'Article de presse', 10),
-  ('EXCAT', 'Catalogue d''exposition', 20),
-  ('BOOK', 'Livre', 30),
-  ('VIDEO', 'Vidéo', 40),
-  ('AUDIO', 'Enregistrement audio', 50)
+  ('W', 'Lien web', 5),
+  ('P', 'Article de presse', 10),
+  ('X', 'Exposition / entretien d''exposition', 20),
+  ('C', 'Catalogue / livre', 30),
+  ('V', 'Vidéo', 40),
+  ('A', 'Enregistrement audio', 50)
 on conflict (code) do update set
   label = excluded.label,
   sort_order = excluded.sort_order,

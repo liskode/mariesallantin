@@ -157,7 +157,7 @@
 
     const tdType = document.createElement('td');
     const typeSel = document.createElement('select');
-    typeSel.className = 'legend-select legend-select--compact';
+    typeSel.className = 'legend-select legend-select--compact resources-type-select';
     mediaTypes.forEach((t) => {
       const opt = document.createElement('option');
       opt.value = t.code;
@@ -181,7 +181,7 @@
     const tdSource = document.createElement('td');
     const sourceInput = document.createElement('input');
     sourceInput.type = 'text';
-    sourceInput.className = 'legend-input';
+    sourceInput.className = 'legend-input resources-source-input';
     sourceInput.value = row.source || '';
     bindInput(sourceInput, row, 'source', tr);
     tdSource.appendChild(sourceInput);

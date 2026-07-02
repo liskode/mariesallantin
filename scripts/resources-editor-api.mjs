@@ -118,7 +118,7 @@ function normalizeResourceInput(raw) {
   const id = String(raw.id || '').trim();
   return {
     id,
-    media_type_code: String(raw.media_type_code || 'WEB').trim().toUpperCase(),
+    media_type_code: String(raw.media_type_code || 'W').trim().toUpperCase(),
     title: String(raw.title || '').trim(),
     media_date: parseDate(raw.media_date),
     source: String(raw.source || '').trim(),
@@ -265,7 +265,7 @@ const server = http.createServer(async (req, res) => {
         .maybeSingle();
       const sort_order = (last?.sort_order ?? 0) + 10;
       const { error } = await supabase.from('related_media').insert({
-        media_type_code: 'WEB',
+        media_type_code: 'W',
         title: 'Nouvelle ressource',
         source: '',
         description: '',

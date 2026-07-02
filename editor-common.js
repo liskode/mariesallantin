@@ -9,10 +9,10 @@
   const EDITOR_TABS = [
     { id: 'works', label: 'Œuvres', href: 'works-editor.html', port: 47835 },
     { id: 'series', label: 'Séries', href: 'series.html', port: 47833 },
-    { id: 'resources', label: 'Ressources', href: 'resources-editor.html', port: 47836 },
-    { id: 'events', label: 'Événements', href: 'events-editor.html', port: 47837 },
     { id: 'codes', label: 'Formats & techniques', href: 'codes-editor.html', port: 47834 },
     { id: 'collectors', label: 'Collectionneurs', href: 'collectors.html', port: 47832 },
+    { id: 'events', label: 'Événements', href: 'events-editor.html', port: 47837 },
+    { id: 'resources', label: 'Ressources', href: 'resources-editor.html', port: 47836 },
   ];
 
   const LOCAL_EDITOR_PORTS = new Set(['47832', '47833', '47834', '47835', '47836', '47837']);

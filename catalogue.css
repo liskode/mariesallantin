@@ -2623,16 +2623,24 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   font-size: 0.78rem;
 }
 
+.resources-editor-table .resources-type-select {
+  width: 4.75rem;
+}
+
 .resources-editor-table .resources-title-input {
-  min-width: 10rem;
+  min-width: 11rem;
+}
+
+.resources-editor-table .resources-source-input {
+  min-width: 7.5rem;
 }
 
 .resources-editor-table .resources-url-input {
-  min-width: 12rem;
+  min-width: 10rem;
 }
 
 .resources-editor-table .resources-path-input {
-  min-width: 8rem;
+  min-width: 7rem;
   font-family: ui-monospace, monospace;
   font-size: 0.72rem;
 }
@@ -2647,7 +2655,7 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 }
 
 .resources-editor-table .resources-series-input {
-  min-width: 7rem;
+  min-width: 6rem;
   font-family: ui-monospace, monospace;
   font-size: 0.72rem;
 }
@@ -2659,7 +2667,7 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 }
 
 .resources-editor-table .resources-desc-textarea {
-  width: 12rem;
+  width: 10rem;
   min-height: 2.5rem;
   resize: vertical;
   padding: 4px 6px;

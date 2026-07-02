@@ -9,21 +9,21 @@
       id: 'web',
       label: 'Sur le web',
       match: function (item) {
-        return !item.internal_path && item.media_type_code === 'WEB';
+        return !item.internal_path && item.media_type_code === 'W';
       },
     },
     {
       id: 'press',
       label: 'Presse',
       match: function (item) {
-        return !item.internal_path && item.media_type_code === 'PRESS';
+        return !item.internal_path && item.media_type_code === 'P';
       },
     },
     {
       id: 'video',
       label: 'Vidéos & interviews',
       match: function (item) {
-        return !item.internal_path && item.media_type_code === 'VIDEO';
+        return !item.internal_path && item.media_type_code === 'V';
       },
     },
     {
@@ -31,7 +31,7 @@
       label: 'Audio',
       optional: true,
       match: function (item) {
-        return !item.internal_path && item.media_type_code === 'AUDIO';
+        return !item.internal_path && item.media_type_code === 'A';
       },
     },
     {
@@ -41,7 +41,7 @@
       match: function (item) {
         return (
           !item.internal_path &&
-          (item.media_type_code === 'EXCAT' || item.media_type_code === 'BOOK')
+          (item.media_type_code === 'X' || item.media_type_code === 'C')
         );
       },
     },
@@ -55,12 +55,12 @@
   ];
 
   const TYPE_LABELS = {
-    WEB: 'Lien',
-    PRESS: 'Presse',
-    VIDEO: 'Vidéo',
-    AUDIO: 'Audio',
-    EXCAT: 'Catalogue',
-    BOOK: 'Livre',
+    W: 'Lien',
+    P: 'Presse',
+    V: 'Vidéo',
+    A: 'Audio',
+    X: 'Expo',
+    C: 'Catalogue',
   };
 
   /** @type {Array<object>} */

@@ -53,7 +53,7 @@ function parseDuration(v: unknown): number | null {
 
 function normalizeResourceInput(raw: Record<string, unknown>) {
   const id = String(raw.id || '').trim();
-  const media_type_code = String(raw.media_type_code || 'WEB').trim().toUpperCase();
+  const media_type_code = String(raw.media_type_code || 'W').trim().toUpperCase();
   const title = String(raw.title || '').trim();
   const publication_status_code = String(raw.publication_status_code || 'N')
     .trim()
@@ -172,7 +172,7 @@ Deno.serve(async (req) => {
         .maybeSingle();
       const sort_order = (last?.sort_order ?? 0) + 10;
       const { error } = await supabase.from('related_media').insert({
-        media_type_code: 'WEB',
+        media_type_code: 'W',
         title: 'Nouvelle ressource',
         source: '',
         description: '',
