@@ -2624,7 +2624,12 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 }
 
 .resources-editor-table .resources-type-select {
-  width: 4.75rem;
+  width: 3.1rem;
+  min-width: 3.1rem;
+}
+
+.resources-editor-table .resources-type-cell {
+  width: 3.3rem;
 }
 
 .resources-editor-table .resources-title-input {

@@ -236,6 +236,39 @@
     return groups;
   }
 
+  function optionLabel(x, mode) {
+    if (mode === 'name' || mode === 'label') return x.label || x.code;
+    if (mode === 'code') return x.code;
+    return x.label ? `${x.code} — ${x.label}` : x.code;
+  }
+
+  function refreshSelectOptionLabels(selectEl, options, labelMode, { onlySelected = false } = {}) {
+    Array.from(selectEl.options).forEach((o) => {
+      if (!o.value) return;
+      const item = options.find((x) => x.code === o.value);
+      if (!item) return;
+      if (onlySelected && o !== selectEl.options[selectEl.selectedIndex]) return;
+      o.textContent = optionLabel(item, labelMode);
+    });
+  }
+
+  /** Menu ouvert : libellés complets ; cellule fermée : code seul (select natif). */
+  function attachClosedCodeSelectDisplay(selectEl, options, openLabelMode, closedLabelMode) {
+    const collapse = () =>
+      refreshSelectOptionLabels(selectEl, options, closedLabelMode, { onlySelected: true });
+    const expand = () => refreshSelectOptionLabels(selectEl, options, openLabelMode);
+
+    selectEl.addEventListener('mousedown', expand);
+    selectEl.addEventListener('keydown', (e) => {
+      if (e.key === ' ' || e.key === 'Enter' || e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        expand();
+      }
+    });
+    selectEl.addEventListener('change', collapse);
+    selectEl.addEventListener('blur', collapse);
+    collapse();
+  }
+
   global.EditorCommon = {
     TRASH_ICON,
     EDITOR_TABS,
@@ -254,5 +287,7 @@
     sortFormats,
     groupFormatsByFamily,
     compareFormatCodes,
+    optionLabel,
+    attachClosedCodeSelectDisplay,
   };
 })(window);

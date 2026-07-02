@@ -190,15 +190,17 @@
     tr.appendChild(tdDelete);
 
     const tdType = document.createElement('td');
+    tdType.className = 'resources-type-cell';
     const typeSel = document.createElement('select');
     typeSel.className = 'legend-select legend-select--compact resources-type-select';
     mediaTypes.forEach((t) => {
       const opt = document.createElement('option');
       opt.value = t.code;
-      opt.textContent = t.label || t.code;
+      opt.textContent = EditorCommon.optionLabel(t, 'code-label');
       if (row.media_type_code === t.code) opt.selected = true;
       typeSel.appendChild(opt);
     });
+    EditorCommon.attachClosedCodeSelectDisplay(typeSel, mediaTypes, 'code-label', 'code');
     bindSelect(typeSel, row, 'media_type_code', tr);
     tdType.appendChild(typeSel);
     tr.appendChild(tdType);

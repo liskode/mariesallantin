@@ -155,13 +155,12 @@
     eventTypes.forEach((t) => {
       const opt = document.createElement('option');
       opt.value = t.code;
-      opt.textContent = t.code + ' — ' + (t.label || t.code);
+      opt.textContent = EditorCommon.optionLabel(t, 'code-label');
       if (row.event_type_code === t.code) opt.selected = true;
       typeSel.appendChild(opt);
     });
+    EditorCommon.attachClosedCodeSelectDisplay(typeSel, eventTypes, 'code-label', 'code');
     bindSelect(typeSel, row, 'event_type_code', tr);
-    const currentType = eventTypes.find((t) => t.code === row.event_type_code);
-    typeSel.title = currentType ? currentType.label || currentType.code : row.event_type_code || '';
     tdType.appendChild(typeSel);
     tr.appendChild(tdType);
 
