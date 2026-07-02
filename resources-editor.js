@@ -135,6 +135,28 @@
       .filter(Boolean);
   }
 
+  function destinationValue(row) {
+    return String(row.url || row.internal_path || '').trim();
+  }
+
+  function bindDestinationInput(input, row, tr) {
+    input.addEventListener('input', () => {
+      const value = String(input.value || '').trim();
+      if (!value) {
+        row.url = '';
+        row.internal_path = '';
+      } else if (/^https?:\/\//i.test(value)) {
+        row.url = value;
+        row.internal_path = '';
+      } else {
+        row.url = '';
+        row.internal_path = value;
+      }
+      markDirty(row.id);
+      tr.classList.add('legend-editor-row--dirty');
+    });
+  }
+
   function bindInput(input, row, field, tr) {
     input.addEventListener('input', () => {
       row[field] = input.value;
@@ -201,14 +223,15 @@
     tdDate.appendChild(dateInput);
     tr.appendChild(tdDate);
 
-    const tdUrl = document.createElement('td');
-    const urlInput = document.createElement('input');
-    urlInput.type = 'text';
-    urlInput.className = 'legend-input resources-url-input';
-    urlInput.value = row.url || '';
-    bindInput(urlInput, row, 'url', tr);
-    tdUrl.appendChild(urlInput);
-    tr.appendChild(tdUrl);
+    const tdDestination = document.createElement('td');
+    const destinationInput = document.createElement('input');
+    destinationInput.type = 'text';
+    destinationInput.className = 'legend-input resources-destination-input';
+    destinationInput.placeholder = 'https://… ou fap.html';
+    destinationInput.value = destinationValue(row);
+    bindDestinationInput(destinationInput, row, tr);
+    tdDestination.appendChild(destinationInput);
+    tr.appendChild(tdDestination);
 
     const tdThumb = document.createElement('td');
     const thumbInput = document.createElement('input');
@@ -229,16 +252,6 @@
     bindInput(fileInput, row, 'file_path', tr);
     tdFile.appendChild(fileInput);
     tr.appendChild(tdFile);
-
-    const tdInternal = document.createElement('td');
-    const internalInput = document.createElement('input');
-    internalInput.type = 'text';
-    internalInput.className = 'legend-input resources-path-input';
-    internalInput.placeholder = 'fap.html';
-    internalInput.value = row.internal_path || '';
-    bindInput(internalInput, row, 'internal_path', tr);
-    tdInternal.appendChild(internalInput);
-    tr.appendChild(tdInternal);
 
     const tdEssential = document.createElement('td');
     const essentialInput = document.createElement('input');
