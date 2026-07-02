@@ -2632,6 +2632,15 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   width: 3.3rem;
 }
 
+.resources-editor-table .resources-status-select {
+  width: 3.1rem;
+  min-width: 3.1rem;
+}
+
+.resources-editor-table .resources-status-cell {
+  width: 3.3rem;
+}
+
 .resources-editor-table .resources-title-input {
   min-width: 11rem;
 }
@@ -2707,6 +2716,15 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 }
 
 .events-editor-table .events-type-cell {
+  width: 3.3rem;
+}
+
+.events-editor-table .events-status-select {
+  width: 3.1rem;
+  min-width: 3.1rem;
+}
+
+.events-editor-table .events-status-cell {
   width: 3.3rem;
 }
 

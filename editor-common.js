@@ -269,6 +269,24 @@
     collapse();
   }
 
+  /**
+   * Remplit un &lt;select&gt; avec options code+libellé, affichage fermé = code seul.
+   * @param {HTMLSelectElement} selectEl
+   * @param {Array<{code:string,label?:string}>} options
+   * @param {string} [selectedCode]
+   */
+  function populateCodeSelect(selectEl, options, selectedCode) {
+    selectEl.innerHTML = '';
+    (options || []).forEach((item) => {
+      const opt = document.createElement('option');
+      opt.value = item.code;
+      opt.textContent = optionLabel(item, 'code-label');
+      if (selectedCode === item.code) opt.selected = true;
+      selectEl.appendChild(opt);
+    });
+    attachClosedCodeSelectDisplay(selectEl, options, 'code-label', 'code');
+  }
+
   global.EditorCommon = {
     TRASH_ICON,
     EDITOR_TABS,
@@ -289,5 +307,6 @@
     compareFormatCodes,
     optionLabel,
     attachClosedCodeSelectDisplay,
+    populateCodeSelect,
   };
 })(window);

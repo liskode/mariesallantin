@@ -152,14 +152,7 @@
     tdType.className = 'events-type-cell';
     const typeSel = document.createElement('select');
     typeSel.className = 'legend-select legend-select--compact events-type-select';
-    eventTypes.forEach((t) => {
-      const opt = document.createElement('option');
-      opt.value = t.code;
-      opt.textContent = EditorCommon.optionLabel(t, 'code-label');
-      if (row.event_type_code === t.code) opt.selected = true;
-      typeSel.appendChild(opt);
-    });
-    EditorCommon.attachClosedCodeSelectDisplay(typeSel, eventTypes, 'code-label', 'code');
+    EditorCommon.populateCodeSelect(typeSel, eventTypes, row.event_type_code);
     bindSelect(typeSel, row, 'event_type_code', tr);
     tdType.appendChild(typeSel);
     tr.appendChild(tdType);
@@ -211,15 +204,10 @@
     tr.appendChild(tdMedia);
 
     const tdStatus = document.createElement('td');
+    tdStatus.className = 'events-status-cell';
     const statusSel = document.createElement('select');
-    statusSel.className = 'legend-select legend-select--compact';
-    publicationStatuses.forEach((s) => {
-      const opt = document.createElement('option');
-      opt.value = s.code;
-      opt.textContent = s.code + ' — ' + (s.label || s.code);
-      if (row.publication_status_code === s.code) opt.selected = true;
-      statusSel.appendChild(opt);
-    });
+    statusSel.className = 'legend-select legend-select--compact events-status-select';
+    EditorCommon.populateCodeSelect(statusSel, publicationStatuses, row.publication_status_code);
     bindSelect(statusSel, row, 'publication_status_code', tr);
     tdStatus.appendChild(statusSel);
     tr.appendChild(tdStatus);
