@@ -275,6 +275,7 @@
         activeFilterId = id;
         renderFilterNav();
         renderGrid();
+        wireFilterNav();
       });
     });
   }

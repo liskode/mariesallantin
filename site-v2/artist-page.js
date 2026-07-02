@@ -205,6 +205,7 @@
         fillFilterNav();
         fillActiveSection();
         wireShowMore();
+        wireFilterNav();
       });
     });
   }
