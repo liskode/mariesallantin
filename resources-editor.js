@@ -177,6 +177,18 @@
     const tr = document.createElement('tr');
     if (dirtyIds.has(row.id)) tr.classList.add('legend-editor-row--dirty');
 
+    const tdDelete = document.createElement('td');
+    tdDelete.className = 'editor-action-cell';
+    const deleteBtn = document.createElement('button');
+    deleteBtn.type = 'button';
+    deleteBtn.className = 'editor-delete-btn';
+    deleteBtn.title = 'Supprimer cette ressource';
+    deleteBtn.setAttribute('aria-label', 'Supprimer ' + (row.title || row.id));
+    deleteBtn.innerHTML = EditorCommon.TRASH_ICON;
+    deleteBtn.addEventListener('click', () => deleteItem(row));
+    tdDelete.appendChild(deleteBtn);
+    tr.appendChild(tdDelete);
+
     const tdType = document.createElement('td');
     const typeSel = document.createElement('select');
     typeSel.className = 'legend-select legend-select--compact resources-type-select';
@@ -320,12 +332,6 @@
     });
     tdDesc.appendChild(descArea);
     tr.appendChild(tdDesc);
-
-    EditorCommon.appendDeleteCell(tr, 0, {
-      title: 'Supprimer cette ressource',
-      ariaLabel: 'Supprimer ' + (row.title || row.id),
-      onDelete: () => deleteItem(row),
-    });
 
     return tr;
   }
