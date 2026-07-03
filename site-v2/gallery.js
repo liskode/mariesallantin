@@ -252,6 +252,21 @@ document.addEventListener('DOMContentLoaded', () => {
     return '';
   }
 
+  /** Dates seules pour l’intro série (ex. « 1999–2000 »). */
+  function formatSeriesYearsLabel(meta) {
+    if (!meta) return '';
+    const start = meta.year_start;
+    const end = meta.year_end;
+    const hasStart = start != null && !Number.isNaN(start);
+    const hasEnd = end != null && !Number.isNaN(end);
+    if (hasStart && hasEnd) {
+      return start === end ? String(start) : `${start}–${end}`;
+    }
+    if (hasStart) return String(start);
+    if (hasEnd) return String(end);
+    return '';
+  }
+
   function formatSeriesHeading(code) {
     const name = seriesNames[code] || code;
     const years = formatSeriesYears(seriesMeta[code]);
@@ -464,6 +479,8 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxIntro,
     lightboxIntroCover,
     lightboxIntroHeading,
+    lightboxIntroTitle,
+    lightboxIntroYears,
     lightboxIntroBody,
     lightboxClose,
     lightboxPrev,
@@ -511,7 +528,19 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
     if (lightboxIntroHeading) {
-      lightboxIntroHeading.textContent = formatSeriesHeading(code);
+      const name = seriesNames[code] || code;
+      const years = formatSeriesYearsLabel(seriesMeta[code]);
+      if (lightboxIntroTitle) {
+        lightboxIntroTitle.textContent = name;
+      }
+      if (lightboxIntroYears) {
+        lightboxIntroYears.textContent = years;
+        lightboxIntroYears.hidden = !years;
+      }
+      lightboxIntroHeading.setAttribute(
+        'aria-label',
+        years ? `Série ${name}, ${years}` : `Série ${name}`
+      );
     }
     if (lightboxIntroBody) {
       fillDescriptionBody(lightboxIntroBody, seriesDescription(code));
@@ -550,7 +579,11 @@ document.addEventListener('DOMContentLoaded', () => {
           <img class="lightbox-intro-cover" src="" alt="" decoding="async" />
           <div class="lightbox-intro-layout">
             <div class="lightbox-intro-header">
-              <h2 class="lightbox-intro-heading"></h2>
+              <div class="lightbox-intro-heading" aria-live="polite">
+                <p class="lightbox-intro-eyebrow">Série</p>
+                <h2 class="lightbox-intro-title"></h2>
+                <p class="lightbox-intro-years"></p>
+              </div>
             </div>
             <div class="lightbox-intro-card">
               <div class="lightbox-intro-body"></div>
@@ -581,6 +614,8 @@ document.addEventListener('DOMContentLoaded', () => {
     lightboxIntro = lightbox.querySelector('.lightbox-series-intro');
     lightboxIntroCover = lightbox.querySelector('.lightbox-intro-cover');
     lightboxIntroHeading = lightbox.querySelector('.lightbox-intro-heading');
+    lightboxIntroTitle = lightbox.querySelector('.lightbox-intro-title');
+    lightboxIntroYears = lightbox.querySelector('.lightbox-intro-years');
     lightboxIntroBody = lightbox.querySelector('.lightbox-intro-body');
     lightboxClose = lightbox.querySelector('.close');
     lightboxPrev = lightbox.querySelector('.prev');

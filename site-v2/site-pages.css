@@ -1203,16 +1203,61 @@
 .site-v2 .lightbox .lightbox-intro-header {
   flex-shrink: 0;
   text-align: center;
+  padding: 0.35rem 0.5rem 0.5rem;
+  position: relative;
+}
+
+.site-v2 .lightbox .lightbox-intro-header::before {
+  content: '';
+  position: absolute;
+  inset: -0.75rem -1.25rem 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.28) 55%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: -1;
 }
 
 .site-v2 .lightbox .lightbox-intro-heading {
   margin: 0;
-  color: #fff;
-  font-size: 1.05rem;
+  position: relative;
+}
+
+.site-v2 .lightbox .lightbox-intro-eyebrow {
+  margin: 0 0 0.35rem;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.68rem;
   font-weight: 600;
-  line-height: 1.35;
-  text-align: center;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.4);
+}
+
+.site-v2 .lightbox .lightbox-intro-title {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(1.55rem, 4.2vw, 2.15rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  text-shadow: 0 3px 14px rgba(0, 0, 0, 0.5);
+}
+
+.site-v2 .lightbox .lightbox-intro-years {
+  margin: 0.45rem 0 0;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.92rem;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+}
+
+.site-v2 .lightbox .lightbox-intro-years[hidden] {
+  display: none !important;
 }
 
 .site-v2 .lightbox .lightbox-intro-card {
@@ -1367,5 +1412,13 @@
 
   .site-v2 .lightbox .next {
     right: 0.35rem;
+  }
+
+  .site-v2 .lightbox .lightbox-intro-title {
+    font-size: 1.45rem;
+  }
+
+  .site-v2 .lightbox .lightbox-intro-years {
+    font-size: 0.84rem;
   }
 }

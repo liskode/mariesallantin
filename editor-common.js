@@ -245,7 +245,9 @@
   function refreshSelectOptionLabels(selectEl, options, labelMode, { onlySelected = false } = {}) {
     Array.from(selectEl.options).forEach((o) => {
       if (!o.value) return;
-      const item = options.find((x) => x.code === o.value);
+      const item = options.find(
+        (x) => String(x.code || '').toUpperCase() === String(o.value || '').toUpperCase()
+      );
       if (!item) return;
       if (onlySelected && o !== selectEl.options[selectEl.selectedIndex]) return;
       o.textContent = optionLabel(item, labelMode);
@@ -276,15 +278,30 @@
    * @param {string} [selectedCode]
    */
   function populateCodeSelect(selectEl, options, selectedCode) {
+    const list = options || [];
+    const normalized = String(selectedCode || '').trim().toUpperCase();
     selectEl.innerHTML = '';
-    (options || []).forEach((item) => {
+    list.forEach((item) => {
+      const code = String(item.code || '').trim().toUpperCase();
       const opt = document.createElement('option');
-      opt.value = item.code;
-      opt.textContent = optionLabel(item, 'code-label');
-      if (selectedCode === item.code) opt.selected = true;
+      opt.value = code;
+      const isSelected = normalized ? normalized === code : false;
+      opt.textContent = optionLabel(item, isSelected ? 'code' : 'code-label');
+      if (isSelected) opt.selected = true;
       selectEl.appendChild(opt);
     });
-    attachClosedCodeSelectDisplay(selectEl, options, 'code-label', 'code');
+    if (normalized && selectEl.selectedIndex < 0) {
+      const idx = list.findIndex(
+        (item) => String(item.code || '').trim().toUpperCase() === normalized
+      );
+      if (idx >= 0) selectEl.selectedIndex = idx;
+    }
+    attachClosedCodeSelectDisplay(selectEl, list, 'code-label', 'code');
+    const finalize = () => refreshSelectOptionLabels(selectEl, list, 'code', { onlySelected: true });
+    finalize();
+    if (typeof requestAnimationFrame === 'function') {
+      requestAnimationFrame(finalize);
+    }
   }
 
   global.EditorCommon = {
