@@ -6539,6 +6539,16 @@
       ],
       "publish": "VAL",
       "photo": "OK"
+    },
+    {
+      "id": "MS0588",
+      "media": "catalogue/MS0588.jpeg",
+      "title": "GRAND HIVER 200cm x300cm",
+      "series": [
+        "COMPA",
+        "HIVER"
+      ],
+      "publish": "VAL"
     }
   ]
 }
