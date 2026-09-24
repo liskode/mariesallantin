@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250630-26" />
+  <link rel="stylesheet" href="catalogue.css?v=20250924-2" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -135,6 +135,7 @@
               <col class="works-col-collector" />
               <col class="works-col-pub" />
               <col class="works-col-photo" />
+              <col class="works-col-photo-credit" />
             </colgroup>
             <thead>
               <tr>
@@ -211,6 +212,9 @@
                     <span class="catalogue-sort-label">Photo</span>
                   </button>
                 </th>
+                <th scope="col" class="catalogue-th works-col-photo-credit" title="Crédit photographique — initiales en colonne, nom complet à l’édition">
+                  <span class="catalogue-sort-label">Créd.</span>
+                </th>
               </tr>
             </thead>
             <tbody id="works-tbody"></tbody>
@@ -257,6 +261,10 @@
           </select>
           <span class="works-import-radio-detail">Laissez « — » pour ne pas renseigner le statut photo.</span>
         </label>
+      </div>
+      <div class="works-import-error-summary" id="works-import-error-summary" hidden>
+        <p class="works-import-error-summary-title">Erreurs détectées</p>
+        <ul class="works-import-error-summary-list" id="works-import-error-summary-list"></ul>
       </div>
       <div class="works-import-preview-wrap" id="works-import-preview-wrap" hidden>
         <table class="catalogue-table works-import-preview-table">
@@ -320,6 +328,6 @@
   </dialog>
 
   <script src="editor-common.js?v=20250702-1"></script>
-  <script src="works-editor.js?v=20250630-27"></script>
+  <script src="works-editor.js?v=20250924-2"></script>
 </body>
 </html>

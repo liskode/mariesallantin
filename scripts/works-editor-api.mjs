@@ -165,6 +165,7 @@ function normalizeWorkInput(raw) {
       photo_status_code: raw.photo_status_code
         ? String(raw.photo_status_code).trim().toUpperCase()
         : null,
+      photo_credit: String(raw.photo_credit || '').trim(),
       collector_code: String(raw.collector_code || '').trim().toUpperCase() || null,
       width_cm: parseCm(raw.width_cm),
       height_cm: parseCm(raw.height_cm),
@@ -211,7 +212,7 @@ async function fetchWorksWithSeries(supabase) {
   const { data: works, error } = await supabase
     .from('works')
     .select(
-      'id, title, year, format_code, technique_code, publication_status_code, photo_status_code, collector_code, width_cm, height_cm, filename_original, image_ext, sort_order, updated_at'
+      'id, title, year, format_code, technique_code, publication_status_code, photo_status_code, photo_credit, collector_code, width_cm, height_cm, filename_original, image_ext, sort_order, updated_at'
     )
     .order('sort_order', { ascending: true })
     .order('id', { ascending: true });

@@ -238,20 +238,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  function formatSeriesYears(meta) {
-    if (!meta) return '';
-    const start = meta.year_start;
-    const end = meta.year_end;
-    const hasStart = start != null && !Number.isNaN(start);
-    const hasEnd = end != null && !Number.isNaN(end);
-    if (hasStart && hasEnd) {
-      return start === end ? ` ${start}` : ` ${start}-${end}`;
-    }
-    if (hasStart) return ` ${start}`;
-    if (hasEnd) return ` ${end}`;
-    return '';
-  }
-
   /** Dates seules pour l’intro série (ex. « 1999–2000 »). */
   function formatSeriesYearsLabel(meta) {
     if (!meta) return '';
@@ -269,8 +255,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function formatSeriesHeading(code) {
     const name = seriesNames[code] || code;
-    const years = formatSeriesYears(seriesMeta[code]);
-    return `Série "${name}"${years}`;
+    const years = formatSeriesYearsLabel(seriesMeta[code]);
+    if (years) return `${name} · ${years}`;
+    return name;
   }
 
   function updateLightboxSeriesHeading() {
@@ -568,7 +555,7 @@ document.addEventListener('DOMContentLoaded', () => {
       <button type="button" class="prev" aria-label="Précédent">&#10094;</button>
       <div class="lightbox-stage">
         <div class="lightbox-work-view">
-          <div class="lightbox-series-heading" aria-live="polite"></div>
+          <div class="lightbox-series-heading lightbox-series-label" aria-live="polite"></div>
           <img src="" alt="" decoding="async" />
           <div class="lightbox-caption">
             <div class="lightbox-work-title"></div>
@@ -580,7 +567,7 @@ document.addEventListener('DOMContentLoaded', () => {
           <div class="lightbox-intro-layout">
             <div class="lightbox-intro-header">
               <div class="lightbox-intro-heading" aria-live="polite">
-                <p class="lightbox-intro-eyebrow">Série</p>
+                <p class="lightbox-intro-eyebrow lightbox-series-label">Série</p>
                 <h2 class="lightbox-intro-title"></h2>
                 <p class="lightbox-intro-years"></p>
               </div>

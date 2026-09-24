@@ -1211,6 +1211,71 @@
     return td;
   }
 
+  function photoCreditInitials(name) {
+    const parts = String(name || '')
+      .trim()
+      .split(/[\s\-]+/)
+      .map((p) => p.replace(/[^\p{L}]/gu, ''))
+      .filter(Boolean);
+    if (!parts.length) return '';
+    return parts
+      .map((p) => p.charAt(0).toLocaleUpperCase('fr'))
+      .join('')
+      .slice(0, 4);
+  }
+
+  function createPhotoCreditCell(work, tr) {
+    const td = document.createElement('td');
+    td.className = 'works-photo-credit-cell';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'legend-input works-photo-credit-input';
+    input.placeholder = '—';
+    input.setAttribute('aria-label', 'Crédit photo de ' + (work.id || ''));
+
+    const showClosed = () => {
+      const full = String(work.photo_credit || '').trim();
+      const initials = photoCreditInitials(full);
+      input.value = initials || '';
+      input.classList.toggle('works-photo-credit-input--closed', Boolean(initials));
+      input.title = full
+        ? full + ' — cliquer pour modifier'
+        : 'Crédit photographique (nom complet)';
+    };
+
+    const showOpen = () => {
+      input.classList.remove('works-photo-credit-input--closed');
+      input.value = work.photo_credit || '';
+      input.title = 'Crédit photographique (nom complet)';
+    };
+
+    showClosed();
+
+    input.addEventListener('focus', () => {
+      showOpen();
+      requestAnimationFrame(() => {
+        try {
+          input.select();
+        } catch {
+          /* ignore */
+        }
+      });
+    });
+    input.addEventListener('input', () => {
+      work.photo_credit = input.value;
+      markDirty(work.id, tr);
+    });
+    input.addEventListener('blur', () => {
+      work.photo_credit = String(input.value || '').trim();
+      input.value = work.photo_credit;
+      markDirty(work.id, tr);
+      showClosed();
+    });
+
+    td.appendChild(input);
+    return td;
+  }
+
   function createCodeSelectCell(work, tr, field, kind, options, cfg) {
     const td = document.createElement('td');
     td.className = 'works-select-cell' + (kind === 'format' ? ' works-format-cell' : '');
@@ -1492,6 +1557,7 @@
           extraClass: 'works-select-compact works-select-photo',
         })
       );
+      tr.appendChild(createPhotoCreditCell(work, tr));
 
       tbody.appendChild(tr);
     }
@@ -1529,6 +1595,7 @@
         technique_code: w.technique_code,
         publication_status_code: w.publication_status_code || 'N',
         photo_status_code: w.photo_status_code || null,
+        photo_credit: w.photo_credit || '',
         collector_code: w.collector_code,
         width_cm: w.width_cm,
         height_cm: w.height_cm,
@@ -1609,6 +1676,8 @@
   const importEnvNoticeEl = document.getElementById('works-import-env-notice');
   const importPreviewWrap = document.getElementById('works-import-preview-wrap');
   const importPreviewTbody = document.getElementById('works-import-preview-tbody');
+  const importErrorSummaryEl = document.getElementById('works-import-error-summary');
+  const importErrorSummaryListEl = document.getElementById('works-import-error-summary-list');
   const importNextIdEl = document.getElementById('works-import-next-id');
   const importNextIdWrap = document.getElementById('works-import-next-id-wrap');
   const importPhotoStatusEl = document.getElementById('works-import-photo-status');
@@ -1778,11 +1847,11 @@
     el.className = 'works-import-env-notice works-import-env-notice--online';
     el.innerHTML =
       '<strong class="works-import-env-title">Simulation d’import — aucune écriture en ligne</strong>' +
-      '<p>Vérifiez les codes MS, corrigez format / technique / série dans le tableau, puis simulez.</p>' +
+      '<p>Un récapitulatif des erreurs (séries, formats, techniques inexistants) s’affiche après sélection des fichiers.</p>' +
       '<p><strong>Pour importer et publier sur le site</strong>&nbsp;:</p>' +
       '<ol>' +
       '<li><code>npm run works:import</code> dans le projet (ou <code>npm run works:api</code>)</li>' +
-      '<li>Importer et publier depuis <code>http://127.0.0.1:47835/</code></li>' +
+      '<li>Corriger les codes puis importer depuis <code>http://127.0.0.1:47835/</code></li>' +
       '</ol>';
   }
 
@@ -1839,11 +1908,131 @@
     if (importNextIdWrap) importNextIdWrap.hidden = mode === 'update';
   }
 
+  /**
+   * Parse une issue d’import en { code, kind } pour le récap.
+   * Ex. « série inconnue : COMPE » → { code: 'COMPE', kind: 'série inexistante' }
+   * Les avertissements de ratio format/dimensions ne sont pas des issues serveur.
+   */
+  function parseImportIssue(raw) {
+    const text = String(raw || '').trim();
+    if (!text) return null;
+    const m = text.match(/^(série|format|technique|statut photo)\s+inconn(?:ue|u)\s*:\s*([A-Z0-9_]+)$/i);
+    if (m) {
+      const type = m[1].toLowerCase();
+      const code = m[2].toUpperCase();
+      const kind =
+        type === 'série'
+          ? 'série inexistante'
+          : type === 'format'
+            ? 'format inexistant'
+            : type === 'technique'
+              ? 'technique inexistante'
+              : 'statut photo inexistant';
+      return { code, kind, key: code + '|' + kind };
+    }
+    return { code: '', kind: text, key: '|' + text };
+  }
+
+  /** Agrège les erreurs du plan (hors avertissements format/dimensions). */
+  function buildImportErrorSummary(plan) {
+    const counts = new Map();
+    for (const row of plan || []) {
+      if (!row || !row.error) continue;
+      const issues =
+        Array.isArray(row.issues) && row.issues.length
+          ? row.issues
+          : String(row.error)
+              .split(/\s*;\s*/)
+              .map((s) => s.trim())
+              .filter(Boolean);
+      for (const issue of issues) {
+        const parsed = parseImportIssue(issue);
+        if (!parsed) continue;
+        const prev = counts.get(parsed.key);
+        if (prev) prev.count += 1;
+        else counts.set(parsed.key, { code: parsed.code, kind: parsed.kind, count: 1 });
+      }
+    }
+    return [...counts.values()].sort((a, b) => {
+      if (b.count !== a.count) return b.count - a.count;
+      return String(a.code || a.kind).localeCompare(String(b.code || b.kind), 'fr');
+    });
+  }
+
+  function renderImportErrorSummary(plan) {
+    if (!importErrorSummaryEl || !importErrorSummaryListEl) return;
+    const summary = buildImportErrorSummary(plan);
+    importErrorSummaryListEl.innerHTML = '';
+    if (!summary.length) {
+      importErrorSummaryEl.hidden = true;
+      return;
+    }
+    for (const item of summary) {
+      const li = document.createElement('li');
+      const n = item.count;
+      const countLabel = n === 1 ? '1 erreur' : n + ' erreurs';
+      if (item.code) {
+        li.innerHTML =
+          '<strong>' +
+          escapeHtml(item.code) +
+          '</strong> : ' +
+          escapeHtml(item.kind) +
+          ' (' +
+          countLabel +
+          ')';
+      } else {
+        li.textContent = item.kind + ' (' + countLabel + ')';
+      }
+      importErrorSummaryListEl.appendChild(li);
+    }
+    importErrorSummaryEl.hidden = false;
+  }
+
+  function escapeHtml(text) {
+    return String(text || '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;');
+  }
+
   function renderImportPreview(plan) {
     if (!importPreviewTbody || !importPreviewWrap || !importSubmitBtn) return;
     revokeImportPreviewObjectUrls();
     importPreviewTbody.innerHTML = '';
+    const simulation = !isLocalDevServer();
     let okCount = 0;
+
+    renderImportErrorSummary(plan);
+
+    // Simulation en ligne : récap des erreurs uniquement (pas le tableau détaillé).
+    if (simulation) {
+      for (const row of plan) {
+        if (!row.error) okCount += 1;
+      }
+      importPreviewWrap.hidden = true;
+      if (importSubmitBtn) importSubmitBtn.disabled = okCount === 0;
+      if (importCodesHintEl) {
+        importCodesHintEl.hidden = true;
+      }
+      updateImportSubmitLabel();
+      if (importStatusEl) {
+        if (!plan.length) {
+          importStatusEl.textContent = '';
+        } else {
+          const errCount = plan.filter((r) => r.error).length;
+          const warnCount = plan.filter((r) => r.warning && !r.error).length;
+          let msg = okCount + ' prêt(s) sur ' + plan.length;
+          if (errCount) msg += ' · ' + errCount + ' erreur(s)';
+          if (warnCount) msg += ' · ' + warnCount + ' avertissement(s)';
+          msg += ' — simulation (aucune écriture)';
+          importStatusEl.textContent = msg;
+        }
+        importStatusEl.classList.remove('legend-editor-api-hint--error');
+      }
+      return;
+    }
+
     for (const row of plan) {
       const tr = document.createElement('tr');
       if (row.error) tr.className = 'works-import-preview-row--error';
@@ -1957,8 +2146,7 @@
         let msg = okCount + ' prêt(s) sur ' + plan.length;
         if (errCount) msg += ' · ' + errCount + ' erreur(s)';
         if (warnCount) msg += ' · ' + warnCount + ' avertissement(s)';
-        if (!isLocalDevServer()) msg += ' — simulation (aucune écriture)';
-        else if (okCount === 0 && plan.length) {
+        if (okCount === 0 && plan.length) {
           msg += ' — corrigez format, technique ou série pour activer l’import';
         } else if (importPublishAfterEl && importPublishAfterEl.checked) {
           msg += ' — puis publication git push';
