@@ -121,7 +121,6 @@ async function fetchSeriesWithCounts(supabase) {
   const { data: series, error } = await supabase
     .from('series')
     .select('code, label, sort_order, icon_work_id, year_start, year_end, description, created_at, updated_at')
-    .order('sort_order', { ascending: true })
     .order('code', { ascending: true });
   if (error) throw error;
 

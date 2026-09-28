@@ -440,13 +440,19 @@
     if (countEl) countEl.textContent = seriesList.length + ' série(s)';
   }
 
+  function sortSeriesByCode(list) {
+    return [...(list || [])].sort((a, b) =>
+      String(a.code || '').localeCompare(String(b.code || ''), 'fr', { sensitivity: 'base' })
+    );
+  }
+
   async function loadSeries() {
     setStatus('Chargement…');
     await loadWorksCatalog();
     const r = await apiFetch('/api/series?token=' + encodeURIComponent(token));
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || 'chargement impossible');
-    seriesList = j.series || [];
+    seriesList = sortSeriesByCode(j.series || []);
     dirtyCodes.clear();
     updateSaveBtn();
     renderTable();
@@ -468,7 +474,7 @@
       });
       const j = await r.json();
       if (!j.ok) throw new Error(j.error || 'échec enregistrement');
-      seriesList = j.series || seriesList;
+      seriesList = sortSeriesByCode(j.series || seriesList);
       dirtyCodes.clear();
       renderTable();
       setStatus('Enregistré (' + toSave.length + ' fiche(s)).');
@@ -495,7 +501,7 @@
     });
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || 'échec création');
-    seriesList = j.series || seriesList;
+    seriesList = sortSeriesByCode(j.series || seriesList);
     dirtyCodes.clear();
     updateSaveBtn();
     renderTable();
@@ -513,7 +519,7 @@
     );
     const j = await r.json();
     if (!j.ok) throw new Error(j.error || 'suppression impossible');
-    seriesList = j.series || seriesList.filter((x) => x.code !== s.code);
+    seriesList = sortSeriesByCode(j.series || seriesList.filter((x) => x.code !== s.code));
     dirtyCodes.delete(s.code);
     updateSaveBtn();
     renderTable();
