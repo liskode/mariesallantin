@@ -107,14 +107,20 @@ function sendJson(res, status, obj) {
   res.end(body);
 }
 
-function readBody(req, maxBytes = 120 * 1024 * 1024) {
+function readBody(req, maxBytes = 512 * 1024 * 1024) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let size = 0;
     req.on('data', (c) => {
       size += c.length;
       if (size > maxBytes) {
-        reject(new Error('corps de requête trop volumineux'));
+        const mb = (size / (1024 * 1024)).toFixed(0);
+        const lim = (maxBytes / (1024 * 1024)).toFixed(0);
+        reject(
+          new Error(
+            `corps de requête trop volumineux (${mb} Mo > limite ${lim} Mo) — relancez npm run works:import et importez par plus petits lots`
+          )
+        );
         req.destroy();
         return;
       }
@@ -321,18 +327,30 @@ async function handleImportWorks(body, { writeFiles }) {
   const imageUpdates = [];
   const jsonEntries = [];
   const imported = [];
-  const fileByName = new Map(
-    files.map((f) => [String(f.originalName || f.name || ''), f])
-  );
+  const fileByName = new Map();
+  for (const f of files) {
+    const raw = String(f.originalName || f.name || '');
+    const key = raw.normalize('NFC').trim();
+    if (key) fileByName.set(key, f);
+    // alias sans trim au cas où
+    if (raw.normalize('NFC') !== key) fileByName.set(raw.normalize('NFC'), f);
+  }
 
   for (const item of plan) {
     if (item.error) {
       imported.push({ ...item, status: 'error' });
       continue;
     }
-    const src = fileByName.get(item.originalName);
+    const nameKey = String(item.originalName || '').normalize('NFC').trim();
+    const src =
+      fileByName.get(nameKey) ||
+      fileByName.get(String(item.originalName || '').normalize('NFC'));
     if (!src) {
-      imported.push({ ...item, status: 'error', error: 'fichier manquant dans la requête' });
+      imported.push({
+        ...item,
+        status: 'error',
+        error: 'fichier manquant dans la requête (' + (item.originalName || '?') + ')',
+      });
       continue;
     }
 
@@ -424,10 +442,18 @@ async function handleImportWorks(body, { writeFiles }) {
   }
 
   if (!addRecords.length && !imageUpdates.length) {
+    const reasons = {};
+    for (const row of imported) {
+      const why = row.error || row.status || 'inconnu';
+      reasons[why] = (reasons[why] || 0) + 1;
+    }
+    const detail = Object.entries(reasons)
+      .map(([why, n]) => `${why} (${n})`)
+      .join(' · ');
     return {
       ok: false,
       status: 400,
-      error: 'aucune œuvre importée',
+      error: 'aucune œuvre importée' + (detail ? ' — ' + detail : ''),
       imported,
       plan,
     };

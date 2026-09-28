@@ -1881,6 +1881,12 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   font-size: 0.82rem;
 }
 
+.works-editor-filter--codes .works-editor-filter-input {
+  min-width: min(140px, 100%);
+  font-family: ui-monospace, monospace;
+  font-size: 0.82rem;
+}
+
 .works-editor-pagination {
   margin: 0;
   flex-shrink: 0;

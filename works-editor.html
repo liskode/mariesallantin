@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250924-2" />
+  <link rel="stylesheet" href="catalogue.css?v=20250928-5" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -65,6 +65,10 @@
               <label class="works-editor-filter">
                 <span class="works-editor-filter-label">Titre</span>
                 <input type="search" id="works-filter-title" class="works-editor-filter-input" placeholder="Filtrer…" autocomplete="off" aria-label="Filtrer par titre" />
+              </label>
+              <label class="works-editor-filter works-editor-filter--codes">
+                <span class="works-editor-filter-label">Code</span>
+                <input type="search" id="works-filter-codes" class="works-editor-filter-input" placeholder="ex. 440 521" autocomplete="off" aria-label="Filtrer par codes MS (plusieurs codes séparés par espace ou virgule)" title="Saisir un ou plusieurs codes (avec ou sans MS), séparés par espace ou virgule. Ex. 440 521 ou MS0440,MS0521." />
               </label>
               <label class="works-editor-filter works-editor-filter--series">
                 <span class="works-editor-filter-label">Séries</span>
@@ -328,6 +332,6 @@
   </dialog>
 
   <script src="editor-common.js?v=20250702-1"></script>
-  <script src="works-editor.js?v=20250924-2"></script>
+  <script src="works-editor.js?v=20250928-5"></script>
 </body>
 </html>

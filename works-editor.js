@@ -42,6 +42,7 @@
   let token = '';
   let filterText = '';
   let seriesFilterText = '';
+  let codesFilterText = '';
   let sortColumn = 'order';
   let currentPage = 0;
   let deleteUnlocked = false;
@@ -61,6 +62,7 @@
   const deleteLockIcon = document.getElementById('works-delete-lock-icon');
   const filterEl = document.getElementById('works-filter-title');
   const seriesFilterEl = document.getElementById('works-filter-series');
+  const codesFilterEl = document.getElementById('works-filter-codes');
   const paginationEl = document.getElementById('works-pagination');
   const pagePrevBtn = document.getElementById('works-page-prev');
   const pageNextBtn = document.getElementById('works-page-next');
@@ -702,6 +704,35 @@
       .filter(Boolean);
   }
 
+  /**
+   * Tokens code MS : "440 521", "MS0440,MS0521", "440, 521" → Set{"MS0440","MS0521"}
+   * Accepte MS#### ou chiffres seuls (paddés sur 4).
+   */
+  function parseCodesFilterTokens(raw) {
+    const out = new Set();
+    const parts = String(raw || '')
+      .trim()
+      .toUpperCase()
+      .split(/[\s,;]+/)
+      .map((t) => t.replace(/[^A-Z0-9]/g, ''))
+      .filter(Boolean);
+    for (const t of parts) {
+      let m = t.match(/^MS(\d{1,4})$/);
+      if (m) {
+        out.add('MS' + m[1].padStart(4, '0'));
+        continue;
+      }
+      m = t.match(/^(\d{1,4})$/);
+      if (m) {
+        out.add('MS' + m[1].padStart(4, '0'));
+        continue;
+      }
+      // MS suivi de plus de 4 chiffres : garder tel quel si valide, sinon ignorer
+      if (/^MS\d{4}$/.test(t)) out.add(t);
+    }
+    return out;
+  }
+
   function workMatchesSeriesFilter(work, tokens) {
     if (!tokens.length) return true;
     const codes = new Set((work.series_codes || []).map((c) => String(c).trim().toUpperCase()));
@@ -713,6 +744,10 @@
     const q = normalizeForSearch(filterText);
     if (q) {
       result = result.filter((w) => normalizeForSearch(w.title).includes(q));
+    }
+    const codeIds = parseCodesFilterTokens(codesFilterText);
+    if (codeIds.size) {
+      result = result.filter((w) => codeIds.has(String(w.id || '').trim().toUpperCase()));
     }
     const seriesTokens = parseSeriesFilterTokens(seriesFilterText);
     if (seriesTokens.length) {
@@ -741,7 +776,7 @@
   }
 
   function hasActiveFilters() {
-    return Boolean(filterText.trim() || seriesFilterText.trim());
+    return Boolean(filterText.trim() || seriesFilterText.trim() || codesFilterText.trim());
   }
 
   function sortByCode(list) {
@@ -2382,7 +2417,8 @@
     }
     const importMode = getImportMode();
     const photoStatusCode = getImportPhotoStatusCode();
-    const batchSize = isLocalDevServer() ? 12 : 2;
+    // Lots réduits : JPEG HD (~3–12 Mo) → ~4–16 Mo en base64 chacun.
+    const batchSize = isLocalDevServer() ? 2 : 1;
     importSubmitBtn.disabled = true;
     if (importStatusEl) {
       importStatusEl.textContent = 'Import en cours…';
@@ -2413,13 +2449,31 @@
             overrides: getImportOverridesPayload(),
           }),
         });
-        const j = await r.json();
+        let j;
+        try {
+          j = await r.json();
+        } catch (parseErr) {
+          throw new Error(
+            'Réponse import invalide (lot ' +
+              (Math.floor(i / batchSize) + 1) +
+              ') — images trop lourdes ou API interrompue. Relancez npm run works:import.'
+          );
+        }
         if (!r.ok || !j.ok) {
-          throw new Error(formatApiError(j.error) || 'import échoué');
+          const firstFail = (j.imported || []).find((row) => row.status === 'error' && row.error);
+          throw new Error(
+            formatApiError(j.error) ||
+              (firstFail && firstFail.error) ||
+              'import échoué'
+          );
         }
         lastWorks = j.works || lastWorks;
         totalOk += (j.imported || []).filter((row) => row.status === 'ok').length;
         allImported.push(...(j.imported || []));
+        if (importStatusEl) {
+          importStatusEl.textContent =
+            'Import en cours… ' + Math.min(i + batch.length, importSelectedFiles.length) + '/' + importSelectedFiles.length;
+        }
       }
 
       worksList = lastWorks;
@@ -2447,10 +2501,18 @@
         setStatus(msg);
       }
     } catch (e) {
+      const msg = formatApiError(e);
+      const nicer =
+        /load failed|failed to fetch|networkerror|network request failed/i.test(msg)
+          ? 'Connexion interrompue pendant l’import (images trop lourdes ou API arrêtée). ' +
+            (totalOk ? totalOk + ' œuvre(s) déjà importée(s). ' : '') +
+            'Réduisez le lot ou relancez npm run works:import, puis réessayez.'
+          : msg;
       if (importStatusEl) {
-        importStatusEl.textContent = formatApiError(e);
+        importStatusEl.textContent = nicer;
         importStatusEl.classList.add('legend-editor-api-hint--error');
       }
+      setStatus(nicer, true);
     } finally {
       if (importSubmitBtn) importSubmitBtn.disabled = false;
     }
@@ -2577,6 +2639,12 @@
 
     filterEl?.addEventListener('input', () => {
       filterText = filterEl.value;
+      currentPage = 0;
+      renderTable();
+    });
+
+    codesFilterEl?.addEventListener('input', () => {
+      codesFilterText = codesFilterEl.value;
       currentPage = 0;
       renderTable();
     });
