@@ -9492,6 +9492,122 @@
         "BAIGN"
       ],
       "publish": "VAL"
+    },
+    {
+      "id": "MS0906",
+      "media": "catalogue/MS0906.jpeg",
+      "title": "Petit ange musicien de face 2014 40X40cm tempera sur toile 41x33cm – Version 2",
+      "series": [
+        "CIEUX",
+        "ANGES"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0907",
+      "media": "catalogue/MS0907.jpeg",
+      "title": "sans titre 1",
+      "series": [
+        "ESTIV",
+        "ETANG",
+        "BAIGN"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0908",
+      "media": "catalogue/MS0908.jpeg",
+      "title": "sans titre 2",
+      "series": [
+        "ESTIV",
+        "ETANG",
+        "BAIGN"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0909",
+      "media": "catalogue/MS0909.jpeg",
+      "title": "2005TST Anges musiciens Mille Cieux 2005 tempera sur toile 24x33cm",
+      "series": [
+        "CIEUX"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0910",
+      "media": "catalogue/MS0910.jpeg",
+      "title": "ange musicien à la trompette 2014 33X24cm tempera sur toile",
+      "series": [
+        "CIEUX",
+        "ANGES"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0911",
+      "media": "catalogue/MS0911.jpeg",
+      "title": "ATELI Anges toulousains",
+      "series": [
+        "CIEUX",
+        "ANGES"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0912",
+      "media": "catalogue/MS0912.jpeg",
+      "title": "Anges musiciens",
+      "series": [
+        "CIEUX",
+        "ANGES"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0913",
+      "media": "catalogue/MS0913.jpeg",
+      "title": "Eros et Anges",
+      "series": [
+        "CIEUX",
+        "ANGES"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0914",
+      "media": "catalogue/MS0914.jpeg",
+      "title": "MS0914",
+      "series": [
+        "CIEUX",
+        "ANGES"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0915",
+      "media": "catalogue/MS0915.jpeg",
+      "title": "Courboissy",
+      "series": [
+        "CIEUX"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0916",
+      "media": "catalogue/MS0916.jpeg",
+      "title": "PARADIS ANGES Eros",
+      "series": [
+        "CIEUX"
+      ],
+      "publish": "VAL"
+    },
+    {
+      "id": "MS0917",
+      "media": "catalogue/MS0917.jpeg",
+      "title": "F4 2005 CIEUX TST Putti Mille Cieux 2005 tempera sur toile 33X24CM",
+      "series": [],
+      "publish": "VAL"
     }
   ]
 }
