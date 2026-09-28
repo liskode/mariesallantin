@@ -3,3 +3,7 @@ node_modules/
 .env.local
 supabase/.temp/
 .DS_Store
+
+# Rapports doublons générés localement
+media/_dupes*
+media/_dupes-pdf-cache/
