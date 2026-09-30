@@ -1719,6 +1719,17 @@
   const importPublishWrap = document.getElementById('works-import-publish-wrap');
   const importPublishAfterEl = document.getElementById('works-import-publish-after');
   const importCodesHintEl = document.getElementById('works-import-codes-hint');
+  const importDupeDialog = document.getElementById('works-import-dupe-dialog');
+  const importDupeProgressEl = document.getElementById('works-import-dupe-progress');
+  const importDupeReasonEl = document.getElementById('works-import-dupe-reason');
+  const importDupeNewImg = document.getElementById('works-import-dupe-new-img');
+  const importDupeExistImg = document.getElementById('works-import-dupe-exist-img');
+  const importDupeNewMeta = document.getElementById('works-import-dupe-new-meta');
+  const importDupeExistMeta = document.getElementById('works-import-dupe-exist-meta');
+  const importDupeCloseBtn = document.getElementById('works-import-dupe-close');
+  const importDupeCancelBtn = document.getElementById('works-import-dupe-cancel');
+  const importDupeSkipBtn = document.getElementById('works-import-dupe-skip');
+  const importDupeForceBtn = document.getElementById('works-import-dupe-force');
   const publishBtn = document.getElementById('works-publish-btn');
   const publishDialog = document.getElementById('works-publish-dialog');
   const publishCloseBtn = document.getElementById('works-publish-close');
@@ -2242,6 +2253,339 @@
     });
   }
 
+  const IMPORT_PHASH_THRESHOLD = 10;
+
+  function hammingHex64(a, b) {
+    if (!a || !b || a.length !== 16 || b.length !== 16) return 64;
+    let x = BigInt('0x' + a) ^ BigInt('0x' + b);
+    let n = 0;
+    while (x) {
+      n += Number(x & 1n);
+      x >>= 1n;
+    }
+    return n;
+  }
+
+  async function sha256HexOfFile(file) {
+    const buf = await file.arrayBuffer();
+    const digest = await crypto.subtle.digest('SHA-256', buf);
+    return [...new Uint8Array(digest)].map((b) => b.toString(16).padStart(2, '0')).join('');
+  }
+
+  /** Difference hash 64 bits (hex) via canvas — aligné sur le serveur. */
+  async function dHashHexOfFile(file) {
+    const bitmap = await createImageBitmap(file);
+    try {
+      const canvas = document.createElement('canvas');
+      canvas.width = 9;
+      canvas.height = 8;
+      const ctx = canvas.getContext('2d', { willReadFrequently: true });
+      if (!ctx) throw new Error('canvas indisponible');
+      ctx.drawImage(bitmap, 0, 0, 9, 8);
+      const { data } = ctx.getImageData(0, 0, 9, 8);
+      const gray = new Array(72);
+      for (let i = 0; i < 72; i++) {
+        const o = i * 4;
+        gray[i] = 0.299 * data[o] + 0.587 * data[o + 1] + 0.114 * data[o + 2];
+      }
+      let bits = 0n;
+      for (let y = 0; y < 8; y++) {
+        for (let x = 0; x < 8; x++) {
+          const left = gray[y * 9 + x];
+          const right = gray[y * 9 + x + 1];
+          bits = (bits << 1n) | (left > right ? 1n : 0n);
+        }
+      }
+      return bits.toString(16).padStart(16, '0');
+    } finally {
+      if (typeof bitmap.close === 'function') bitmap.close();
+    }
+  }
+
+  async function fetchWorkFingerprints() {
+    const r = await apiFetch('/api/works/fingerprints?token=' + encodeURIComponent(token));
+    const j = await r.json();
+    if (!r.ok || !j.ok) {
+      throw new Error(formatApiError(j.error) || 'empreintes indisponibles — redémarrez npm run works:api');
+    }
+    return j.fingerprints || [];
+  }
+
+  /**
+   * @param {File[]} files
+   * @returns {Promise<Array<{ file: File, match: object, kind: string, distance: number|null }>>}
+   */
+  async function findImportDuplicateSuspects(files) {
+    if (!files.length) return [];
+    if (importStatusEl) {
+      importStatusEl.textContent = 'Recherche de doublons…';
+      importStatusEl.classList.remove('legend-editor-api-hint--error');
+    }
+    let catalog;
+    try {
+      catalog = await fetchWorkFingerprints();
+    } catch (e) {
+      console.warn('[dupes]', e);
+      if (importStatusEl) {
+        importStatusEl.textContent =
+          'Avertissement : contrôle doublons impossible (' +
+          formatApiError(e) +
+          '). Import sans revue.';
+      }
+      return [];
+    }
+    if (!catalog.length) return [];
+
+    const bySha = new Map();
+    const withPhash = [];
+    for (const row of catalog) {
+      if (row.file_sha256) {
+        const list = bySha.get(row.file_sha256) || [];
+        list.push(row);
+        bySha.set(row.file_sha256, list);
+      }
+      if (row.phash) withPhash.push(row);
+    }
+
+    /** @type {Array<{ file: File, sha: string, phash: string }>} */
+    const scanned = [];
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
+      if (importStatusEl) {
+        importStatusEl.textContent =
+          'Recherche de doublons… ' + (i + 1) + '/' + files.length;
+      }
+      let sha = '';
+      let phash = '';
+      try {
+        sha = await sha256HexOfFile(file);
+      } catch (e) {
+        console.warn('[sha]', file.name, e);
+      }
+      try {
+        phash = await dHashHexOfFile(file);
+      } catch (e) {
+        console.warn('[phash]', file.name, e);
+      }
+      scanned.push({ file, sha, phash });
+    }
+
+    const suspects = [];
+    const seenNames = new Set();
+
+    for (let i = 0; i < scanned.length; i++) {
+      const cur = scanned[i];
+      let best = null;
+
+      if (cur.sha && bySha.has(cur.sha)) {
+        const hit = bySha.get(cur.sha)[0];
+        best = { match: hit, kind: 'exact_sha256', distance: 0 };
+      }
+
+      if (!best && cur.phash) {
+        let minDist = IMPORT_PHASH_THRESHOLD + 1;
+        let minRow = null;
+        for (const row of withPhash) {
+          const d = hammingHex64(cur.phash, row.phash);
+          if (d < minDist) {
+            minDist = d;
+            minRow = row;
+          }
+        }
+        if (minRow && minDist <= IMPORT_PHASH_THRESHOLD) {
+          best = {
+            match: minRow,
+            kind: minDist === 0 ? 'identical_phash' : 'similar_phash',
+            distance: minDist,
+          };
+        }
+      }
+
+      // Doublon dans le même lot (fichier déjà scanné)
+      if (!best) {
+        for (let j = 0; j < i; j++) {
+          const other = scanned[j];
+          if (cur.sha && other.sha && cur.sha === other.sha) {
+            best = {
+              match: {
+                id: null,
+                title: '(même lot)',
+                filename_original: other.file.name,
+                _batchFile: other.file,
+              },
+              kind: 'batch_exact',
+              distance: 0,
+            };
+            break;
+          }
+          if (cur.phash && other.phash) {
+            const d = hammingHex64(cur.phash, other.phash);
+            if (d <= IMPORT_PHASH_THRESHOLD) {
+              best = {
+                match: {
+                  id: null,
+                  title: '(même lot)',
+                  filename_original: other.file.name,
+                  _batchFile: other.file,
+                },
+                kind: d === 0 ? 'batch_identical' : 'batch_similar',
+                distance: d,
+              };
+              break;
+            }
+          }
+        }
+      }
+
+      if (best && !seenNames.has(cur.file.name)) {
+        seenNames.add(cur.file.name);
+        suspects.push({ file: cur.file, ...best });
+      }
+    }
+    return suspects;
+  }
+
+  function dupeReasonLabel(kind, distance) {
+    if (kind === 'exact_sha256' || kind === 'batch_exact') {
+      return 'Fichier identique (mêmes octets).';
+    }
+    if (kind === 'identical_phash' || kind === 'batch_identical' || distance === 0) {
+      return 'Image visuelle identique (empreinte perceptuelle).';
+    }
+    return (
+      'Image très proche (distance ' +
+      distance +
+      '/' +
+      IMPORT_PHASH_THRESHOLD +
+      ') — possible doublon ou autre prise de vue.'
+    );
+  }
+
+  /**
+   * Revue un par un. Retourne les noms de fichiers à importer (Set),
+   * ou null si l’utilisateur annule tout l’import.
+   * @param {Array<{ file: File, match: object, kind: string, distance: number|null }>} suspects
+   * @param {File[]} allFiles
+   */
+  function reviewImportDuplicates(suspects, allFiles) {
+    return new Promise((resolve) => {
+      if (!importDupeDialog || !suspects.length) {
+        resolve(new Set(allFiles.map((f) => f.name)));
+        return;
+      }
+
+      const skipNames = new Set();
+      let index = 0;
+      let newObjectUrl = '';
+      let existObjectUrl = '';
+
+      function revokeReviewUrls() {
+        if (newObjectUrl) {
+          try {
+            URL.revokeObjectURL(newObjectUrl);
+          } catch {
+            /* ignore */
+          }
+          newObjectUrl = '';
+        }
+        if (existObjectUrl) {
+          try {
+            URL.revokeObjectURL(existObjectUrl);
+          } catch {
+            /* ignore */
+          }
+          existObjectUrl = '';
+        }
+      }
+
+      function finish(result) {
+        revokeReviewUrls();
+        importDupeSkipBtn?.removeEventListener('click', onSkip);
+        importDupeForceBtn?.removeEventListener('click', onForce);
+        importDupeCancelBtn?.removeEventListener('click', onCancel);
+        importDupeCloseBtn?.removeEventListener('click', onCancel);
+        importDupeDialog.removeEventListener('cancel', onCancel);
+        if (importDupeDialog.open) importDupeDialog.close();
+        resolve(result);
+      }
+
+      function onCancel(e) {
+        if (e && e.preventDefault) e.preventDefault();
+        finish(null);
+      }
+
+      function onSkip() {
+        skipNames.add(suspects[index].file.name);
+        index += 1;
+        showCurrent();
+      }
+
+      function onForce() {
+        index += 1;
+        showCurrent();
+      }
+
+      function showCurrent() {
+        revokeReviewUrls();
+        if (index >= suspects.length) {
+          const keep = new Set(
+            allFiles.map((f) => f.name).filter((n) => !skipNames.has(n))
+          );
+          finish(keep);
+          return;
+        }
+        const item = suspects[index];
+        if (importDupeProgressEl) {
+          importDupeProgressEl.textContent =
+            'Suspect ' + (index + 1) + ' / ' + suspects.length;
+        }
+        if (importDupeReasonEl) {
+          importDupeReasonEl.textContent = dupeReasonLabel(item.kind, item.distance);
+        }
+        newObjectUrl = URL.createObjectURL(item.file);
+        if (importDupeNewImg) importDupeNewImg.src = newObjectUrl;
+        if (importDupeNewMeta) {
+          importDupeNewMeta.textContent = item.file.name;
+        }
+
+        const match = item.match || {};
+        if (match._batchFile) {
+          existObjectUrl = URL.createObjectURL(match._batchFile);
+          if (importDupeExistImg) importDupeExistImg.src = existObjectUrl;
+        } else {
+          const workLike = {
+            id: match.id,
+            filename_original: match.filename_original,
+            image_ext: match.image_ext,
+          };
+          const url = thumbUrlForWork(workLike);
+          if (importDupeExistImg) {
+            importDupeExistImg.src = url || '';
+            importDupeExistImg.onerror = () => {
+              const media = mediaPathForWork(workLike);
+              if (media) importDupeExistImg.src = MEDIA_BASE + encodeMediaPath(media);
+            };
+          }
+        }
+        if (importDupeExistMeta) {
+          const bits = [];
+          if (match.id) bits.push(match.id);
+          if (match.title) bits.push(match.title);
+          if (match.filename_original) bits.push(match.filename_original);
+          importDupeExistMeta.textContent = bits.join(' — ') || '—';
+        }
+        if (!importDupeDialog.open) importDupeDialog.showModal();
+      }
+
+      importDupeSkipBtn?.addEventListener('click', onSkip);
+      importDupeForceBtn?.addEventListener('click', onForce);
+      importDupeCancelBtn?.addEventListener('click', onCancel);
+      importDupeCloseBtn?.addEventListener('click', onCancel);
+      importDupeDialog.addEventListener('cancel', onCancel);
+      showCurrent();
+    });
+  }
+
   async function openImportDialog() {
     if (!importDialog) return;
     revokeImportPreviewObjectUrls();
@@ -2428,8 +2772,46 @@
     let lastWorks = worksList;
     let totalOk = 0;
     const allImported = [];
+    let skippedDupes = 0;
 
     try {
+      if (importMode === 'add') {
+        await loadWorksCatalog();
+        const suspects = await findImportDuplicateSuspects(importSelectedFiles);
+        if (suspects.length) {
+          if (importStatusEl) {
+            importStatusEl.textContent =
+              suspects.length + ' doublon(s) suspecté(s) — revue…';
+          }
+          const keepNames = await reviewImportDuplicates(suspects, importSelectedFiles);
+          if (keepNames == null) {
+            if (importStatusEl) importStatusEl.textContent = 'Import annulé.';
+            return;
+          }
+          const before = importSelectedFiles.length;
+          importSelectedFiles = importSelectedFiles.filter((f) => keepNames.has(f.name));
+          skippedDupes = before - importSelectedFiles.length;
+          if (!importSelectedFiles.length) {
+            if (importStatusEl) {
+              importStatusEl.textContent =
+                'Aucune œuvre à importer (tous les doublons ont été ignorés).';
+            }
+            setStatus('Import annulé : uniquement des doublons ignorés.');
+            return;
+          }
+          // Réaligner le plan / overrides sur les fichiers restants
+          const remaining = new Set(importSelectedFiles.map((f) => f.name));
+          for (const key of Object.keys(importOverrides)) {
+            if (!remaining.has(key)) delete importOverrides[key];
+          }
+          await refreshImportPlan();
+          const stillOk = importPlan.filter((r) => !r.error).length;
+          if (!stillOk) {
+            throw new Error('Après exclusion des doublons, plus aucun fichier valide à importer.');
+          }
+        }
+      }
+
       for (let i = 0; i < importSelectedFiles.length; i += batchSize) {
         const batch = importSelectedFiles.slice(i, i + batchSize);
         const files = [];
@@ -2495,6 +2877,7 @@
         await publishImportedWorks(importedIds);
       } else {
         let msg = totalOk + ' œuvre(s) importée(s).';
+        if (skippedDupes) msg += ' ' + skippedDupes + ' doublon(s) ignoré(s).';
         if (isLocalDevServer()) {
           msg += ' Cochez « Publier après import » ou utilisez « Publier médias » pour le site en ligne.';
         }

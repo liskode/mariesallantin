@@ -33,6 +33,10 @@ import {
   publishMediaToGitHub,
   resolvePublishPaths,
 } from './works-git-publish.mjs';
+import {
+  computeDHash,
+  sha256Buffer,
+} from './image-fingerprint.mjs';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
@@ -362,6 +366,17 @@ async function handleImportWorks(body, { writeFiles }) {
       continue;
     }
 
+    let fingerprints = { file_sha256: null, phash: null };
+    try {
+      const Sharp = (await import('sharp')).default;
+      fingerprints = {
+        file_sha256: sha256Buffer(buffer),
+        phash: await computeDHash(Sharp, buffer),
+      };
+    } catch (e) {
+      console.warn('[fingerprint]', item.originalName, e?.message || e);
+    }
+
     const isUpdate = item.effectiveMode === 'update';
 
     if (writeFiles) {
@@ -387,6 +402,10 @@ async function handleImportWorks(body, { writeFiles }) {
         originalName: item.originalName,
         fileSizeBytes: buffer.length,
       });
+      if (fingerprints.file_sha256) {
+        built.dbPatch.file_sha256 = fingerprints.file_sha256;
+        built.dbPatch.phash = fingerprints.phash;
+      }
       if (writeFiles) {
         try {
           await generateThumbnailForMedia(mediaRoot, built.mediaRel);
@@ -415,6 +434,10 @@ async function handleImportWorks(body, { writeFiles }) {
       photoStatusCode,
       item,
     });
+    if (fingerprints.file_sha256) {
+      built.dbRow.file_sha256 = fingerprints.file_sha256;
+      built.dbRow.phash = fingerprints.phash;
+    }
     sortOrder += 1;
 
     if (writeFiles) {
@@ -564,6 +587,33 @@ const server = http.createServer(async (req, res) => {
       const supabase = createSupabase();
       const start = await resolveNextSequentialStart(supabase, worksJsonPath);
       sendJson(res, 200, { ok: true, next_id: formatWorkId(start) });
+      return;
+    }
+
+    if (req.method === 'GET' && url.pathname === '/api/works/fingerprints') {
+      if (url.searchParams.get('token') !== TOKEN) {
+        sendJson(res, 403, { ok: false, error: 'token incorrect' });
+        return;
+      }
+      const supabase = createSupabase();
+      const pageSize = 1000;
+      const rows = [];
+      for (let from = 0; ; from += pageSize) {
+        const { data, error } = await supabase
+          .from('works')
+          .select('id, title, filename_original, image_ext, file_sha256, phash')
+          .order('id', { ascending: true })
+          .range(from, from + pageSize - 1);
+        if (error) throw error;
+        if (!data?.length) break;
+        rows.push(...data);
+        if (data.length < pageSize) break;
+      }
+      sendJson(res, 200, {
+        ok: true,
+        fingerprints: rows.filter((r) => r.file_sha256 || r.phash),
+        total_works: rows.length,
+      });
       return;
     }
 
