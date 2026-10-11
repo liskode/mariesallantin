@@ -16,7 +16,6 @@
   ];
 
   const LOCAL_EDITOR_PORTS = new Set(['47832', '47833', '47834', '47835', '47836', '47837']);
-  const EDIT_PASS = 'MS75';
   const SAVE_BTN_LABEL_DIRTY = 'Enregistrer les modifications';
   const SAVE_BTN_LABEL_CLEAN = 'Modifications enregistrées';
   const AUTH_STORAGE_KEY = 'mariesallantin_editor_token';
@@ -30,34 +29,51 @@
     'catalogue_edit_mode_ok',
   ];
 
-  function validatePassword(pass) {
-    return String(pass || '').trim() === EDIT_PASS;
+  function isLocalEditorHost() {
+    const host = window.location.hostname || '';
+    return (
+      (host === '127.0.0.1' || host === 'localhost') &&
+      LOCAL_EDITOR_PORTS.has(window.location.port || '')
+    );
   }
 
-  function migrateLegacyAuth() {
-    for (const key of LEGACY_AUTH_KEYS) {
-      if (sessionStorage.getItem(key) === '1') {
-        sessionStorage.setItem(AUTH_STORAGE_KEY, EDIT_PASS);
-        LEGACY_AUTH_KEYS.forEach((k) => sessionStorage.removeItem(k));
-        return EDIT_PASS;
-      }
-    }
-    return null;
+  /**
+   * Vérifie le mot de passe auprès du serveur (Edge Function works-api) :
+   * le mot de passe n'est jamais stocké dans le code du site.
+   * En local (API Node sur 127.0.0.1:4783x), chaque requête est vérifiée par l'API locale.
+   * @returns {Promise<boolean>}
+   */
+  async function verifyPassword(pass) {
+    const p = String(pass || '').trim();
+    if (!p) return false;
+    if (isLocalEditorHost()) return true;
+    const r = await fetch('media/collectors-config.json', { cache: 'no-store' });
+    if (!r.ok) throw new Error('Configuration introuvable (media/collectors-config.json)');
+    const cfg = await r.json();
+    const api = String(cfg.worksApiUrl || '').trim().replace(/\/$/, '');
+    const anon = String(cfg.anonKey || '').trim();
+    if (!api || !anon) throw new Error('worksApiUrl / anonKey manquants dans la configuration');
+    const res = await fetch(api + '/api/works/next-id?token=' + encodeURIComponent(p), {
+      headers: { apikey: anon, Authorization: 'Bearer ' + anon },
+      cache: 'no-store',
+    });
+    if (res.status === 403) return false;
+    if (!res.ok) throw new Error('API en ligne indisponible (HTTP ' + res.status + ')');
+    return true;
   }
 
   function getSessionToken() {
-    const stored = sessionStorage.getItem(AUTH_STORAGE_KEY);
-    if (stored === EDIT_PASS) return stored;
-    return migrateLegacyAuth();
+    LEGACY_AUTH_KEYS.forEach((k) => sessionStorage.removeItem(k));
+    return sessionStorage.getItem(AUTH_STORAGE_KEY) || '';
   }
 
   function hasSession() {
-    return getSessionToken() === EDIT_PASS;
+    return !!getSessionToken();
   }
 
   function setSessionToken(pass) {
     const p = String(pass || '').trim();
-    if (p !== EDIT_PASS) return false;
+    if (!p) return false;
     sessionStorage.setItem(AUTH_STORAGE_KEY, p);
     LEGACY_AUTH_KEYS.forEach((k) => sessionStorage.removeItem(k));
     return true;
@@ -307,8 +323,7 @@
   global.EditorCommon = {
     TRASH_ICON,
     EDITOR_TABS,
-    EDIT_PASS,
-    validatePassword,
+    verifyPassword,
     getSessionToken,
     hasSession,
     setSessionToken,

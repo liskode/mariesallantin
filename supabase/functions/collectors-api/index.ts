@@ -26,8 +26,8 @@ function routePath(pathname: string): string {
 }
 
 function checkToken(token: string): boolean {
-  const expected = Deno.env.get('CATALOGUE_EDITOR_TOKEN') || 'MS75';
-  return token === expected;
+  const expected = Deno.env.get('CATALOGUE_EDITOR_TOKEN') || '';
+  return expected !== '' && token === expected;
 }
 
 function createSupabase(): SupabaseClient {

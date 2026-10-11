@@ -434,7 +434,15 @@
 
   async function tryOpenSession(pass) {
     token = String(pass || '').trim();
-    if (!EditorCommon.validatePassword(token)) {
+    let valid = false;
+    try {
+      valid = await EditorCommon.verifyPassword(token);
+    } catch (e) {
+      showLogin(String(e.message || e));
+      return;
+    }
+    if (!valid) {
+      EditorCommon.clearSession();
       showLogin('Mot de passe incorrect.');
       return;
     }

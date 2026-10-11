@@ -13,7 +13,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 
 const PORT = Number(process.env.EVENTS_EDITOR_PORT || 47837);
-const TOKEN = process.env.CATALOGUE_EDITOR_TOKEN || 'MS75';
+const TOKEN =
+  process.env.CATALOGUE_EDITOR_TOKEN ||
+  loadEnvFile(path.join(root, '.env')).CATALOGUE_EDITOR_TOKEN ||
+  '';
+if (!TOKEN) {
+  console.error('CATALOGUE_EDITOR_TOKEN manquant : renseignez-le dans .env (voir .env.example).');
+  process.exit(1);
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',

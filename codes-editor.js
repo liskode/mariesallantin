@@ -480,7 +480,18 @@
   async function tryLogin() {
     const pass = passEl ? passEl.value : '';
     const ec = AUTH();
-    if (!ec || !ec.validatePassword(pass)) {
+    let valid = false;
+    try {
+      valid = !!ec && (await ec.verifyPassword(pass));
+    } catch (e) {
+      if (loginErr) {
+        loginErr.textContent = String(e.message || e);
+        loginErr.hidden = false;
+      }
+      return;
+    }
+    if (!valid) {
+      if (ec) ec.clearSession();
       if (loginErr) {
         loginErr.textContent = 'Mot de passe incorrect.';
         loginErr.hidden = false;

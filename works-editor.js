@@ -2905,7 +2905,16 @@
     loginBtn.addEventListener('click', async () => {
       const pass = passEl.value.trim();
       const ec = AUTH();
-      if (!ec || !ec.validatePassword(pass)) {
+      let valid = false;
+      try {
+        valid = !!ec && (await ec.verifyPassword(pass));
+      } catch (e) {
+        loginErr.hidden = false;
+        loginErr.textContent = String(e.message || e);
+        return;
+      }
+      if (!valid) {
+        if (ec) ec.clearSession();
         loginErr.hidden = false;
         loginErr.textContent = 'Mot de passe incorrect.';
         return;
@@ -3075,10 +3084,9 @@
   async function init() {
     bindEvents();
     await showApiHint();
-    if (AUTH() && AUTH().hasSession()) {
-      token = AUTH().getSessionToken() || '';
-      if (passEl) passEl.value = token;
-      await enterApp();
+    if (AUTH() && AUTH().hasSession() && passEl) {
+      passEl.value = AUTH().getSessionToken() || '';
+      loginBtn.click();
     }
   }
 

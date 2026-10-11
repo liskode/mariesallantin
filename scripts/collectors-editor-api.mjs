@@ -9,7 +9,7 @@
  * Variables (.env) :
  *   SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
  *   COLLECTORS_EDITOR_PORT  (défaut 47832)
- *   CATALOGUE_EDITOR_TOKEN  (défaut MS75)
+ *   CATALOGUE_EDITOR_TOKEN  (obligatoire, dans .env)
  */
 
 import http from 'node:http';
@@ -24,7 +24,14 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(__dirname, '..');
 
 const PORT = Number(process.env.COLLECTORS_EDITOR_PORT || 47832);
-const TOKEN = process.env.CATALOGUE_EDITOR_TOKEN || 'MS75';
+const TOKEN =
+  process.env.CATALOGUE_EDITOR_TOKEN ||
+  loadEnvFile(path.join(root, '.env')).CATALOGUE_EDITOR_TOKEN ||
+  '';
+if (!TOKEN) {
+  console.error('CATALOGUE_EDITOR_TOKEN manquant : renseignez-le dans .env (voir .env.example).');
+  process.exit(1);
+}
 
 const MIME = {
   '.html': 'text/html; charset=utf-8',

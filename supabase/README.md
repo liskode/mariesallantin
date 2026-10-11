@@ -72,7 +72,7 @@ npm run collectors:api
 # puis http://127.0.0.1:47832/
 ```
 
-Mot de passe : `MS75` (`CATALOGUE_EDITOR_TOKEN`). L’API locale utilise `SUPABASE_SERVICE_ROLE_KEY` depuis `.env`.
+Mot de passe : valeur de `CATALOGUE_EDITOR_TOKEN` (dans `.env`). L’API locale utilise `SUPABASE_SERVICE_ROLE_KEY` depuis `.env`.
 
 ### Éditeur en ligne (GitHub Pages + Edge Function)
 
@@ -89,15 +89,15 @@ supabase login
 supabase link --project-ref leezsypadtvypdgqgvtk
 
 # Secrets (Dashboard → Edge Functions → Secrets, ou CLI) :
-#   CATALOGUE_EDITOR_TOKEN=MS75
+#   CATALOGUE_EDITOR_TOKEN=<mot-de-passe-éditeur>
 # SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY : fournis automatiquement par Supabase (ne pas les définir).
 
-supabase secrets set CATALOGUE_EDITOR_TOKEN=MS75
+supabase secrets set CATALOGUE_EDITOR_TOKEN=<mot-de-passe-éditeur>
 
 supabase functions deploy collectors-api --no-verify-jwt
 ```
 
-`verify_jwt = false` est déjà dans `supabase/config.toml` : l’accès est protégé par le mot de passe `MS75` dans la requête, pas par un compte Supabase.
+`verify_jwt = false` est déjà dans `supabase/config.toml` : l’accès est protégé par le mot de passe éditeur dans la requête, pas par un compte Supabase.
 
 **2. Configurer le site** — dans `media/collectors-config.json`, renseigner la clé **anon** (publique, depuis Project Settings → API) :
 
@@ -121,11 +121,11 @@ Les vignettes au survol utilisent `media/works.json` et `media/catalogue/_thumbs
 2. Déployer l’Edge Function :
 
 ```bash
-supabase secrets set CATALOGUE_EDITOR_TOKEN=MS75
+supabase secrets set CATALOGUE_EDITOR_TOKEN=<mot-de-passe-éditeur>
 supabase functions deploy series-api --no-verify-jwt
 ```
 
-3. Ouvrir **https://mariesallantin.art/series.html** (mot de passe `MS75`)
+3. Ouvrir **https://mariesallantin.art/series.html** (mot de passe éditeur)
 
 Champs éditables : libellé, icône (`icon_work_id` = MS####), `year_start`, `year_end`, `description` (texte libre, paragraphes conservés).
 
@@ -140,7 +140,7 @@ Développement local : `npm run series:api` → http://127.0.0.1:47833/
 supabase functions deploy codes-api --no-verify-jwt --project-ref leezsypadtvypdgqgvtk
 ```
 
-3. Ouvrir **https://mariesallantin.art/codes-editor.html** (mot de passe `MS75`)
+3. Ouvrir **https://mariesallantin.art/codes-editor.html** (mot de passe éditeur)
 
 Deux panneaux côte à côte : formats (code, libellé, hauteur/largeur cm) et techniques (code, libellé). Boutons **+ Nouveau** pour ajouter un code vide puis compléter la ligne.
 
@@ -161,5 +161,5 @@ supabase functions deploy public-site-api --no-verify-jwt --project-ref leezsypa
 
 ## Prochaines étapes
 
-1. Brancher l’éditeur catalogue (mode MS75) vers Supabase
+1. Brancher l’éditeur catalogue (mode éditeur) vers Supabase
 2. Optionnel : export `works.json` pour GitHub Pages tant que le site reste statique

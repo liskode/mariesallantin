@@ -11,7 +11,7 @@ DÉMARRAGE (sur votre Mac, dans le dossier du projet)
   → Démarre l'éditeur local et ouvre le navigateur sur :
     http://127.0.0.1:47835/
 
-  Mot de passe : MS75
+  Mot de passe : celui de l'éditeur (CATALOGUE_EDITOR_TOKEN dans .env)
 
   Alternative : npm run works:api  (même adresse, sans ouverture auto du navigateur)
 
