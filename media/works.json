@@ -407,18 +407,6 @@
       "dimensions": "1927 × 3000 px"
     },
     {
-      "id": "MS0029",
-      "media": "catalogue/MS0029_ABSTR_METAM_120F_1987_AST_Métamorphose n°10, acrylique sur toile, 195X130cm_galerie Nicole Ferry.jpeg",
-      "title": "Métamorphose n°10, acrylique sur toile, 195X130cm*galerie Nicole Ferry",
-      "series": [
-        "ABSTR"
-      ],
-      "photo": "OK",
-      "publish": "VAL",
-      "tailleMo": 0.55,
-      "dimensions": "1484 × 3000 px"
-    },
-    {
       "id": "MS0030",
       "media": "catalogue/MS0030_ABSTR_METAM_HOFO_1987_ASB_Petite métamorphose N°1 60X66cm acrylique sur bois.jpeg",
       "title": "Petite métamorphose N°1 60X66cm acrylique sur bois",
@@ -1151,18 +1139,6 @@
       "dimensions": "1863 × 3000 px"
     },
     {
-      "id": "MS0091",
-      "media": "catalogue/MS0091_APHRO_UNIVE_002F_1994_AST_Aphrodite avec deux cercles , 24x19cm, acrylique sur toile.jpeg",
-      "title": "Aphrodite avec deux cercles , 24x19cm, acrylique sur toile",
-      "series": [
-        "APHRO"
-      ],
-      "photo": "OK",
-      "publish": "VAL",
-      "tailleMo": 1.444,
-      "dimensions": "2360 × 3000 px"
-    },
-    {
       "id": "MS0092",
       "media": "catalogue/MS0092_CIEUX_DANTE.jpeg",
       "title": "Dante",
@@ -1284,19 +1260,6 @@
       "publish": "VAL",
       "tailleMo": 1.245,
       "dimensions": "2502 × 3000 px"
-    },
-    {
-      "id": "MS0102",
-      "media": "catalogue/MS0102_ENCRE_DANTE_PURGA_ATELI_ Divine comédie _combinaison 2  2017_2023.jpeg",
-      "title": "Combinaison 2 2017_2023",
-      "series": [
-        "ENCRE",
-        "PURGA"
-      ],
-      "photo": "OK",
-      "publish": "VAL",
-      "tailleMo": 0.731,
-      "dimensions": "3000 × 2198 px"
     },
     {
       "id": "MS0103",
@@ -1820,19 +1783,6 @@
       "publish": "VAL",
       "tailleMo": 0.685,
       "dimensions": "2357 × 3000 px"
-    },
-    {
-      "id": "MS0145",
-      "media": "catalogue/MS0145_JUGEM_ENCRE_ATELI_DANTE_2017_2023_ Combinaison 1.jpeg",
-      "title": "Combinaison 1",
-      "series": [
-        "ATELI",
-        "JUGEM"
-      ],
-      "photo": "OK",
-      "publish": "VAL",
-      "tailleMo": 0.778,
-      "dimensions": "3000 × 2250 px"
     },
     {
       "id": "MS0146",
@@ -2900,30 +2850,6 @@
       "dimensions": "3000 × 2250 px"
     },
     {
-      "id": "MS0235",
-      "media": "catalogue/MS0235_OFF_ENCRE_ATELI_ (2).jpeg",
-      "title": "Ateli_",
-      "series": [
-        "ENCRE"
-      ],
-      "photo": "OK",
-      "publish": "VAL",
-      "tailleMo": 0.724,
-      "dimensions": "3000 × 2250 px"
-    },
-    {
-      "id": "MS0236",
-      "media": "catalogue/MS0236_OFF_ENCRE_ATELI_ (3).jpeg",
-      "title": "Ateli_",
-      "series": [
-        "ENCRE"
-      ],
-      "photo": "OK",
-      "publish": "VAL",
-      "tailleMo": 0.745,
-      "dimensions": "3000 × 2250 px"
-    },
-    {
       "id": "MS0237",
       "media": "catalogue/MS0237_OFF_ENCRE_ATELI_ (4).jpeg",
       "title": "Ateli_",
@@ -2934,18 +2860,6 @@
       "publish": "VAL",
       "tailleMo": 0.721,
       "dimensions": "2250 × 3000 px"
-    },
-    {
-      "id": "MS0238",
-      "media": "catalogue/MS0238_OFF_ENCRE_ATELI.jpeg",
-      "title": "Ateli",
-      "series": [
-        "ENCRE"
-      ],
-      "photo": "OK",
-      "publish": "VAL",
-      "tailleMo": 0.753,
-      "dimensions": "3000 × 2250 px"
     },
     {
       "id": "MS0239",
@@ -4105,30 +4019,12 @@
       "photo": "OK"
     },
     {
-      "id": "MS0349",
-      "media": "catalogue/MS0349.jpeg",
-      "title": "N°31 Dame et Licorne (la mort) 1991",
-      "series": [
-        "LICOR"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
       "id": "MS0350",
       "media": "catalogue/MS0350.jpeg",
       "title": "détail (3)",
       "series": [
         "LICOR"
       ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
-      "id": "MS0351",
-      "media": "catalogue/MS0351.jpeg",
-      "title": "LICOR (1) DOUBLON",
-      "series": [],
       "publish": "VAL",
       "photo": "OK"
     },
@@ -4409,7 +4305,7 @@
     {
       "id": "MS0379",
       "media": "catalogue/MS0379.jpeg",
-      "title": "Dans le jardin de la licorne.N°1 DOUBLON",
+      "title": "Dans le jardin de la licorne.N°1",
       "series": [
         "LICOR"
       ],
@@ -4619,17 +4515,6 @@
       "series": [
         "LICOR",
         "POLYP"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
-      "id": "MS0400",
-      "media": "catalogue/MS0400.jpeg",
-      "title": "MS0400",
-      "series": [
-        "ATELI",
-        "LICOR"
       ],
       "publish": "VAL",
       "photo": "OK"
@@ -5037,7 +4922,7 @@
     {
       "id": "MS0440",
       "media": "catalogue/MS0440.jpeg",
-      "title": "Univers et cariatides DOUBLON",
+      "title": "Univers et cariatides",
       "series": [
         "UNIVE"
       ],
@@ -5047,7 +4932,7 @@
     {
       "id": "MS0441",
       "media": "catalogue/MS0441.jpeg",
-      "title": "Univers, le char du soleil DOUBLON",
+      "title": "Univers, le char du soleil",
       "series": [
         "UNIVE"
       ],
@@ -5067,7 +4952,7 @@
     {
       "id": "MS0443",
       "media": "catalogue/MS0443.jpeg",
-      "title": "Vénus et Phaeton suite univers DOUBLON",
+      "title": "Vénus et Phaeton suite univers",
       "series": [
         "UNIVE",
         "PHAET"
@@ -5078,7 +4963,7 @@
     {
       "id": "MS0444",
       "media": "catalogue/MS0444.jpeg",
-      "title": "L'enlèvement (1) DOUBLON",
+      "title": "L'enlèvement (1)",
       "series": [
         "UNIVE"
       ],
@@ -5088,7 +4973,7 @@
     {
       "id": "MS0445",
       "media": "catalogue/MS0445.jpeg",
-      "title": "Figure dans l'univers DOUBLON",
+      "title": "Figure dans l'univers",
       "series": [
         "UNIVE"
       ],
@@ -5098,7 +4983,7 @@
     {
       "id": "MS0446",
       "media": "catalogue/MS0446.jpeg",
-      "title": "Univers et cariatide (1) DOUBLON",
+      "title": "Univers et cariatide (1)",
       "series": [
         "UNIVE"
       ],
@@ -5108,7 +4993,7 @@
     {
       "id": "MS0447",
       "media": "catalogue/MS0447.jpeg",
-      "title": "* col part manon DOUBLON",
+      "title": "* col part manon",
       "series": [
         "UNIVE"
       ],
@@ -5118,7 +5003,7 @@
     {
       "id": "MS0448",
       "media": "catalogue/MS0448.jpeg",
-      "title": "Trois figures suite Univers DOUBLON",
+      "title": "Trois figures suite Univers",
       "series": [
         "UNIVE"
       ],
@@ -5128,7 +5013,7 @@
     {
       "id": "MS0449",
       "media": "catalogue/MS0449.jpeg",
-      "title": "Naissance de Vénus et compagnie deVénus dans l'univers 9 fois 60cmx60cm soit 180x180cm. DOUBLON",
+      "title": "Naissance de Vénus et compagnie deVénus dans l'univers 9 fois 60cmx60cm soit 180x180cm.",
       "series": [
         "UNIVE",
         "POLYP"
@@ -5137,19 +5022,9 @@
       "photo": "OK"
     },
     {
-      "id": "MS0450",
-      "media": "catalogue/MS0450.jpeg",
-      "title": "Univers DOUBLON",
-      "series": [
-        "UNIVE"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
       "id": "MS0451",
       "media": "catalogue/MS0451.jpeg",
-      "title": "Le char du soleil,suite univers DOUBLON",
+      "title": "Le char du soleil,suite univers",
       "series": [
         "UNIVE",
         "PHAET"
@@ -5160,7 +5035,7 @@
     {
       "id": "MS0452",
       "media": "catalogue/MS0452.jpeg",
-      "title": "TST chute dans l'Univers et cariatide DOUBLON",
+      "title": "TST chute dans l'Univers et cariatide",
       "series": [
         "UNIVE"
       ],
@@ -5170,7 +5045,7 @@
     {
       "id": "MS0453",
       "media": "catalogue/MS0453.jpeg",
-      "title": "Dyptique Naissance de Vénus dans l'Univers 41x48cm DOUBLON",
+      "title": "Dyptique Naissance de Vénus dans l'Univers 41x48cm",
       "series": [
         "UNIVE",
         "NAISS"
@@ -5181,7 +5056,7 @@
     {
       "id": "MS0454",
       "media": "catalogue/MS0454.jpeg",
-      "title": "Déesse avec soleil DOUBLON",
+      "title": "Déesse avec soleil",
       "series": [
         "UNIVE"
       ],
@@ -5191,7 +5066,7 @@
     {
       "id": "MS0455",
       "media": "catalogue/MS0455.jpeg",
-      "title": "Cariatide et chute dans l'univers DOUBLON",
+      "title": "Cariatide et chute dans l'univers",
       "series": [
         "UNIVE"
       ],
@@ -5201,7 +5076,7 @@
     {
       "id": "MS0456",
       "media": "catalogue/MS0456.jpeg",
-      "title": "l'enlèvement, la cie de Vénus DOUBLON",
+      "title": "l'enlèvement, la cie de Vénus",
       "series": [
         "UNIVE",
         "CIEUX"
@@ -5212,7 +5087,7 @@
     {
       "id": "MS0457",
       "media": "catalogue/MS0457.jpeg",
-      "title": "Figures dans l'univers DOUBLON",
+      "title": "Figures dans l'univers",
       "series": [
         "UNIVE"
       ],
@@ -5233,7 +5108,7 @@
     {
       "id": "MS0459",
       "media": "catalogue/MS0459.jpeg",
-      "title": "La chute de Phaeton suite univers. DOUBLON",
+      "title": "La chute de Phaeton suite univers.",
       "series": [
         "UNIVE",
         "PHAET"
@@ -5244,7 +5119,7 @@
     {
       "id": "MS0460",
       "media": "catalogue/MS0460.jpeg",
-      "title": "L'enlèvement DOUBLON",
+      "title": "L'enlèvement",
       "series": [
         "UNIVE"
       ],
@@ -5254,7 +5129,7 @@
     {
       "id": "MS0461",
       "media": "catalogue/MS0461.jpeg",
-      "title": "Univers et cariatides DOUBLON",
+      "title": "Univers et cariatides",
       "series": [
         "UNIVE"
       ],
@@ -5264,7 +5139,7 @@
     {
       "id": "MS0462",
       "media": "catalogue/MS0462.jpeg",
-      "title": "Univers et chute (1) DOUBLON",
+      "title": "Univers et chute (1)",
       "series": [
         "UNIVE"
       ],
@@ -5274,7 +5149,7 @@
     {
       "id": "MS0463",
       "media": "catalogue/MS0463.jpeg",
-      "title": "Le triomphe d'Eros, suite univers. DOUBLON",
+      "title": "Le triomphe d'Eros, suite univers.",
       "series": [
         "UNIVE",
         "PHAET"
@@ -5285,7 +5160,7 @@
     {
       "id": "MS0464",
       "media": "catalogue/MS0464.jpeg",
-      "title": "figures dans l'univers1996 DOUBLON",
+      "title": "figures dans l'univers1996",
       "series": [
         "UNIVE"
       ],
@@ -5295,17 +5170,7 @@
     {
       "id": "MS0465",
       "media": "catalogue/MS0465.jpeg",
-      "title": "Figures dans l'univers*Alin Avila DOUBLON",
-      "series": [
-        "UNIVE"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
-      "id": "MS0466",
-      "media": "catalogue/MS0466.jpeg",
-      "title": "MS0466",
+      "title": "Figures dans l'univers*Alin Avila",
       "series": [
         "UNIVE"
       ],
@@ -5327,7 +5192,7 @@
     {
       "id": "MS0468",
       "media": "catalogue/MS0468.jpeg",
-      "title": "Le triomphe d'Eros, suite univers. DOUBLON",
+      "title": "Le triomphe d'Eros, suite univers.",
       "series": [
         "UNIVE",
         "PHAET"
@@ -5336,20 +5201,9 @@
       "photo": "OK"
     },
     {
-      "id": "MS0469",
-      "media": "catalogue/MS0469.jpeg",
-      "title": "MS0469",
-      "series": [
-        "APHRO",
-        "UNIVE"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
       "id": "MS0470",
       "media": "catalogue/MS0470.jpeg",
-      "title": "Danse dans l'univers *col part Lucien Chabason et Anne Vourc'h DOUBLON",
+      "title": "Danse dans l'univers *col part Lucien Chabason et Anne Vourc'h",
       "series": [
         "UNIVE"
       ],
@@ -5359,7 +5213,7 @@
     {
       "id": "MS0471",
       "media": "catalogue/MS0471.jpeg",
-      "title": "Le triomphe d'Eros, suite univers DOUBLON",
+      "title": "Le triomphe d'Eros, suite univers",
       "series": [
         "UNIVE"
       ],
@@ -5369,7 +5223,7 @@
     {
       "id": "MS0472",
       "media": "catalogue/MS0472.jpeg",
-      "title": "Danse dans l'univers *col part Chabason et Vourc'h DOUBLON",
+      "title": "Danse dans l'univers *col part Chabason et Vourc'h",
       "series": [
         "UNIVE"
       ],
@@ -5379,7 +5233,7 @@
     {
       "id": "MS0473",
       "media": "catalogue/MS0473.jpeg",
-      "title": "Univers et cariatide DOUBLON",
+      "title": "Univers et cariatide",
       "series": [
         "UNIVE"
       ],
@@ -5410,7 +5264,7 @@
     {
       "id": "MS0476",
       "media": "catalogue/MS0476.jpeg",
-      "title": "Danse dans l'univers DOUBLON",
+      "title": "Danse dans l'univers",
       "series": [
         "UNIVE"
       ],
@@ -5442,7 +5296,7 @@
     {
       "id": "MS0479",
       "media": "catalogue/MS0479.jpeg",
-      "title": "Univers et danse DOUBLON",
+      "title": "Univers et danse",
       "series": [
         "UNIVE"
       ],
@@ -5452,7 +5306,7 @@
     {
       "id": "MS0480",
       "media": "catalogue/MS0480.jpeg",
-      "title": "MS0480 DOUBLON",
+      "title": "MS0480",
       "series": [
         "UNIVE",
         "APHRO"
@@ -5463,7 +5317,7 @@
     {
       "id": "MS0481",
       "media": "catalogue/MS0481.jpeg",
-      "title": "Figures das l'univers DOUBLON",
+      "title": "Figures das l'univers",
       "series": [
         "UNIVE"
       ],
@@ -5473,7 +5327,7 @@
     {
       "id": "MS0482",
       "media": "catalogue/MS0482.jpeg",
-      "title": "Univers et chute DOUBLON",
+      "title": "Univers et chute",
       "series": [
         "UNIVE"
       ],
@@ -5492,53 +5346,9 @@
       "photo": "OK"
     },
     {
-      "id": "MS0484",
-      "media": "catalogue/MS0484.jpeg",
-      "title": "Naissance de Vénus et compagnie deVénus dans l'univers 9 fois 60cmx60cm soit 180x180cm. DOUBLON",
-      "series": [
-        "UNIVE",
-        "POLYP"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
       "id": "MS0485",
       "media": "catalogue/MS0485.jpeg",
       "title": "P008 2007 TST Univers et la chute de Phaeton",
-      "series": [
-        "UNIVE",
-        "PHAET"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
-      "id": "MS0486",
-      "media": "catalogue/MS0486.jpeg",
-      "title": "F006 2007 TST Le triomphe d'Eros, suite univers. DOUBLON",
-      "series": [
-        "UNIVE",
-        "PHAET"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
-      "id": "MS0487",
-      "media": "catalogue/MS0487.jpeg",
-      "title": "F006 2007 TST Le triomphe d'Eros, suite univers. DOUBLON",
-      "series": [
-        "UNIVE",
-        "PHAET"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
-      "id": "MS0488",
-      "media": "catalogue/MS0488.jpeg",
-      "title": "F006 2007 TST Le char du soleil,suite univers DOUBLON",
       "series": [
         "UNIVE",
         "PHAET"
@@ -5552,17 +5362,6 @@
       "title": "Envol dans l'univers",
       "series": [
         "UNIVE"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
-      "id": "MS0490",
-      "media": "catalogue/MS0490.jpeg",
-      "title": "Dyptique Naissance de Vénus dans l'Univers 41x48cm DOUBLON",
-      "series": [
-        "UNIVE",
-        "NAISS"
       ],
       "publish": "VAL",
       "photo": "OK"
@@ -5605,17 +5404,6 @@
       "series": [
         "UNIVE",
         "CIEUX"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
-      "id": "MS0503",
-      "media": "catalogue/MS0503.jpeg",
-      "title": "MS0503",
-      "series": [
-        "UNIVE",
-        "APHRO"
       ],
       "publish": "VAL",
       "photo": "OK"
@@ -5736,17 +5524,6 @@
       "title": "Univers *col part amie de Catherine Gobet",
       "series": [
         "UNIVE"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
-      "id": "MS0519",
-      "media": "catalogue/MS0519.jpeg",
-      "title": "l'enlèvement , la cie de Vénus. DOUBLON",
-      "series": [
-        "UNIVE",
-        "CIEUX"
       ],
       "publish": "VAL",
       "photo": "OK"
@@ -5874,7 +5651,7 @@
     {
       "id": "MS0542",
       "media": "catalogue/MS0542.jpeg",
-      "title": "Univers avec deux figures DOUBLON",
+      "title": "Univers avec deux figures",
       "series": [
         "UNIVE"
       ],
@@ -5885,16 +5662,6 @@
       "id": "MS0543",
       "media": "catalogue/MS0543.jpeg",
       "title": "trois figures dans l'univers",
-      "series": [
-        "UNIVE"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
-      "id": "MS0545",
-      "media": "catalogue/MS0545.jpeg",
-      "title": "Cariatide et chute dans l'univers",
       "series": [
         "UNIVE"
       ],
@@ -6198,17 +5965,6 @@
       "photo": "OK"
     },
     {
-      "id": "MS0580",
-      "media": "catalogue/MS0580.jpeg",
-      "title": "combinaison",
-      "series": [
-        "FORET",
-        "POLYP"
-      ],
-      "publish": "VAL",
-      "photo": "OK"
-    },
-    {
       "id": "MS0581",
       "media": "catalogue/MS0581.jpeg",
       "title": "promenade en famille en forêt, recherche de champignons. 65x92cm",
@@ -6300,13 +6056,6 @@
       "publish": "VAL"
     },
     {
-      "id": "MS0590",
-      "media": "catalogue/MS0590.jpeg",
-      "title": "ENCOUR JUGEM ENCRE ATELI",
-      "series": [],
-      "publish": "VAL"
-    },
-    {
       "id": "MS0591",
       "media": "catalogue/MS0591.jpeg",
       "title": "(3)",
@@ -6367,17 +6116,6 @@
       "media": "catalogue/MS0597.jpeg",
       "title": "ENCOUR HIVER ATELI (3)",
       "series": [],
-      "publish": "VAL"
-    },
-    {
-      "id": "MS0598",
-      "media": "catalogue/MS0598.jpeg",
-      "title": "BERG VARIATION DE BERGUES R",
-      "series": [
-        "ATELI",
-        "ROUGE",
-        "ABSTR"
-      ],
       "publish": "VAL"
     },
     {
@@ -6616,15 +6354,6 @@
       "series": [
         "ATELI",
         "NAISS"
-      ],
-      "publish": "VAL"
-    },
-    {
-      "id": "MS0625",
-      "media": "catalogue/MS0625.jpeg",
-      "title": "(52)",
-      "series": [
-        "ATELI"
       ],
       "publish": "VAL"
     },
@@ -6985,16 +6714,6 @@
       "publish": "VAL"
     },
     {
-      "id": "MS0666",
-      "media": "catalogue/MS0666.jpeg",
-      "title": "JARDIN 020C 2022",
-      "series": [
-        "ATELI",
-        "LICOR"
-      ],
-      "publish": "VAL"
-    },
-    {
       "id": "MS0667",
       "media": "catalogue/MS0667.jpeg",
       "title": "MS0667",
@@ -7230,16 +6949,6 @@
       "publish": "VAL"
     },
     {
-      "id": "MS0693",
-      "media": "catalogue/MS0693.jpeg",
-      "title": "(1)",
-      "series": [
-        "ENCRE",
-        "ATELI"
-      ],
-      "publish": "VAL"
-    },
-    {
       "id": "MS0694",
       "media": "catalogue/MS0694.jpeg",
       "title": "Anne malherbe",
@@ -7312,30 +7021,10 @@
       "publish": "VAL"
     },
     {
-      "id": "MS0702",
-      "media": "catalogue/MS0702.jpeg",
-      "title": "(53)",
-      "series": [
-        "ATELI"
-      ],
-      "publish": "VAL"
-    },
-    {
       "id": "MS0703",
       "media": "catalogue/MS0703.jpeg",
       "title": "(22) 2",
       "series": [
-        "ATELI"
-      ],
-      "publish": "VAL"
-    },
-    {
-      "id": "MS0704",
-      "media": "catalogue/MS0704.jpeg",
-      "title": "LA FIN DES TEMPS. COMBINAISON 2023",
-      "series": [
-        "JUGEM",
-        "ENCRE",
         "ATELI"
       ],
       "publish": "VAL"
@@ -7595,16 +7284,6 @@
       "publish": "VAL"
     },
     {
-      "id": "MS0733",
-      "media": "catalogue/MS0733.jpeg",
-      "title": "MS0733",
-      "series": [
-        "ENCRE",
-        "ATELI"
-      ],
-      "publish": "VAL"
-    },
-    {
       "id": "MS0734",
       "media": "catalogue/MS0734.jpeg",
       "title": "(40)",
@@ -7660,16 +7339,6 @@
       "media": "catalogue/MS0739.jpeg",
       "title": "ENCOUR ATELI",
       "series": [],
-      "publish": "VAL"
-    },
-    {
-      "id": "MS0740",
-      "media": "catalogue/MS0740.jpeg",
-      "title": "(1) 2",
-      "series": [
-        "ENCRE",
-        "ATELI"
-      ],
       "publish": "VAL"
     },
     {
@@ -7741,15 +7410,6 @@
       "publish": "VAL"
     },
     {
-      "id": "MS0748",
-      "media": "catalogue/MS0748.jpeg",
-      "title": "(23) DOUBLON",
-      "series": [
-        "ATELI"
-      ],
-      "publish": "VAL"
-    },
-    {
       "id": "MS0749",
       "media": "catalogue/MS0749.jpeg",
       "title": "(17) 2",
@@ -7803,16 +7463,6 @@
       "media": "catalogue/MS0754.jpeg",
       "title": "(45)",
       "series": [
-        "ATELI"
-      ],
-      "publish": "VAL"
-    },
-    {
-      "id": "MS0755",
-      "media": "catalogue/MS0755.jpeg",
-      "title": "2",
-      "series": [
-        "ENCRE",
         "ATELI"
       ],
       "publish": "VAL"
@@ -8035,16 +7685,6 @@
       "publish": "VAL"
     },
     {
-      "id": "MS0780",
-      "media": "catalogue/MS0780.jpeg",
-      "title": "(2)",
-      "series": [
-        "ENCRE",
-        "ATELI"
-      ],
-      "publish": "VAL"
-    },
-    {
       "id": "MS0781",
       "media": "catalogue/MS0781.jpeg",
       "title": "MS0781",
@@ -8115,15 +7755,6 @@
       "publish": "VAL"
     },
     {
-      "id": "MS0788",
-      "media": "catalogue/MS0788.jpeg",
-      "title": "(16) 2",
-      "series": [
-        "ATELI"
-      ],
-      "publish": "VAL"
-    },
-    {
       "id": "MS0789",
       "media": "catalogue/MS0789.jpeg",
       "title": "MS0789",
@@ -8145,7 +7776,7 @@
     {
       "id": "MS0791",
       "media": "catalogue/MS0791.jpeg",
-      "title": "(22) DOUBLON",
+      "title": "(22)",
       "series": [
         "ATELI"
       ],
@@ -8283,7 +7914,7 @@
     {
       "id": "MS0806",
       "media": "catalogue/MS0806.jpeg",
-      "title": "(1) DOUBLON",
+      "title": "(1)",
       "series": [
         "CIEUX"
       ],
@@ -8292,7 +7923,7 @@
     {
       "id": "MS0807",
       "media": "catalogue/MS0807.jpeg",
-      "title": "PARADIS Eros (série ??) DOUBLON",
+      "title": "PARADIS Eros (série ??)",
       "series": [
         "CIEUX"
       ],
@@ -8319,7 +7950,7 @@
     {
       "id": "MS0810",
       "media": "catalogue/MS0810.jpeg",
-      "title": "Eros et anges DOUBLON",
+      "title": "Eros et anges",
       "series": [
         "CIEUX",
         "ANGES"
@@ -8385,7 +8016,7 @@
     {
       "id": "MS0817",
       "media": "catalogue/MS0817.jpeg",
-      "title": "Anges musiciens Mille Cieux 2005 tempera sur toile 24x33cm DOUBLON",
+      "title": "Anges musiciens Mille Cieux 2005 tempera sur toile 24x33cm",
       "series": [
         "CIEUX",
         "ANGES"
@@ -8395,14 +8026,14 @@
     {
       "id": "MS0818",
       "media": "catalogue/MS0818.jpeg",
-      "title": "F4 2005 CIEUX TST Putti MILLE CIEUX 2005 tempera sur toile 33X24CM DOUBLON",
+      "title": "F4 2005 CIEUX TST Putti MILLE CIEUX 2005 tempera sur toile 33X24CM",
       "series": [],
       "publish": "VAL"
     },
     {
       "id": "MS0819",
       "media": "catalogue/MS0819.jpeg",
-      "title": "COURBOISSY DOUBLON",
+      "title": "COURBOISSY",
       "series": [
         "CIEUX"
       ],
@@ -8465,7 +8096,7 @@
     {
       "id": "MS0826",
       "media": "catalogue/MS0826.jpeg",
-      "title": "ange musicien à la trompette 2014 33X24cm tempera sur toile DOUBLON",
+      "title": "ange musicien à la trompette 2014 33X24cm tempera sur toile",
       "series": [
         "CIEUX"
       ],
@@ -8474,7 +8105,7 @@
     {
       "id": "MS0827",
       "media": "catalogue/MS0827.jpeg",
-      "title": "MS0827 DOUBLON",
+      "title": "MS0827",
       "series": [
         "CIEUX",
         "ANGES"
@@ -8484,7 +8115,7 @@
     {
       "id": "MS0828",
       "media": "catalogue/MS0828.jpeg",
-      "title": "Petit ange musicien de face 2014 40X40cm tempera sur toile 41x33cm – Version 2 DOUBLON",
+      "title": "Petit ange musicien de face 2014 40X40cm tempera sur toile 41x33cm – Version 2",
       "series": [
         "CIEUX",
         "ANGES"
@@ -8494,7 +8125,7 @@
     {
       "id": "MS0829",
       "media": "catalogue/MS0829.jpeg",
-      "title": "10 CIEUX ANGES DOUBLON",
+      "title": "10 CIEUX ANGES",
       "series": [],
       "publish": "VAL"
     },
