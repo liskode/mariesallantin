@@ -553,7 +553,10 @@
     const msg =
       'Supprimer l\'œuvre ' +
       label +
-      ' de la base ?\n\nLes fichiers image (catalogue) ne sont pas effacés du disque.';
+      ' de la base ?\n\n' +
+      (isLocalDevServer()
+        ? 'L\'image et sa miniature seront archivées (dossier BaseArt-archives) puis retirées du site à la prochaine publication (« Publier médias »).'
+        : 'L\'image sera retirée du site à la prochaine publication depuis le studio d\'import local (« Publier médias » ou npm run works:publish).');
     if (!window.confirm(msg)) return;
 
     setStatus('Suppression…');
@@ -583,8 +586,12 @@
       updateSaveBtn();
       renderTable();
       let statusMsg = 'Œuvre ' + work.id + ' supprimée.';
-      if (isLocalDevServer() && j.works_json_removed) {
-        statusMsg += ' Entrée retirée de works.json.';
+      if (isLocalDevServer()) {
+        if (j.works_json_removed) statusMsg += ' Entrée retirée de works.json.';
+        const n = Array.isArray(j.media_archived) ? j.media_archived.length : 0;
+        if (n) statusMsg += ' ' + n + ' fichier(s) image archivé(s) — pensez à « Publier médias ».';
+      } else {
+        statusMsg += ' L\'image sera retirée du site à la prochaine publication locale.';
       }
       setStatus(statusMsg);
     } catch (e) {
@@ -2659,6 +2666,12 @@
       }
       if (publishConfirmBtn) {
         publishConfirmBtn.disabled = !preview.paths || !preview.paths.length;
+      }
+      if (publishStatusEl && preview.deleted_works && preview.deleted_works.length) {
+        publishStatusEl.textContent =
+          'Œuvres supprimées de la base : ' +
+          preview.deleted_works.join(' ') +
+          ' — images archivées, elles seront retirées du site.';
       }
     } catch (e) {
       if (publishStatusEl) {

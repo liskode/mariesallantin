@@ -83,6 +83,19 @@ APRÈS L'IMPORT
     l'éditeur puis Enregistrer si nécessaire.
 
 
+SUPPRIMER UNE ŒUVRE
+───────────────────
+
+  • Dans l'éditeur (déverrouiller la suppression, icône corbeille).
+  • En local : l'œuvre est retirée de la base et de works.json, son image et
+    sa miniature sont déplacées dans ~/Documents/BaseArt-archives/
+    oeuvres-supprimees/AAAA-MM-JJ/ (rien n'est effacé définitivement).
+    Puis « Publier médias » pour les retirer du site.
+  • En ligne : seule la base est modifiée. Les images seront archivées et
+    retirées du site à la prochaine publication locale (« Publier médias »
+    ou npm run works:publish), qui fait ce ménage automatiquement.
+
+
 RAPPELS
 ───────
 

@@ -10,35 +10,31 @@ const execFileAsync = promisify(execFile);
 
 const PUBLISH_PATHSPECS = ['media/catalogue', 'media/works.json'];
 
-function parseGitShortLine(line) {
-  const trimmed = String(line || '').trim();
-  if (!trimmed) return null;
-  const status = trimmed.slice(0, 2).trim();
-  let file = trimmed.slice(3).trim();
-  if (file.startsWith('"') && file.endsWith('"')) {
-    file = file
-      .slice(1, -1)
-      .replace(/\\(\d{3})/g, (_, oct) => String.fromCharCode(parseInt(oct, 8)))
-      .replace(/\\"/g, '"')
-      .replace(/\\\\/g, '\\');
-  }
-  return { status, path: file };
+/** MS0805.jpeg, MS0001_titre….jpeg → appartient à l'œuvre (pas MS00051). */
+function fileBelongsToWork(basename, id) {
+  const b = String(basename || '').toUpperCase();
+  return b.startsWith(id) && !/[0-9]/.test(b.charAt(id.length));
 }
 
 /**
  * @param {string} root
  */
 export async function listMediaPublishStatus(root) {
+  // -z : chemins bruts (ni guillemets ni échappement), un enregistrement « XY chemin » par NUL.
   const { stdout } = await execFileAsync(
     'git',
-    ['status', '--short', '--', ...PUBLISH_PATHSPECS],
+    ['-c', 'core.quotePath=false', 'status', '--porcelain', '-z', '--untracked-files=all', '--', ...PUBLISH_PATHSPECS],
     { cwd: root, encoding: 'utf8', maxBuffer: 8 * 1024 * 1024 }
   );
   const files = [];
   const workIds = new Set();
-  for (const line of stdout.split('\n')) {
-    const parsed = parseGitShortLine(line);
-    if (!parsed) continue;
+  const records = stdout.split('\0');
+  for (let i = 0; i < records.length; i++) {
+    const rec = records[i];
+    if (rec.length < 4) continue;
+    const xy = rec.slice(0, 2);
+    const parsed = { status: xy.trim(), path: rec.slice(3) };
+    if (xy[0] === 'R' || xy[0] === 'C') i++; // renommage : l'ancien chemin suit
     files.push(parsed);
     const base = path.basename(parsed.path);
     const m = base.match(/^(MS\d{4})/i);
@@ -67,14 +63,14 @@ export function mediaPathsForWorkIds(root, workIds) {
   for (const id of ids) {
     if (fs.existsSync(catalogueDir)) {
       for (const name of fs.readdirSync(catalogueDir)) {
-        if (name.toUpperCase().startsWith(id + '.')) {
+        if (fileBelongsToWork(name, id)) {
           paths.add(`media/catalogue/${name}`);
         }
       }
     }
     if (fs.existsSync(thumbDir)) {
       for (const name of fs.readdirSync(thumbDir)) {
-        if (name.toUpperCase().startsWith(id + '.')) {
+        if (fileBelongsToWork(name, id)) {
           paths.add(`media/catalogue/_thumbs/${name}`);
         }
       }
@@ -91,14 +87,15 @@ export async function resolvePublishPaths(root, opts = {}) {
   const status = await listMediaPublishStatus(root);
   const workIds = (opts.workIds || []).map((id) => String(id).trim().toUpperCase()).filter(Boolean);
 
+  // Fichiers supprimés du disque (œuvres supprimées) : à publier aussi, git add enregistre la suppression.
+  const deleted = new Set(status.files.filter((f) => f.status === 'D').map((f) => f.path));
+  const keep = (p) => fs.existsSync(path.join(root, p)) || deleted.has(p);
+
   if (!workIds.length) {
     return {
       paths: status.files
         .map((f) => f.path)
-        .filter((p) => {
-          const abs = path.join(root, p);
-          return fs.existsSync(abs) || p === 'media/works.json';
-        }),
+        .filter((p) => keep(p) || p === 'media/works.json'),
       status,
     };
   }
@@ -110,16 +107,13 @@ export async function resolvePublishPaths(root, opts = {}) {
       if (p === 'media/works.json') return true;
       const base = path.basename(p);
       for (const id of idSet) {
-        if (base.toUpperCase().startsWith(id + '.')) return true;
+        if (fileBelongsToWork(base, id)) return true;
       }
       return false;
     });
 
   const fromDisk = mediaPathsForWorkIds(root, workIds);
-  const paths = [...new Set([...fromStatus, ...fromDisk])].filter((p) => {
-    const abs = path.join(root, p);
-    return fs.existsSync(abs);
-  });
+  const paths = [...new Set([...fromStatus, ...fromDisk])].filter(keep);
 
   return { paths, status };
 }

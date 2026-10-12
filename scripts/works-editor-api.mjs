@@ -33,6 +33,7 @@ import {
   publishMediaToGitHub,
   resolvePublishPaths,
 } from './works-git-publish.mjs';
+import { archiveWorkMedia, syncDeletedWorks } from './works-media-cleanup.mjs';
 import {
   computeDHash,
   sha256Buffer,
@@ -688,9 +689,13 @@ const server = http.createServer(async (req, res) => {
       const workIds = workIdsRaw
         ? workIdsRaw.split(',').map((id) => id.trim().toUpperCase()).filter(Boolean)
         : [];
-      const { paths, status } = await resolvePublishPaths(root, { workIds });
+      const cleanup = await syncDeletedWorks(root, createSupabase());
+      const { paths, status } = await resolvePublishPaths(root, {
+        workIds: workIds.length ? [...workIds, ...cleanup.work_ids] : [],
+      });
       sendJson(res, 200, {
         ok: true,
+        deleted_works: cleanup.work_ids,
         paths,
         work_ids: status.workIds,
         count: paths.length,
@@ -710,12 +715,16 @@ const server = http.createServer(async (req, res) => {
       const workIds = Array.isArray(body.work_ids)
         ? body.work_ids.map((id) => String(id).trim().toUpperCase()).filter(Boolean)
         : [];
+      const cleanup = await syncDeletedWorks(root, createSupabase());
+      const paths = Array.isArray(body.paths) && body.paths.length
+        ? [...new Set([...body.paths, ...cleanup.archived, 'media/works.json'])]
+        : body.paths;
       const result = await publishMediaToGitHub(root, {
         message: body.message,
-        workIds,
-        paths: body.paths,
+        workIds: workIds.length ? [...workIds, ...cleanup.work_ids] : [],
+        paths,
       });
-      sendJson(res, 200, { ok: true, ...result });
+      sendJson(res, 200, { ok: true, deleted_works: cleanup.work_ids, ...result });
       return;
     }
 
@@ -735,12 +744,15 @@ const server = http.createServer(async (req, res) => {
       if (error) throw error;
       const worksJsonPath = path.join(root, 'media', 'works.json');
       const removedJson = removeWorksJsonEntries(worksJsonPath, [workId]);
+      const media = await archiveWorkMedia(root, [workId]);
       const works = await fetchWorksWithSeries(supabase);
       sendJson(res, 200, {
         ok: true,
         works,
         deleted: workId,
         works_json_removed: removedJson > 0,
+        media_archived: media.archived,
+        archive_dir: media.archive_dir,
       });
       return;
     }
