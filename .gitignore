@@ -7,3 +7,7 @@ supabase/.temp/
 # Rapports doublons générés localement
 media/_dupes*
 media/_dupes-pdf-cache/
+
+# Outils Vision compilés et caches d'empreintes
+tools/vision/bin/
+.cache/

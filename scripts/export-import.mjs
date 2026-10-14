@@ -10,10 +10,12 @@
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import crypto from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
 import { computeDHash, sha256Buffer } from './image-fingerprint.mjs';
 import { measureImage, qualityScore } from './image-quality.mjs';
+import { moveFile } from './works-media-cleanup.mjs';
 import {
   appendWorksJsonEntries,
   buildWorkRecordsFromPlanItem,
@@ -164,6 +166,196 @@ export async function importNewGroups(opts) {
     sortOrder++;
   }
   return { imported: done, remaining: pending.length - done.length };
+}
+
+/** Doublons pour lesquels « remplacer la photo » est coché et pas encore fait. */
+export function pendingReplacements(exportDir) {
+  const work = path.join(exportDir, '_baseart');
+  const triage = readJson(path.join(work, 'triage.json'), { groups: [] });
+  const decisions = readJson(path.join(work, 'decisions.json'), {});
+  const imported = readJson(path.join(work, 'imported.json'), {});
+  return triage.groups
+    .filter((g) => !imported[g.id])
+    .filter((g) => {
+      const d = decisions[g.id] || {};
+      return (d.category || g.proposal) === 'duplicate' && d.replace === true && (d.work !== undefined ? d.work : g.work);
+    })
+    .map((g) => ({ group: g, decision: decisions[g.id] || {}, workId: decisions[g.id]?.work || g.work }));
+}
+
+/**
+ * Remplace la photo de référence d'œuvres existantes par la meilleure photo du groupe.
+ * Ancienne image + miniature + ancien original → ~/Documents/BaseArt-archives/photos-remplacees/AAAA-MM-JJ/.
+ * Seuls la photo, l'indice de qualité et les empreintes changent ; les informations de la fiche sont conservées.
+ */
+export async function replacePhotos(opts) {
+  const { root, exportDir, supabase, limit = 50, dryRun = false, log = console.log } = opts;
+  const importedPath = path.join(exportDir, '_baseart', 'imported.json');
+  const pending = pendingReplacements(exportDir);
+  const batch = pending.slice(0, limit);
+  const worksJsonPath = path.join(root, 'media', 'works.json');
+  const mediaRoot = path.join(root, 'media');
+  const catalogueDir = path.join(mediaRoot, 'catalogue');
+  const origDir = originalsDir(root);
+  const day = new Date().toISOString().slice(0, 10);
+  const archiveDir = path.join(
+    process.env.BASEART_ARCHIVE_DIR ? path.dirname(process.env.BASEART_ARCHIVE_DIR) : path.join(root, '..', 'BaseArt-archives'),
+    'photos-remplacees',
+    day
+  );
+  const belongs = (name, id) => name.toUpperCase().startsWith(id) && !/[0-9]/.test(name.charAt(id.length));
+  const done = [];
+
+  for (const { group, decision, workId } of batch) {
+    const bestName = decision.best || group.photos[0].name;
+    const srcAbs = path.join(exportDir, bestName);
+    const { data: row, error: rErr } = await supabase.from('works').select('id').eq('id', workId).maybeSingle();
+    if (rErr) throw rErr;
+    if (!row || !fs.existsSync(srcAbs)) {
+      log(`  ${group.id} : ${!row ? 'œuvre ' + workId + ' introuvable' : 'photo introuvable'}, ignoré`);
+      continue;
+    }
+    if (dryRun) {
+      log(`  ${group.id} → ${workId} : nouvelle photo ${bestName} (simulation)`);
+      done.push({ group: group.id, work: workId });
+      continue;
+    }
+    // Archive l'ancienne image, sa miniature et l'ancien original
+    for (const name of fs.readdirSync(catalogueDir)) {
+      if (belongs(name, workId) && fs.statSync(path.join(catalogueDir, name)).isFile()) {
+        await moveFile(path.join(catalogueDir, name), path.join(archiveDir, 'catalogue', name));
+      }
+    }
+    const thumbDir = path.join(catalogueDir, '_thumbs');
+    for (const name of fs.existsSync(thumbDir) ? fs.readdirSync(thumbDir) : []) {
+      if (belongs(name, workId)) await moveFile(path.join(thumbDir, name), path.join(archiveDir, 'catalogue', '_thumbs', name));
+    }
+    for (const name of fs.existsSync(origDir) ? fs.readdirSync(origDir) : []) {
+      if (belongs(name, workId)) await moveFile(path.join(origDir, name), path.join(archiveDir, 'originaux', name));
+    }
+
+    // Nouvelle photo
+    const mediaRel = `catalogue/${workId}.jpeg`;
+    const webAbs = path.join(mediaRoot, 'catalogue', workId + '.jpeg');
+    await makeWebVersion(srcAbs, webAbs);
+    await generateThumbnailForMedia(mediaRoot, mediaRel);
+    const measures = await measureImage(sharp, srcAbs);
+    const webBuf = await fs.promises.readFile(webAbs);
+    const { error } = await supabase
+      .from('works')
+      .update({
+        image_ext: 'jpeg',
+        filename_original: bestName,
+        image_quality: qualityScore(measures),
+        image_quality_details: measures,
+        file_sha256: sha256Buffer(webBuf),
+        phash: await computeDHash(sharp, webBuf),
+        file_size_bytes: webBuf.length,
+      })
+      .eq('id', workId);
+    if (error) throw new Error(`${workId} : ${error.message}`);
+    appendWorksJsonEntries(worksJsonPath, [{ id: workId, media: mediaRel }]);
+    await fs.promises.mkdir(origDir, { recursive: true });
+    await fs.promises.copyFile(srcAbs, path.join(origDir, workId + (path.extname(bestName).toLowerCase() || '.jpeg')));
+
+    const imported = readJson(importedPath, {});
+    imported[group.id] = { work: workId, photo: bestName, replaced: true, at: new Date().toISOString() };
+    writeJson(importedPath, imported);
+    done.push({ group: group.id, work: workId });
+    log(`  ${group.id} → ${workId} : photo remplacée par ${bestName}`);
+  }
+  return { replaced: done, remaining: pending.length - done.length };
+}
+
+export const PHOTO_MAX_SIDE = 2048;
+
+/** Groupes triés « autre photo » (décision explicite) avec au moins une œuvre rattachée, pas encore importés. */
+export function pendingOtherPhotos(exportDir) {
+  const work = path.join(exportDir, '_baseart');
+  const triage = readJson(path.join(work, 'triage.json'), { groups: [] });
+  const decisions = readJson(path.join(work, 'decisions.json'), {});
+  const imported = readJson(path.join(work, 'imported.json'), {});
+  return triage.groups
+    .filter((g) => !imported[g.id] && decisions[g.id]?.category === 'situ')
+    .map((g) => ({ group: g, decision: decisions[g.id] }))
+    .filter(({ decision }) => Array.isArray(decision.situ_works) && decision.situ_works.length);
+}
+
+/**
+ * Importe les « autres photos » (atelier, exposition, collectionneur, combinaison, détail…) :
+ * version allégée dans media/photos/, original dans BaseArt-originaux/autres-photos/,
+ * fiche work_photos + liens vers les œuvres.
+ */
+export async function importOtherPhotos(opts) {
+  const { root, exportDir, supabase, limit = 50, dryRun = false, log = console.log } = opts;
+  const importedPath = path.join(exportDir, '_baseart', 'imported.json');
+  const pending = pendingOtherPhotos(exportDir);
+  const batch = pending.slice(0, limit);
+  const mediaRoot = path.join(root, 'media');
+  const origDir = path.join(originalsDir(root), 'autres-photos');
+  const done = [];
+
+  for (const { group, decision } of batch) {
+    const bestName = decision.best || group.photos[0].name;
+    const srcAbs = path.join(exportDir, bestName);
+    const ids = [...new Set(decision.situ_works.map((w) => String(w).toUpperCase()))].sort();
+    const { data: found, error: fErr } = await supabase.from('works').select('id').in('id', ids);
+    if (fErr) throw fErr;
+    const existing = new Set((found || []).map((r) => r.id));
+    const links = ids.filter((id) => existing.has(id));
+    if (!links.length || !fs.existsSync(srcAbs)) {
+      log(`  ${group.id} : ${!links.length ? 'aucune œuvre rattachée existante' : 'photo introuvable'}, ignoré`);
+      continue;
+    }
+    const type = /^[AECMDX]$/.test(decision.situ_type || '') ? decision.situ_type : 'X';
+    const id = crypto.randomUUID();
+    const base = `${links[0]}-${type}-${id.slice(0, 8)}.jpeg`;
+    if (dryRun) {
+      log(`  ${group.id} → ${base} (${links.join(' ')}) (simulation)`);
+      done.push({ group: group.id, photo_id: id });
+      continue;
+    }
+    const webAbs = path.join(mediaRoot, 'photos', base);
+    const thumbAbs = path.join(mediaRoot, 'photos', '_thumbs', base.replace(/\.jpeg$/, '.webp'));
+    await fs.promises.mkdir(path.dirname(thumbAbs), { recursive: true });
+    await sharp(srcAbs, { limitInputPixels: false })
+      .rotate()
+      .resize(PHOTO_MAX_SIDE, PHOTO_MAX_SIDE, { fit: 'inside', withoutEnlargement: true })
+      .toColourspace('srgb')
+      .jpeg({ quality: 82, mozjpeg: true })
+      .toFile(webAbs);
+    await sharp(webAbs).resize(320, 320, { fit: 'inside' }).webp({ quality: 80 }).toFile(thumbAbs);
+    const measures = await measureImage(sharp, srcAbs);
+    const webBuf = await fs.promises.readFile(webAbs);
+    const { error } = await supabase.from('work_photos').insert({
+      id,
+      file_path: 'media/photos/' + base,
+      type_code: type,
+      caption: String(decision.caption || '').trim(),
+      source_filename: bestName,
+      image_quality: qualityScore(measures),
+      width_px: measures.width_px,
+      height_px: measures.height_px,
+      file_sha256: sha256Buffer(webBuf),
+    });
+    if (error) {
+      for (const f of [webAbs, thumbAbs]) await fs.promises.rm(f, { force: true });
+      throw new Error(`${group.id} : ${error.message}`);
+    }
+    const { error: lErr } = await supabase
+      .from('work_photo_links')
+      .insert(links.map((work_id) => ({ photo_id: id, work_id })));
+    if (lErr) throw new Error(`${group.id} liens : ${lErr.message}`);
+    await fs.promises.mkdir(origDir, { recursive: true });
+    await fs.promises.copyFile(srcAbs, path.join(origDir, base.replace(/\.jpeg$/, path.extname(bestName).toLowerCase() || '.jpeg')));
+
+    const imported = readJson(importedPath, {});
+    imported[group.id] = { photo_id: id, file: base, works: links, at: new Date().toISOString() };
+    writeJson(importedPath, imported);
+    done.push({ group: group.id, photo_id: id, works: links });
+    log(`  ${group.id} → ${base} (${links.join(' ')})`);
+  }
+  return { added: done, remaining: pending.length - done.length };
 }
 
 // ---- CLI

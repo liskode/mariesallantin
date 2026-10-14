@@ -599,6 +599,245 @@
     }
   }
 
+  // ---- Doublons possibles (♊) : comparaison côte à côte et fusion de deux fiches
+  const twinsDialog = document.getElementById('works-twins-dialog');
+  const twinsBody = document.getElementById('works-twins-body');
+  const twinsProgress = document.getElementById('works-twins-progress');
+  const twinsMergeBtn = document.getElementById('works-twins-merge');
+  let twinsPairs = [];
+  let twinsIndex = 0;
+  let twinsState = null;
+
+  const TWIN_FIELDS = [
+    ['title', 'Titre'],
+    ['year', 'Année'],
+    ['format_code', 'Format', 'formats'],
+    ['technique_code', 'Technique', 'techniques'],
+    ['width_cm', 'Largeur (cm)'],
+    ['height_cm', 'Hauteur (cm)'],
+    ['collector_code', 'Collectionneur', 'collectors'],
+    ['publication_status_code', 'Publication', 'publication_statuses'],
+    ['photo_status_code', 'Statut photo', 'photo_statuses'],
+    ['photo_credit', 'Crédit photo'],
+  ];
+
+  async function worksOnlineFetch(pathAndQuery, init) {
+    const cfg = await loadSiteConfig();
+    const base = String(cfg.worksApiUrl || PRODUCTION_API).trim().replace(/\/$/, '');
+    return serviceApiFetch(base, pathAndQuery, init);
+  }
+
+  function twinLabel(field, value) {
+    if (value === null || value === undefined || value === '') return '—';
+    const def = TWIN_FIELDS.find((f) => f[0] === field);
+    const list = def && def[2] ? meta[def[2]] || [] : null;
+    if (list) {
+      const hit = list.find((x) => x.code === value);
+      return hit ? value + ' — ' + (hit.label || '') : String(value);
+    }
+    return String(value);
+  }
+
+  function twinWork(id) {
+    return worksList.find((w) => String(w.id).toUpperCase() === id) || null;
+  }
+
+  function nextTwinPair() {
+    while (twinsIndex < twinsPairs.length) {
+      const p = twinsPairs[twinsIndex];
+      if (twinWork(p.work_a) && twinWork(p.work_b)) return p;
+      twinsIndex++;
+    }
+    return null;
+  }
+
+  function renderTwins() {
+    const pair = nextTwinPair();
+    twinsBody.textContent = '';
+    if (!pair) {
+      twinsProgress.textContent = 'Aucun doublon possible à examiner.';
+      twinsMergeBtn.disabled = true;
+      document.getElementById('works-twins-dismiss').disabled = true;
+      document.getElementById('works-twins-skip').disabled = true;
+      return;
+    }
+    document.getElementById('works-twins-dismiss').disabled = false;
+    document.getElementById('works-twins-skip').disabled = false;
+    const works = [twinWork(pair.work_a), twinWork(pair.work_b)];
+    const q = (w) => (w.image_quality == null ? -1 : w.image_quality);
+    const keep = q(works[1]) > q(works[0]) ? works[1].id : works[0].id;
+    twinsState = { pair, works, keep, fields: {}, series: new Set(works.flatMap((w) => w.series_codes || [])) };
+    const remaining = twinsPairs.length - twinsIndex;
+    twinsProgress.textContent =
+      'Paire ' + (twinsIndex + 1) + ' sur ' + twinsPairs.length + ' (' + remaining + ' restante' + (remaining > 1 ? 's' : '') + ')' +
+      ' · ressemblance ' + (pair.distance < 0.33 ? 'très forte' : 'possible') + ' (distance ' + pair.distance.toFixed(2) + ')';
+
+    const grid = document.createElement('div');
+    grid.className = 'works-twins-grid';
+    // En-têtes : photo, code, fiche à conserver
+    grid.appendChild(document.createElement('div'));
+    for (const w of works) {
+      const head = document.createElement('div');
+      head.className = 'works-twins-head';
+      const img = document.createElement('img');
+      img.src = fullImageUrlForWork(w) || thumbUrlForWork(w);
+      img.alt = w.id;
+      img.className = 'works-twins-img';
+      img.addEventListener('click', () => window.open(img.src, '_blank', 'noopener'));
+      const code = document.createElement('div');
+      code.className = 'works-twins-code';
+      code.textContent = w.id;
+      code.appendChild(createQualityDot(w));
+      const lab = document.createElement('label');
+      lab.className = 'works-twins-keep';
+      const r = document.createElement('input');
+      r.type = 'radio';
+      r.name = 'twins-keep';
+      r.value = w.id;
+      r.checked = w.id === keep;
+      r.addEventListener('change', () => {
+        twinsState.keep = w.id;
+        renderTwinFields(grid);
+        updateTwinsMergeBtn();
+      });
+      lab.append(r, ' Fiche conservée (garde sa photo)');
+      head.append(img, code, lab);
+      grid.appendChild(head);
+    }
+    twinsBody.appendChild(grid);
+    renderTwinFields(grid);
+    updateTwinsMergeBtn();
+  }
+
+  function renderTwinFields(grid) {
+    grid.querySelectorAll('.works-twins-row').forEach((n) => n.remove());
+    const { works, keep } = twinsState;
+    const kept = works.find((w) => w.id === keep);
+    twinsState.fields = {};
+    for (const [field, label] of TWIN_FIELDS) {
+      const vals = works.map((w) => (w[field] === undefined ? null : w[field]));
+      const differs = String(vals[0] ?? '') !== String(vals[1] ?? '');
+      // Valeur par défaut : celle de la fiche conservée, sinon la valeur non vide
+      let chosen = kept[field] ?? null;
+      if ((chosen === null || chosen === '') && differs) chosen = vals.find((v) => v !== null && v !== '') ?? null;
+      twinsState.fields[field] = chosen;
+      const name = document.createElement('div');
+      name.className = 'works-twins-row works-twins-label' + (differs ? ' works-twins-differs' : '');
+      name.textContent = label;
+      grid.appendChild(name);
+      works.forEach((w, i) => {
+        const cell = document.createElement('div');
+        cell.className = 'works-twins-row' + (differs ? ' works-twins-differs' : '');
+        if (differs) {
+          const lab = document.createElement('label');
+          const r = document.createElement('input');
+          r.type = 'radio';
+          r.name = 'twins-' + field;
+          r.checked = String(vals[i] ?? '') === String(chosen ?? '');
+          r.addEventListener('change', () => { twinsState.fields[field] = vals[i]; });
+          lab.append(r, ' ' + twinLabel(field, vals[i]));
+          cell.appendChild(lab);
+        } else {
+          cell.textContent = twinLabel(field, vals[i]);
+        }
+        grid.appendChild(cell);
+      });
+    }
+    // Séries : réunion par défaut
+    const name = document.createElement('div');
+    name.className = 'works-twins-row works-twins-label';
+    name.textContent = 'Séries (fiche conservée)';
+    const cell = document.createElement('div');
+    cell.className = 'works-twins-row works-twins-series';
+    for (const code of [...new Set(works.flatMap((w) => w.series_codes || []))].sort()) {
+      const lab = document.createElement('label');
+      const c = document.createElement('input');
+      c.type = 'checkbox';
+      c.checked = twinsState.series.has(code);
+      c.addEventListener('change', () => (c.checked ? twinsState.series.add(code) : twinsState.series.delete(code)));
+      const owners = works.filter((w) => (w.series_codes || []).includes(code)).map((w) => w.id).join(', ');
+      lab.title = 'Présente sur ' + owners;
+      lab.append(c, ' ' + code);
+      cell.appendChild(lab);
+    }
+    if (!cell.childNodes.length) cell.textContent = '—';
+    grid.append(name, cell);
+  }
+
+  function updateTwinsMergeBtn() {
+    const other = twinsState.works.find((w) => w.id !== twinsState.keep);
+    twinsMergeBtn.disabled = false;
+    twinsMergeBtn.textContent = 'Fusionner : garder ' + twinsState.keep + ', supprimer ' + other.id;
+  }
+
+  async function openTwinsDialog() {
+    if (!twinsDialog) return;
+    twinsBody.textContent = '';
+    twinsProgress.textContent = 'Chargement…';
+    twinsDialog.showModal();
+    try {
+      const r = await worksOnlineFetch('/api/similar?token=' + encodeURIComponent(token));
+      const j = await r.json();
+      if (!r.ok || !j.ok) throw new Error(formatApiError(j.error) || 'lecture impossible');
+      twinsPairs = j.pairs || [];
+      twinsIndex = 0;
+      renderTwins();
+    } catch (e) {
+      twinsProgress.textContent = 'Erreur : ' + (e.message || e);
+    }
+  }
+
+  async function twinsPost(pathName, payload) {
+    const r = await worksOnlineFetch(pathName, { method: 'POST', body: JSON.stringify({ token, ...payload }) });
+    const j = await r.json();
+    if (!r.ok || !j.ok) throw new Error(formatApiError(j.error) || 'échec');
+    return j;
+  }
+
+  if (twinsDialog) {
+    document.getElementById('works-twins-btn').addEventListener('click', () => {
+      if (dirtyIds.size) {
+        setStatus('Enregistrez d\u2019abord vos modifications en cours avant de traiter les doublons.', true);
+        return;
+      }
+      openTwinsDialog();
+    });
+    document.getElementById('works-twins-close').addEventListener('click', () => twinsDialog.close());
+    document.getElementById('works-twins-skip').addEventListener('click', () => { twinsIndex++; renderTwins(); });
+    document.getElementById('works-twins-dismiss').addEventListener('click', async () => {
+      const p = twinsState.pair;
+      try {
+        await twinsPost('/api/similar/dismiss', { pairs: [[p.work_a, p.work_b]] });
+        twinsIndex++;
+        renderTwins();
+      } catch (e) {
+        twinsProgress.textContent = 'Erreur : ' + e.message;
+      }
+    });
+    twinsMergeBtn.addEventListener('click', async () => {
+      const { keep, works, fields, series } = twinsState;
+      const remove = works.filter((w) => w.id !== keep).map((w) => w.id);
+      if (!window.confirm('Fusionner ' + remove.join(', ') + ' dans ' + keep + ' ?\n\n' + remove.join(', ') +
+        ' sera supprimée ; ses autres photos, médias et messages passent sur ' + keep +
+        '. Son image sera archivée à la prochaine publication locale.')) return;
+      twinsMergeBtn.disabled = true;
+      try {
+        const j = await twinsPost('/api/works/merge', { keep, remove, fields, series: [...series] });
+        if (Array.isArray(j.works)) worksList = j.works;
+        for (const id of remove) {
+          if (workMediaById) workMediaById.delete(id);
+        }
+        renderTable();
+        setStatus('Fusion : ' + remove.join(', ') + ' → ' + keep + '.');
+        twinsIndex++;
+        renderTwins();
+      } catch (e) {
+        twinsProgress.textContent = 'Erreur : ' + e.message;
+        twinsMergeBtn.disabled = false;
+      }
+    });
+  }
+
   function setStatus(msg, isError) {
     if (!statusEl) return;
     statusEl.textContent = msg || '';

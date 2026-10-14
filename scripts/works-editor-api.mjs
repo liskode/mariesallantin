@@ -742,6 +742,9 @@ const server = http.createServer(async (req, res) => {
         return;
       }
       const supabase = createSupabase();
+      // Une série dont l'icône est cette œuvre bloquerait la suppression : on retire l'icône
+      const { error: iErr } = await supabase.from('series').update({ icon_work_id: null }).eq('icon_work_id', workId);
+      if (iErr) throw iErr;
       const { error } = await supabase.from('works').delete().eq('id', workId);
       if (error) throw error;
       const worksJsonPath = path.join(root, 'media', 'works.json');

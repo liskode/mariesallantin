@@ -119,6 +119,9 @@
               <button type="button" class="legend-editor-btn works-import-toolbar-btn" id="works-import-btn" aria-label="Importer des œuvres" title="Importer des œuvres (studio local : npm run works:import)">
                 <img src="images/import.png" alt="" class="legend-editor-btn-picto" width="16" height="16" />
               </button>
+              <button type="button" class="legend-editor-btn works-twins-toolbar-btn" id="works-twins-btn" aria-label="Doublons possibles" title="Doublons possibles : comparer et fusionner les fiches">
+                <span class="works-twins-picto" aria-hidden="true">♊&#xFE0E;</span>
+              </button>
               <button type="button" class="legend-editor-btn works-publish-toolbar-btn" id="works-publish-btn" hidden title="Publier les médias sur mariesallantin.art (git push)">
                 Publier médias
               </button>
@@ -335,6 +338,22 @@
         <button type="button" class="legend-editor-btn legend-editor-btn--save" id="works-import-dupe-force">
           Importer quand même
         </button>
+      </footer>
+    </div>
+  </dialog>
+
+  <dialog id="works-twins-dialog" class="works-import-dupe-dialog works-twins-dialog">
+    <div class="works-import-dupe-panel works-twins-panel">
+      <header class="works-import-dialog-header">
+        <h2 class="works-import-dialog-title">Doublons possibles</h2>
+        <button type="button" class="works-import-dialog-close" id="works-twins-close" aria-label="Fermer">×</button>
+      </header>
+      <p class="works-import-dupe-progress" id="works-twins-progress" aria-live="polite"></p>
+      <div class="works-twins-body" id="works-twins-body"></div>
+      <footer class="works-import-dialog-footer works-import-dupe-footer">
+        <button type="button" class="legend-editor-btn" id="works-twins-dismiss">Ce ne sont pas des doublons</button>
+        <button type="button" class="legend-editor-btn" id="works-twins-skip">Passer</button>
+        <button type="button" class="legend-editor-btn legend-editor-btn--save" id="works-twins-merge">Fusionner</button>
       </footer>
     </div>
   </dialog>

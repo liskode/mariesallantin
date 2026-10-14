@@ -226,6 +226,47 @@ async function worker() {
 await Promise.all([worker(), worker(), worker(), worker()]);
 for (const g of groups) for (const p of g.photos) p.thumb = 'th/' + thumbName(p.name);
 
+// Les décisions et le suivi d'import sont rangés par numéro de carte : si les cartes ont changé
+// (photos ajoutées ou retirées), on les rattache à la nouvelle carte qui contient les mêmes photos.
+const triagePath = path.join(workDir, 'triage.json');
+if (fs.existsSync(triagePath)) {
+  const prev = JSON.parse(fs.readFileSync(triagePath, 'utf8'));
+  const newIdByPhoto = new Map();
+  for (const g of groups) for (const p of g.photos) newIdByPhoto.set(p.name, g.id);
+  const remap = new Map();
+  for (const g of prev.groups || []) {
+    const votes = new Map();
+    for (const p of g.photos) {
+      const id = newIdByPhoto.get(p.name);
+      if (id) votes.set(id, (votes.get(id) || 0) + 1);
+    }
+    const best = [...votes.entries()].sort((a, b) => b[1] - a[1])[0];
+    if (best) remap.set(g.id, best[0]);
+  }
+  for (const name of ['decisions.json', 'imported.json']) {
+    const file = path.join(workDir, name);
+    if (!fs.existsSync(file)) continue;
+    const old = JSON.parse(fs.readFileSync(file, 'utf8'));
+    const next = {};
+    let moved = 0;
+    for (const [id, v] of Object.entries(old)) {
+      const to = remap.get(id);
+      if (!to) {
+        console.warn(`  ${name} : carte ${id} sans équivalent (photos retirées de l'export), conservée sous son ancien numéro`);
+        next[id] = v;
+        continue;
+      }
+      if (to !== id) moved++;
+      next[to] = { ...(next[to] || {}), ...v };
+    }
+    if (moved) {
+      fs.copyFileSync(file, file + '.avant-renumerotation');
+      fs.writeFileSync(file, JSON.stringify(next, null, 1));
+      console.log(`  ${name} : ${moved} entrée(s) rattachée(s) à leur nouvelle carte (sauvegarde : ${name}.avant-renumerotation)`);
+    }
+  }
+}
+
 const triage = {
   export_dir: exportDir,
   generated_at: new Date().toISOString(),
@@ -233,7 +274,7 @@ const triage = {
   groups,
   group_pairs: [...pairs.entries()].map(([k, d]) => ({ a: k.split('|')[0], b: k.split('|')[1], d: Math.round(d * 1000) / 1000 })),
 };
-fs.writeFileSync(path.join(workDir, 'triage.json'), JSON.stringify(triage));
+fs.writeFileSync(triagePath, JSON.stringify(triage));
 const count = (p) => groups.filter((g) => g.proposal === p).length;
 console.log(
   `${photos.length} photos → ${groups.length} groupes : ${count('duplicate')} déjà dans BaseArt, ` +

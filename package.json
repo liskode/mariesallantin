@@ -22,7 +22,9 @@
     "works:dupes": "node scripts/works-fingerprint-scan.mjs",
     "works:quality": "node scripts/works-quality-scan.mjs",
     "export:triage": "node scripts/export-triage-build.mjs",
-    "export:tri": "node scripts/export-triage-server.mjs"
+    "export:tri": "node scripts/export-triage-server.mjs",
+    "works:similar": "node scripts/works-similarity-scan.mjs",
+    "export:analyse": "node scripts/export-analyse.mjs"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.49.8",

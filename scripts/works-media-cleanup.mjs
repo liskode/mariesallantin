@@ -32,7 +32,7 @@ function listMediaFiles(root) {
   return out;
 }
 
-async function moveFile(src, dest) {
+export async function moveFile(src, dest) {
   await fs.promises.mkdir(path.dirname(dest), { recursive: true });
   let target = dest;
   const ext = path.extname(dest);

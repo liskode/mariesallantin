@@ -2933,3 +2933,18 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   border: 1px solid currentColor;
   opacity: 0.35;
 }
+
+/* Doublons possibles (♊) */
+.works-twins-picto { font-size: 16px; line-height: 16px; display: inline-block; width: 16px; text-align: center; }
+.works-twins-panel { max-width: min(1100px, 96vw); }
+.works-twins-body { max-height: 70vh; overflow: auto; }
+.works-twins-grid { display: grid; grid-template-columns: minmax(110px, auto) 1fr 1fr; gap: 4px 12px; align-items: start; }
+.works-twins-head { text-align: center; }
+.works-twins-img { width: 100%; max-height: 42vh; object-fit: contain; background: #8881; cursor: zoom-in; }
+.works-twins-code { font-weight: 600; margin: 4px 0; }
+.works-twins-keep { font-size: 13px; }
+.works-twins-row { padding: 3px 0; border-top: 1px solid #8883; font-size: 13px; word-break: break-word; }
+.works-twins-label { color: #666; }
+.works-twins-differs { background: #f5c54222; }
+.works-twins-series { grid-column: span 2; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+@media (max-width: 640px) { .works-twins-grid { grid-template-columns: 1fr 1fr; } .works-twins-label { grid-column: span 2; } .works-twins-grid > div:first-child { display: none; } }

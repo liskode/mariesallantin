@@ -179,6 +179,7 @@
           rerender();
         },
       });
+      if (!s.situ_works.length) ctx.append(el('div', { class: 'warn', text: 'Aucune œuvre rattachée : la photo ne sera pas ajoutée tant qu\u2019aucune œuvre n\u2019est choisie.' }));
       const cap = el('input', { type: 'text', value: s.caption, placeholder: 'Légende (lieu, date, collectionneur…)', size: 32, onchange: (e) => save(g, { caption: e.target.value }) });
       ctx.append(el('div', {}, add), el('div', {}, cap));
       if (g.scene && g.scene.labels.length) ctx.append(el('div', { class: 'auto', text: 'Détecté : ' + g.scene.labels.join(', ') }));
@@ -228,7 +229,7 @@
 
     const right = el('div', {},
       el('div', { class: 'name' }, best.name, dot(best.quality),
-        imported[g.id] ? el('span', { class: 'imported', text: 'importée : ' + imported[g.id].work }) : null),
+        imported[g.id] ? el('span', { class: 'imported', text: (imported[g.id].replaced ? 'photo remplacée : ' : imported[g.id].photo_id ? 'photo ajoutée' : 'importée : ') + (imported[g.id].work || '') }) : null),
       el('div', { class: 'auto', text: g.id + ' · ' + g.photos.length + ' photo(s)' + (best.w ? ' · ' + best.w + '×' + best.h + ' px' : '') }),
       meta, cats, contextPanel(g, s, rerender));
     node.append(left, right);
@@ -291,12 +292,16 @@
     const pending = withAuto ? s.pending_new_unreviewed : s.pending_new;
     $('import-status').textContent =
       pending + ' nouvelle(s) à importer' + (withAuto ? ' (dont propositions non vues)' : ' (validées)') +
-      ' · ' + s.imported + ' importée(s) · ' + s.to_publish + ' fichier(s) à publier';
+      ' · ' + s.pending_replace + ' photo(s) à remplacer · ' + s.imported + ' traitée(s) · ' + s.to_publish + ' fichier(s) à publier';
+    $('replace-btn').disabled = !!s.busy || !s.pending_replace;
+    $('photos-btn').disabled = !!s.busy || !s.pending_photos;
+    $('photos-btn').textContent = 'Ajouter les autres photos (' + s.pending_photos + ')';
+    $('replace-btn').textContent = 'Remplacer les photos cochées (' + s.pending_replace + ')';
     $('import-btn').disabled = !!s.busy || !pending;
     $('publish-btn').disabled = !!s.busy || !s.to_publish;
   }
   async function runAction(url, label, body) {
-    $('import-btn').disabled = $('publish-btn').disabled = true;
+    $('import-btn').disabled = $('publish-btn').disabled = $('replace-btn').disabled = $('photos-btn').disabled = true;
     $('import-msg').textContent = label + '…';
     try {
       const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-BaseArt': '1' }, body: JSON.stringify(body || {}) });
@@ -318,6 +323,20 @@
     render();
   });
   $('include-unreviewed').addEventListener('change', refreshImportStatus);
+  $('photos-btn').addEventListener('click', async () => {
+    if (!confirm('Ajouter les autres photos validées (atelier, exposition, combinaison, détail…) et les rattacher à leurs œuvres ?')) return;
+    const j = await runAction('api/photos', 'Ajout des autres photos en cours');
+    for (const x of j.added) imported[x.group] = { photo_id: x.photo_id, work: x.works.join(' ') };
+    $('import-msg').textContent = j.added.length + ' photo(s) ajoutée(s).' + (j.remaining ? ' ' + j.remaining + ' restante(s).' : '');
+    render();
+  });
+  $('replace-btn').addEventListener('click', async () => {
+    if (!confirm('Remplacer la photo de référence des œuvres cochées (anciennes photos archivées, informations des fiches conservées) ?')) return;
+    const j = await runAction('api/replace', 'Remplacement en cours');
+    for (const x of j.replaced) imported[x.group] = { work: x.work, replaced: true };
+    $('import-msg').textContent = j.replaced.length + ' photo(s) remplacée(s). Vérifiez-les dans l\u2019éditeur puis publiez.';
+    render();
+  });
   $('validate-page').addEventListener('click', async () => {
     const slice = visible.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).filter((g) => !decisions[g.id]?.category);
     if (!slice.length) { alert('Toutes les cartes de cette page sont déjà validées.'); return; }

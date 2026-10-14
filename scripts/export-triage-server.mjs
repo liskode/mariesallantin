@@ -15,7 +15,14 @@ import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 import { fetchAll } from './supabase-fetch-all.mjs';
 import { extractMsIdFromFilename } from './work-import.mjs';
-import { importNewGroups, pendingNewGroups } from './export-import.mjs';
+import {
+  importNewGroups,
+  importOtherPhotos,
+  pendingNewGroups,
+  pendingOtherPhotos,
+  pendingReplacements,
+  replacePhotos,
+} from './export-import.mjs';
 import { publishMediaToGitHub, resolvePublishPaths } from './works-git-publish.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -149,6 +156,8 @@ const server = http.createServer(async (req, res) => {
           busy,
           pending_new: pendingNewGroups(exportDir).length,
           pending_new_unreviewed: pendingNewGroups(exportDir, { includeUnreviewed: true }).length,
+          pending_replace: pendingReplacements(exportDir).length,
+          pending_photos: pendingOtherPhotos(exportDir).length,
           imported: Object.keys(readImported()).length,
           to_publish: paths.length,
         });
@@ -168,7 +177,7 @@ const server = http.createServer(async (req, res) => {
       writeDecisions(all);
       return sendJson(res, 200, { ok: true, decision: all[group] });
     }
-    if (req.method === 'POST' && (url.pathname === '/api/import' || url.pathname === '/api/publish')) {
+    if (req.method === 'POST' && ['/api/import', '/api/replace', '/api/photos', '/api/publish'].includes(url.pathname)) {
       if (req.headers['x-baseart'] !== '1') return sendJson(res, 403, { ok: false, error: 'requête refusée' });
       if (busy) return sendJson(res, 409, { ok: false, error: 'opération déjà en cours : ' + busy });
       const body = JSON.parse((await readBody(req)) || '{}');
@@ -184,11 +193,24 @@ const server = http.createServer(async (req, res) => {
           catalogue = catalogueFiles();
           return sendJson(res, 200, { ok: true, ...result, log });
         }
+        if (url.pathname === '/api/replace') {
+          busy = 'remplacement';
+          const log = [];
+          const result = await replacePhotos({ root, exportDir, supabase, limit: 50, log: (m) => { log.push(m); console.error(m); } });
+          catalogue = catalogueFiles();
+          return sendJson(res, 200, { ok: true, ...result, log });
+        }
+        if (url.pathname === '/api/photos') {
+          busy = 'autres photos';
+          const log = [];
+          const result = await importOtherPhotos({ root, exportDir, supabase, limit: 50, log: (m) => { log.push(m); console.error(m); } });
+          return sendJson(res, 200, { ok: true, ...result, log });
+        }
         busy = 'publication';
         const imported = Object.values(readImported()).map((x) => x.work).sort();
         const range = imported.length ? imported[0] + '–' + imported[imported.length - 1] : '';
         const result = await publishMediaToGitHub(root, {
-          message: 'Import photothèque : nouvelles œuvres ' + range,
+          message: 'Import photothèque : nouvelles œuvres, photos remplacées, autres photos ' + range,
         });
         return sendJson(res, 200, { ok: true, ...result });
       } finally {

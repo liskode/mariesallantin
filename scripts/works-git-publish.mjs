@@ -8,7 +8,7 @@ import { promisify } from 'node:util';
 
 const execFileAsync = promisify(execFile);
 
-const PUBLISH_PATHSPECS = ['media/catalogue', 'media/works.json'];
+const PUBLISH_PATHSPECS = ['media/catalogue', 'media/works.json', 'media/photos'];
 
 /** MS0805.jpeg, MS0001_titre….jpeg → appartient à l'œuvre (pas MS00051). */
 function fileBelongsToWork(basename, id) {

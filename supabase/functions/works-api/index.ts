@@ -300,10 +300,116 @@ Deno.serve(async (req) => {
         return jsonResponse(400, { ok: false, error: 'work_id invalide' });
       }
       const supabase = createSupabase();
+      // Une série dont l'icône est cette œuvre bloquerait la suppression : on retire l'icône
+      const { error: iErr } = await supabase.from('series').update({ icon_work_id: null }).eq('icon_work_id', workId);
+      if (iErr) throw iErr;
       const { error } = await supabase.from('works').delete().eq('id', workId);
       if (error) throw error;
       const works = await fetchWorksWithSeries(supabase);
       return jsonResponse(200, { ok: true, works, deleted: workId });
+    }
+
+    // ---- Doublons possibles (outil ♊)
+    if (req.method === 'GET' && path === '/api/similar') {
+      const token = url.searchParams.get('token') || '';
+      if (!checkToken(token)) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      const supabase = createSupabase();
+      const pairs = await fetchAll((from, to) =>
+        supabase
+          .from('work_similarities')
+          .select('work_a, work_b, distance')
+          .eq('status', 'open')
+          .order('distance', { ascending: true })
+          .order('work_a')
+          .order('work_b')
+          .range(from, to)
+      );
+      return jsonResponse(200, { ok: true, pairs });
+    }
+
+    if (req.method === 'POST' && path === '/api/similar/dismiss') {
+      const body = await req.json();
+      if (!checkToken(String(body.token || ''))) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      const pairs = Array.isArray(body.pairs) ? body.pairs : [];
+      const supabase = createSupabase();
+      for (const p of pairs) {
+        const [a, b] = [String(p[0] || '').toUpperCase(), String(p[1] || '').toUpperCase()].sort();
+        if (!/^MS\d{4}$/.test(a) || !/^MS\d{4}$/.test(b)) continue;
+        const { error } = await supabase
+          .from('work_similarities')
+          .update({ status: 'dismissed', updated_at: new Date().toISOString() })
+          .eq('work_a', a)
+          .eq('work_b', b);
+        if (error) throw error;
+      }
+      return jsonResponse(200, { ok: true, dismissed: pairs.length });
+    }
+
+    if (req.method === 'POST' && path === '/api/works/merge') {
+      const body = await req.json();
+      if (!checkToken(String(body.token || ''))) {
+        return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      }
+      const keep = String(body.keep || '').trim().toUpperCase();
+      const remove = [...new Set((Array.isArray(body.remove) ? body.remove : []).map((x: unknown) => String(x).trim().toUpperCase()))];
+      if (!/^MS\d{4}$/.test(keep) || !remove.length || remove.some((r) => !/^MS\d{4}$/.test(r) || r === keep)) {
+        return jsonResponse(400, { ok: false, error: 'œuvres à fusionner invalides' });
+      }
+      const supabase = createSupabase();
+      const { data: found, error: fErr } = await supabase.from('works').select('id').in('id', [keep, ...remove]);
+      if (fErr) throw fErr;
+      if ((found || []).length !== remove.length + 1) {
+        return jsonResponse(404, { ok: false, error: 'œuvre introuvable (déjà fusionnée ?)' });
+      }
+
+      // 1. Valeurs retenues sur la fiche conservée
+      const FIELDS = ['title', 'year', 'format_code', 'technique_code', 'collector_code', 'publication_status_code',
+        'photo_status_code', 'photo_credit', 'width_cm', 'height_cm'];
+      const patch: Record<string, unknown> = {};
+      for (const k of FIELDS) if (body.fields && k in body.fields) patch[k] = body.fields[k];
+      if (Object.keys(patch).length) {
+        patch.updated_at = new Date().toISOString();
+        const { error } = await supabase.from('works').update(patch).eq('id', keep);
+        if (error) throw error;
+      }
+      // 2. Séries : liste choisie (par défaut, réunion des séries)
+      if (Array.isArray(body.series)) {
+        const codes = [...new Set(body.series.map((c: unknown) => String(c).trim().toUpperCase()).filter(Boolean))];
+        const { error: dErr } = await supabase.from('work_series').delete().eq('work_id', keep);
+        if (dErr) throw dErr;
+        if (codes.length) {
+          const { error } = await supabase.from('work_series').insert(codes.map((series_code) => ({ work_id: keep, series_code })));
+          if (error) throw error;
+        }
+      }
+      // 3. Tout ce qui pointait vers les fiches supprimées est reporté sur la fiche conservée
+      for (const table of ['work_photo_links', 'related_media_works']) {
+        const key = table === 'work_photo_links' ? 'photo_id' : 'media_id';
+        const { data: rows, error } = await supabase.from(table).select(key).in('work_id', remove);
+        if (error) throw error;
+        const ids = [...new Set((rows || []).map((r: Record<string, unknown>) => r[key]))];
+        if (ids.length) {
+          const { error: uErr } = await supabase
+            .from(table)
+            .upsert(ids.map((id) => ({ [key]: id, work_id: keep })), { onConflict: key + ',work_id', ignoreDuplicates: true });
+          if (uErr) throw uErr;
+        }
+      }
+      {
+        const { error } = await supabase.from('work_messages').update({ work_id: keep }).in('work_id', remove);
+        if (error) throw error;
+        const { error: sErr } = await supabase.from('series').update({ icon_work_id: keep }).in('icon_work_id', remove);
+        if (sErr) throw sErr;
+      }
+      // 4. Suppression des fiches fusionnées (leurs images seront archivées à la prochaine publication)
+      const { error: delErr } = await supabase.from('works').delete().in('id', remove);
+      if (delErr) throw delErr;
+      const works = await fetchWorksWithSeries(supabase);
+      return jsonResponse(200, { ok: true, kept: keep, removed: remove, works });
     }
 
     return jsonResponse(404, { ok: false, error: 'not found' });
