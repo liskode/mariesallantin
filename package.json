@@ -19,7 +19,8 @@
     "works:api": "node scripts/works-editor-api.mjs",
     "works:import": "node scripts/works-import-studio.mjs",
     "works:publish": "node scripts/works-publish-cli.mjs",
-    "works:dupes": "node scripts/works-fingerprint-scan.mjs"
+    "works:dupes": "node scripts/works-fingerprint-scan.mjs",
+    "works:quality": "node scripts/works-quality-scan.mjs"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.49.8",
