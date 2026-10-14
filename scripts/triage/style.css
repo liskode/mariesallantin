@@ -31,7 +31,13 @@ h1 { font-size: 18px; margin: 0 0 8px; }
 .filters button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 .tools { display: flex; gap: 12px; align-items: center; margin-top: 8px; flex-wrap: wrap; }
 .tools input { flex: 1 1 240px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); color: var(--fg); font: inherit; }
+.validate { font: inherit; padding: 4px 10px; border: 1px solid var(--accent); color: var(--accent); background: var(--card); border-radius: 6px; cursor: pointer; }
 .pager button { font: inherit; padding: 3px 9px; border: 1px solid var(--line); background: var(--card); color: var(--fg); border-radius: 6px; cursor: pointer; }
+.import-panel { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 8px; padding: 6px 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); }
+.import-panel button { font: inherit; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--new); background: var(--new); color: #fff; cursor: pointer; }
+.import-panel button#publish-btn { border-color: var(--accent); background: var(--accent); }
+.import-panel button:disabled { opacity: 0.5; cursor: wait; }
+.imported { display: inline-block; background: var(--new); color: #fff; border-radius: 4px; padding: 0 6px; font-size: 12px; margin-left: 6px; }
 .help { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
 kbd { border: 1px solid var(--line); border-radius: 3px; padding: 0 4px; font-size: 11px; background: var(--card); }
 

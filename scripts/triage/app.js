@@ -9,6 +9,7 @@
 
   let groups = [];
   let decisions = {};
+  let imported = {};
   let workById = new Map();
   let filter = 'all';
   let search = '';
@@ -68,6 +69,7 @@
     ['maybe', 'Peut-être une autre photo', (g, s) => s.category === 'new' && g.maybe_situ],
     ['situ', 'Autres photos', (g, s) => s.category === 'situ'],
     ['ignore', 'Écartées', (g, s) => s.category === 'ignore'],
+    ['imported', 'Importées', (g) => !!imported[g.id]],
   ];
 
   function matchesSearch(g) {
@@ -225,7 +227,8 @@
       !s.reviewed ? el('span', { class: 'auto', text: 'proposition automatique' }) : null);
 
     const right = el('div', {},
-      el('div', { class: 'name' }, best.name, dot(best.quality)),
+      el('div', { class: 'name' }, best.name, dot(best.quality),
+        imported[g.id] ? el('span', { class: 'imported', text: 'importée : ' + imported[g.id].work }) : null),
       el('div', { class: 'auto', text: g.id + ' · ' + g.photos.length + ' photo(s)' + (best.w ? ' · ' + best.w + '×' + best.h + ' px' : '') }),
       meta, cats, contextPanel(g, s, rerender));
     node.append(left, right);
@@ -282,6 +285,53 @@
     }
   });
 
+  async function refreshImportStatus() {
+    const s = await (await fetch('api/import/status', { cache: 'no-store' })).json();
+    const withAuto = $('include-unreviewed').checked;
+    const pending = withAuto ? s.pending_new_unreviewed : s.pending_new;
+    $('import-status').textContent =
+      pending + ' nouvelle(s) à importer' + (withAuto ? ' (dont propositions non vues)' : ' (validées)') +
+      ' · ' + s.imported + ' importée(s) · ' + s.to_publish + ' fichier(s) à publier';
+    $('import-btn').disabled = !!s.busy || !pending;
+    $('publish-btn').disabled = !!s.busy || !s.to_publish;
+  }
+  async function runAction(url, label, body) {
+    $('import-btn').disabled = $('publish-btn').disabled = true;
+    $('import-msg').textContent = label + '…';
+    try {
+      const r = await fetch(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-BaseArt': '1' }, body: JSON.stringify(body || {}) });
+      const j = await r.json();
+      if (!j.ok) throw new Error(j.error || r.status);
+      return j;
+    } catch (e) {
+      $('import-msg').textContent = 'Erreur : ' + e.message;
+      throw e;
+    } finally {
+      await refreshImportStatus();
+    }
+  }
+  $('import-btn').addEventListener('click', async () => {
+    if (!confirm('Importer les 50 prochaines nouvelles œuvres (fiches « À valider », versions allégées, originaux mis de côté) ?')) return;
+    const j = await runAction('api/import', 'Import en cours (environ 1 à 2 minutes)', { limit: 50, include_unreviewed: $('include-unreviewed').checked });
+    for (const x of j.imported) imported[x.group] = { work: x.work };
+    $('import-msg').textContent = j.imported.length + ' œuvre(s) importée(s) : ' + (j.imported[0]?.work || '') + '–' + (j.imported[j.imported.length - 1]?.work || '') + '. Vérifiez-les dans l\u2019éditeur puis publiez.';
+    render();
+  });
+  $('include-unreviewed').addEventListener('change', refreshImportStatus);
+  $('validate-page').addEventListener('click', async () => {
+    const slice = visible.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE).filter((g) => !decisions[g.id]?.category);
+    if (!slice.length) { alert('Toutes les cartes de cette page sont déjà validées.'); return; }
+    if (!confirm('Valider la proposition affichée pour ' + slice.length + ' carte(s) non vue(s) de cette page ?')) return;
+    for (const g of slice) await save(g, { category: state(g).category });
+    render();
+    refreshImportStatus();
+  });
+  $('publish-btn').addEventListener('click', async () => {
+    if (!confirm('Publier sur le site les images et works.json importés (commit + push GitHub) ?')) return;
+    const j = await runAction('api/publish', 'Publication en cours');
+    $('import-msg').textContent = j.pushed ? 'Publié : ' + j.paths.length + ' fichier(s). En ligne dans quelques minutes.' : 'Rien à publier.';
+  });
+
   $('prev').addEventListener('click', () => { if (page > 0) { page--; render(); } });
   $('next').addEventListener('click', () => { if ((page + 1) * PAGE_SIZE < visible.length) { page++; render(); } });
   let t;
@@ -292,8 +342,10 @@
     .then((d) => {
       groups = d.triage.groups;
       decisions = d.decisions || {};
+      imported = d.imported || {};
       workById = new Map(d.works.map((w) => [w.id, w]));
       render();
+      refreshImportStatus();
     })
     .catch((e) => { $('cards').textContent = 'Chargement impossible : ' + e.message; });
 })();

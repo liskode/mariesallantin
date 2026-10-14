@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Tri de l'export — BaseArt</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
   <header class="bar">
@@ -12,11 +12,19 @@
     <nav class="filters" id="filters" aria-label="Filtres"></nav>
     <div class="tools">
       <input type="search" id="search" placeholder="Rechercher (nom, code, titre)…" aria-label="Rechercher">
+      <button type="button" id="validate-page" class="validate">Valider les propositions de cette page</button>
       <span class="pager">
         <button type="button" id="prev" aria-label="Page précédente">←</button>
         <span id="page"></span>
         <button type="button" id="next" aria-label="Page suivante">→</button>
       </span>
+    </div>
+    <div class="import-panel" id="import-panel">
+      <span id="import-status">…</span>
+      <button type="button" id="import-btn">Importer un lot de 50 nouvelles œuvres</button>
+      <label class="auto"><input type="checkbox" id="include-unreviewed"> inclure les propositions non vues</label>
+      <button type="button" id="publish-btn">Publier sur le site</button>
+      <span id="import-msg" class="auto"></span>
     </div>
     <p class="help">Clavier : <kbd>D</kbd> doublon · <kbd>N</kbd> nouvelle · <kbd>S</kbd> autre photo (atelier, expo, combinaison, détail…) · <kbd>X</kbd> écarter · <kbd>↑</kbd><kbd>↓</kbd> carte suivante · cliquer la photo pour l'agrandir. Chaque choix est enregistré aussitôt.</p>
   </header>
@@ -25,6 +33,6 @@
     <img id="lightbox-img" alt="">
     <p id="lightbox-caption"></p>
   </dialog>
-  <script src="app.js"></script>
+  <script src="app.js?v=3"></script>
 </body>
 </html>

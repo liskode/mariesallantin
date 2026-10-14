@@ -15,6 +15,8 @@ import { fileURLToPath } from 'node:url';
 import { createClient } from '@supabase/supabase-js';
 import { fetchAll } from './supabase-fetch-all.mjs';
 import { extractMsIdFromFilename } from './work-import.mjs';
+import { importNewGroups, pendingNewGroups } from './export-import.mjs';
+import { publishMediaToGitHub, resolvePublishPaths } from './works-git-publish.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.EXPORT_TRIAGE_PORT || 47840);
@@ -58,6 +60,16 @@ function catalogueFiles() {
 }
 let catalogue = catalogueFiles();
 
+const importedPath = path.join(workDir, 'imported.json');
+function readImported() {
+  try {
+    return JSON.parse(fs.readFileSync(importedPath, 'utf8'));
+  } catch {
+    return {};
+  }
+}
+let busy = null; // une seule opération d'import / publication à la fois
+
 function readDecisions() {
   try {
     return JSON.parse(fs.readFileSync(decisionsPath, 'utf8'));
@@ -81,7 +93,7 @@ const MIME = {
   '.webp': 'image/webp',
   '.png': 'image/png',
 };
-function sendFile(res, file) {
+function sendFile(res, file, { cache = true } = {}) {
   if (!file || !fs.existsSync(file)) {
     res.writeHead(404);
     res.end();
@@ -89,7 +101,7 @@ function sendFile(res, file) {
   }
   res.writeHead(200, {
     'Content-Type': MIME[path.extname(file).toLowerCase()] || 'application/octet-stream',
-    'Cache-Control': 'max-age=3600',
+    'Cache-Control': cache ? 'max-age=3600' : 'no-cache',
   });
   fs.createReadStream(file).pipe(res);
 }
@@ -115,8 +127,8 @@ const server = http.createServer(async (req, res) => {
   const url = new URL(req.url || '/', `http://127.0.0.1:${PORT}`);
   try {
     if (req.method === 'GET') {
-      if (url.pathname === '/') return sendFile(res, path.join(appDir, 'index.html'));
-      if (/^\/(app\.js|style\.css)$/.test(url.pathname)) return sendFile(res, path.join(appDir, url.pathname.slice(1)));
+      if (url.pathname === '/') return sendFile(res, path.join(appDir, 'index.html'), { cache: false });
+      if (/^\/(app\.js|style\.css)$/.test(url.pathname)) return sendFile(res, path.join(appDir, url.pathname.slice(1)), { cache: false });
       if (url.pathname.startsWith('/th/')) return sendFile(res, inside(path.join(workDir, 'th'), url.pathname.slice(4)));
       if (url.pathname === '/photo') return sendFile(res, inside(exportDir, url.searchParams.get('name') || ''));
       if (url.pathname.startsWith('/cat/')) {
@@ -128,7 +140,18 @@ const server = http.createServer(async (req, res) => {
         const works = await fetchAll((f, t) =>
           supabase.from('works').select('id, title, year, image_quality').order('id').range(f, t)
         );
-        return sendJson(res, 200, { ok: true, triage, decisions: readDecisions(), works });
+        return sendJson(res, 200, { ok: true, triage, decisions: readDecisions(), imported: readImported(), works });
+      }
+      if (url.pathname === '/api/import/status') {
+        const { paths } = await resolvePublishPaths(root, {});
+        return sendJson(res, 200, {
+          ok: true,
+          busy,
+          pending_new: pendingNewGroups(exportDir).length,
+          pending_new_unreviewed: pendingNewGroups(exportDir, { includeUnreviewed: true }).length,
+          imported: Object.keys(readImported()).length,
+          to_publish: paths.length,
+        });
       }
     }
     if (req.method === 'POST' && url.pathname === '/api/decision') {
@@ -144,6 +167,33 @@ const server = http.createServer(async (req, res) => {
       all[group] = { ...(all[group] || {}), ...patch, at: new Date().toISOString() };
       writeDecisions(all);
       return sendJson(res, 200, { ok: true, decision: all[group] });
+    }
+    if (req.method === 'POST' && (url.pathname === '/api/import' || url.pathname === '/api/publish')) {
+      if (req.headers['x-baseart'] !== '1') return sendJson(res, 403, { ok: false, error: 'requête refusée' });
+      if (busy) return sendJson(res, 409, { ok: false, error: 'opération déjà en cours : ' + busy });
+      const body = JSON.parse((await readBody(req)) || '{}');
+      try {
+        if (url.pathname === '/api/import') {
+          busy = 'import';
+          const limit = Math.max(1, Math.min(200, parseInt(body.limit, 10) || 50));
+          const log = [];
+          const result = await importNewGroups({
+            root, exportDir, supabase, limit, includeUnreviewed: !!body.include_unreviewed,
+            log: (m) => { log.push(m); console.error(m); },
+          });
+          catalogue = catalogueFiles();
+          return sendJson(res, 200, { ok: true, ...result, log });
+        }
+        busy = 'publication';
+        const imported = Object.values(readImported()).map((x) => x.work).sort();
+        const range = imported.length ? imported[0] + '–' + imported[imported.length - 1] : '';
+        const result = await publishMediaToGitHub(root, {
+          message: 'Import photothèque : nouvelles œuvres ' + range,
+        });
+        return sendJson(res, 200, { ok: true, ...result });
+      } finally {
+        busy = null;
+      }
     }
     sendJson(res, 404, { ok: false, error: 'not found' });
   } catch (e) {

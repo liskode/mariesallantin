@@ -99,8 +99,35 @@ export async function fetchNextSortOrder(supabase) {
 export async function resolveNextSequentialStart(supabase, worksJsonPath) {
   const dbIds = await fetchExistingWorkIds(supabase);
   const jsonIds = loadWorksJsonIds(worksJsonPath);
-  const all = [...dbIds, ...jsonIds];
+  const root = path.dirname(path.dirname(worksJsonPath));
+  const all = [...dbIds, ...jsonIds, ...usedWorkIdsOnDisk(root)];
   return maxWorkIdNumber(all) + 1;
+}
+
+/**
+ * Codes MS déjà attribués un jour (œuvres supprimées archivées, originaux) : un code n'est jamais réattribué.
+ * Dossiers voisins du dépôt : BaseArt-archives/ et BaseArt-originaux/ (+ media/Archive, media/catalogue-deleted).
+ */
+export function usedWorkIdsOnDisk(root) {
+  const dirs = [
+    path.join(root, '..', 'BaseArt-archives'),
+    path.join(root, '..', 'BaseArt-originaux'),
+    path.join(root, 'media', 'Archive'),
+    path.join(root, 'media', 'catalogue-deleted'),
+  ];
+  const ids = new Set();
+  const walk = (dir, depth) => {
+    if (depth > 4 || !fs.existsSync(dir)) return;
+    for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (ent.isDirectory()) walk(path.join(dir, ent.name), depth + 1);
+      else {
+        const id = extractMsIdFromFilename(ent.name);
+        if (id) ids.add(id);
+      }
+    }
+  };
+  for (const d of dirs) walk(d, 0);
+  return ids;
 }
 
 function stemFromFilename(filename) {
