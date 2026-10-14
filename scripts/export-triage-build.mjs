@@ -94,11 +94,14 @@ const photos = matches.map((m, i) => {
     (hasPeople && framed && art < 0.7);
   const weak = (sceneLabels.length > 0 && art < 0.85) || (hasPeople && art < 0.6);
   if (hasPeople) sceneLabels.unshift('personnes');
+  // Plusieurs tableaux côte à côte sans personne : combinaison (ou polyptyque, à vérifier)
+  const multi = !hasPeople && (s?.paintings || []).filter((p) => p.area >= 0.05 && p.area <= 0.6).length >= 2;
   if (framed) sceneLabels.push('tableau(x) dans la scène');
   return {
     i,
     name,
     art: Math.round(art * 100) / 100,
+    multi,
     quality,
     w: met.w || null,
     h: met.h || null,
@@ -147,9 +150,18 @@ for (const members of byRoot.values()) {
     if (!meta[k]) meta[k] = members.map((p) => p.meta[k]).find(Boolean) || (k === 'title' ? '' : null);
   }
 
+  // Indices tirés des noms de fichiers du groupe
+  const names = members.map((p) => p.name).join(' ');
+  const isDetail = /d[ée]tail|DETAI/i.test(names);
+  const isCombination = /combi/i.test(names);
+  const isEnsemble = /dipty|dypt|tripty|polyp/i.test(names); // diptyque, polyptyque : une seule œuvre
+  let typeHint = null;
+  if (isDetail) typeHint = 'D';
+  else if (isCombination || (best.multi && !isEnsemble)) typeHint = 'M';
+
   let proposal = 'new';
   if (dupWork) proposal = 'duplicate';
-  else if (best.scene?.strong) proposal = 'situ';
+  else if (best.scene?.strong || isDetail || isCombination) proposal = 'situ';
   const current = dupWork ? workById.get(dupWork) : null;
   groups.push({
     id: '',
@@ -161,7 +173,9 @@ for (const members of byRoot.values()) {
     nearest,
     suspect: !dupWork && nearest[0] && nearest[0].d < SUSPECT ? nearest[0] : null,
     scene: best.scene,
-    maybe_situ: !dupWork && !best.scene?.strong && !!best.scene,
+    maybe_situ: !dupWork && !best.scene?.strong && !isDetail && !isCombination && (!!best.scene || (best.multi && !isEnsemble)),
+    type_hint: typeHint,
+    hint: isDetail ? 'détail (nom du fichier)' : isCombination ? 'combinaison (nom du fichier)' : best.multi && !isEnsemble ? 'plusieurs tableaux côte à côte' : null,
     situ_candidates: situCandidates,
     meta,
     _members: members.map((p) => p.i),
@@ -224,5 +238,5 @@ const count = (p) => groups.filter((g) => g.proposal === p).length;
 console.log(
   `${photos.length} photos → ${groups.length} groupes : ${count('duplicate')} déjà dans BaseArt, ` +
     `${count('new')} nouvelles (dont ${groups.filter((g) => g.suspect).length} proches d'une œuvre), ` +
-    `${count('situ')} in situ ; ${triage.group_pairs.length} paires de doublons possibles entre nouvelles.`
+    `${count('situ')} autres photos ; ${triage.group_pairs.length} paires de doublons possibles entre nouvelles.`
 );

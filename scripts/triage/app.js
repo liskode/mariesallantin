@@ -3,9 +3,9 @@
   'use strict';
 
   const PAGE_SIZE = 40;
-  const CAT_LABELS = { duplicate: 'Doublon', new: 'Nouvelle', situ: 'In situ', ignore: 'Écarter' };
+  const CAT_LABELS = { duplicate: 'Doublon', new: 'Nouvelle', situ: 'Autre photo', ignore: 'Écarter' };
   const CAT_KEYS = { d: 'duplicate', n: 'new', s: 'situ', x: 'ignore' };
-  const SITU_TYPES = { A: 'Atelier', E: 'Exposition', C: 'Chez un collectionneur', X: 'Autre' };
+  const SITU_TYPES = { A: 'Atelier', E: 'Exposition', C: 'Chez un collectionneur', M: 'Combinaison de tableaux', D: 'Détail', X: 'Autre' };
 
   let groups = [];
   let decisions = {};
@@ -38,7 +38,7 @@
       replace: d.replace !== undefined ? d.replace : false,
       best: d.best || g.photos[0].name,
       situ_works: d.situ_works || [],
-      situ_type: d.situ_type || 'E',
+      situ_type: d.situ_type || g.type_hint || 'X',
       caption: d.caption || '',
       reviewed: !!decisions[g.id],
     };
@@ -65,8 +65,8 @@
     ['replace', 'Photo meilleure', (g, s) => s.category === 'duplicate' && g.replace_suggested],
     ['new', 'Nouvelles', (g, s) => s.category === 'new'],
     ['suspect', 'Nouvelles proches d’une œuvre', (g, s) => s.category === 'new' && g.suspect],
-    ['maybe', 'Peut-être in situ', (g, s) => s.category === 'new' && g.maybe_situ],
-    ['situ', 'In situ', (g, s) => s.category === 'situ'],
+    ['maybe', 'Peut-être une autre photo', (g, s) => s.category === 'new' && g.maybe_situ],
+    ['situ', 'Autres photos', (g, s) => s.category === 'situ'],
     ['ignore', 'Écartées', (g, s) => s.category === 'ignore'],
   ];
 
@@ -135,7 +135,8 @@
       );
     } else if (s.category === 'new') {
       if (g.maybe_situ) {
-        ctx.append(el('div', { class: 'warn', text: 'Peut-être une photo in situ (' + g.scene.labels.join(', ') + ') — touche S si c\u2019est le cas.' }));
+        const why = [g.hint, ...(g.scene ? g.scene.labels : [])].filter(Boolean).join(', ');
+        ctx.append(el('div', { class: 'warn', text: 'Peut-être une autre photo (' + why + ') — touche S si c\u2019est le cas.' }));
       }
       if (g.suspect) {
         ctx.append(el('div', { class: 'warn', text: 'Ressemble à une œuvre de BaseArt (doublon possible, à trier ensuite) :' }));
@@ -145,7 +146,7 @@
         ctx.append(el('div', { class: 'auto', text: 'Cliquer une vignette pour en faire un doublon de cette œuvre.' }));
       }
     } else if (s.category === 'situ') {
-      const sel = el('select', { 'aria-label': 'Type de photo in situ', onchange: (e) => save(g, { situ_type: e.target.value }) },
+      const sel = el('select', { 'aria-label': 'Type de photo', onchange: (e) => save(g, { situ_type: e.target.value }) },
         ...Object.entries(SITU_TYPES).map(([k, v]) => {
           const o = el('option', { value: k, text: v });
           if (k === s.situ_type) o.selected = true;
@@ -160,7 +161,8 @@
       };
       const suggestions = g.situ_candidates.map((c) => c.work);
       const ids = [...new Set([...s.situ_works, ...suggestions])];
-      ctx.append(el('div', { class: 'auto', text: 'Œuvres visibles sur la photo (cliquer pour rattacher) — suggestions automatiques :' }));
+      if (g.hint) ctx.append(el('div', { class: 'auto', text: 'Indice : ' + g.hint }));
+      ctx.append(el('div', { class: 'auto', text: 'Œuvre(s) concernée(s) (cliquer pour rattacher) — suggestions automatiques :' }));
       ctx.append(el('div', { class: 'works' }, ...ids.map((id) => {
         const c = g.situ_candidates.find((x) => x.work === id);
         return workThumb(id, { on: s.situ_works.includes(id), d: c ? c.d : null, onclick: () => toggle(id) });
@@ -177,7 +179,7 @@
       });
       const cap = el('input', { type: 'text', value: s.caption, placeholder: 'Légende (lieu, date, collectionneur…)', size: 32, onchange: (e) => save(g, { caption: e.target.value }) });
       ctx.append(el('div', {}, add), el('div', {}, cap));
-      if (g.scene) ctx.append(el('div', { class: 'auto', text: 'Détecté : ' + g.scene.labels.join(', ') }));
+      if (g.scene && g.scene.labels.length) ctx.append(el('div', { class: 'auto', text: 'Détecté : ' + g.scene.labels.join(', ') }));
     }
     return ctx;
   }

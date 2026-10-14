@@ -68,6 +68,7 @@ export function parseExportFilename(filename, known) {
     const m = title.match(/\b(19[4-9]\d|20[0-3]\d)\b/);
     if (m) year = parseInt(m[1], 10);
   }
+  if (!format && /dipty|dypt/i.test(stem) && known.formats.has('DIPT')) format = 'DIPT';
   if (/^(img|dsc|dscn|p\d{5,})/i.test(stem.trim())) title = '';
   return { series, year, format, technique, title };
 }
