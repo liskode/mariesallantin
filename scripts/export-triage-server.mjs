@@ -24,6 +24,7 @@ import {
   replacePhotos,
 } from './export-import.mjs';
 import { publishMediaToGitHub, resolvePublishPaths } from './works-git-publish.mjs';
+import { isOnline, pushResultsToDb, saveDecisionToDb, syncDecisionsFromDb } from './export-online.mjs';
 
 const root = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PORT = Number(process.env.EXPORT_TRIAGE_PORT || 47840);
@@ -143,6 +144,8 @@ const server = http.createServer(async (req, res) => {
         return sendFile(res, catalogue.thumbs.get(id) || catalogue.full.get(id));
       }
       if (url.pathname === '/api/data') {
+        // Si le tri est en ligne, les décisions de l'artiste (base) font foi
+        if (await isOnline(exportDir, supabase)) await syncDecisionsFromDb(exportDir, supabase);
         const triage = JSON.parse(fs.readFileSync(triagePath, 'utf8'));
         const works = await fetchAll((f, t) =>
           supabase.from('works').select('id, title, year, image_quality').order('id').range(f, t)
@@ -175,12 +178,19 @@ const server = http.createServer(async (req, res) => {
       const all = readDecisions();
       all[group] = { ...(all[group] || {}), ...patch, at: new Date().toISOString() };
       writeDecisions(all);
+      if (await isOnline(exportDir, supabase)) {
+        const triage = JSON.parse(fs.readFileSync(triagePath, 'utf8'));
+        const g = triage.groups.find((x) => x.id === group);
+        await saveDecisionToDb(exportDir, supabase, group, all[group], g ? g.photos.map((p) => p.name) : []);
+      }
       return sendJson(res, 200, { ok: true, decision: all[group] });
     }
     if (req.method === 'POST' && ['/api/import', '/api/replace', '/api/photos', '/api/publish'].includes(url.pathname)) {
       if (req.headers['x-baseart'] !== '1') return sendJson(res, 403, { ok: false, error: 'requête refusée' });
       if (busy) return sendJson(res, 409, { ok: false, error: 'opération déjà en cours : ' + busy });
       const body = JSON.parse((await readBody(req)) || '{}');
+      const online = await isOnline(exportDir, supabase);
+      if (online && url.pathname !== '/api/publish') await syncDecisionsFromDb(exportDir, supabase);
       try {
         if (url.pathname === '/api/import') {
           busy = 'import';
@@ -215,6 +225,7 @@ const server = http.createServer(async (req, res) => {
         return sendJson(res, 200, { ok: true, ...result });
       } finally {
         busy = null;
+        if (online && url.pathname !== '/api/publish') await pushResultsToDb(exportDir, supabase).catch((e) => console.error(e));
       }
     }
     sendJson(res, 404, { ok: false, error: 'not found' });

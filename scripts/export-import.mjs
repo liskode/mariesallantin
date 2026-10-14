@@ -178,9 +178,15 @@ export function pendingReplacements(exportDir) {
     .filter((g) => !imported[g.id])
     .filter((g) => {
       const d = decisions[g.id] || {};
-      return (d.category || g.proposal) === 'duplicate' && d.replace === true && (d.work !== undefined ? d.work : g.work);
+      // « Remplacer » coché (page locale) ou photo de l'export gardée à la place de celle du catalogue (page en ligne)
+      const keepsExportPhoto = !!d.keep && d.keep !== 'catalogue';
+      return (d.category || g.proposal) === 'duplicate' && (d.replace === true || keepsExportPhoto) && (d.work !== undefined ? d.work : g.work);
     })
-    .map((g) => ({ group: g, decision: decisions[g.id] || {}, workId: decisions[g.id]?.work || g.work }));
+    .map((g) => {
+      const d = decisions[g.id] || {};
+      const decision = d.keep && d.keep !== 'catalogue' ? { ...d, best: d.keep } : d;
+      return { group: g, decision, workId: d.work || g.work };
+    });
 }
 
 /**
@@ -278,7 +284,8 @@ export function pendingOtherPhotos(exportDir) {
   return triage.groups
     .filter((g) => !imported[g.id] && decisions[g.id]?.category === 'situ')
     .map((g) => ({ group: g, decision: decisions[g.id] }))
-    .filter(({ decision }) => Array.isArray(decision.situ_works) && decision.situ_works.length);
+    // Rattachée à au moins une œuvre, ou gardée « on verra plus tard » (sans rattachement pour l'instant)
+    .filter(({ decision }) => (Array.isArray(decision.situ_works) && decision.situ_works.length) || decision.later === true);
 }
 
 /**
@@ -298,18 +305,21 @@ export async function importOtherPhotos(opts) {
   for (const { group, decision } of batch) {
     const bestName = decision.best || group.photos[0].name;
     const srcAbs = path.join(exportDir, bestName);
-    const ids = [...new Set(decision.situ_works.map((w) => String(w).toUpperCase()))].sort();
-    const { data: found, error: fErr } = await supabase.from('works').select('id').in('id', ids);
-    if (fErr) throw fErr;
-    const existing = new Set((found || []).map((r) => r.id));
-    const links = ids.filter((id) => existing.has(id));
-    if (!links.length || !fs.existsSync(srcAbs)) {
-      log(`  ${group.id} : ${!links.length ? 'aucune œuvre rattachée existante' : 'photo introuvable'}, ignoré`);
+    const ids = [...new Set((decision.situ_works || []).map((w) => String(w).toUpperCase()))].sort();
+    let links = [];
+    if (ids.length) {
+      const { data: found, error: fErr } = await supabase.from('works').select('id').in('id', ids);
+      if (fErr) throw fErr;
+      const existing = new Set((found || []).map((r) => r.id));
+      links = ids.filter((id) => existing.has(id));
+    }
+    if ((!links.length && decision.later !== true) || !fs.existsSync(srcAbs)) {
+      log(`  ${group.id} : ${!fs.existsSync(srcAbs) ? 'photo introuvable' : 'aucune œuvre rattachée existante'}, ignoré`);
       continue;
     }
     const type = /^[AECMDX]$/.test(decision.situ_type || '') ? decision.situ_type : 'X';
     const id = crypto.randomUUID();
-    const base = `${links[0]}-${type}-${id.slice(0, 8)}.jpeg`;
+    const base = `${links[0] || 'A-RATTACHER'}-${type}-${id.slice(0, 8)}.jpeg`;
     if (dryRun) {
       log(`  ${group.id} → ${base} (${links.join(' ')}) (simulation)`);
       done.push({ group: group.id, photo_id: id });
@@ -342,10 +352,12 @@ export async function importOtherPhotos(opts) {
       for (const f of [webAbs, thumbAbs]) await fs.promises.rm(f, { force: true });
       throw new Error(`${group.id} : ${error.message}`);
     }
-    const { error: lErr } = await supabase
-      .from('work_photo_links')
-      .insert(links.map((work_id) => ({ photo_id: id, work_id })));
-    if (lErr) throw new Error(`${group.id} liens : ${lErr.message}`);
+    if (links.length) {
+      const { error: lErr } = await supabase
+        .from('work_photo_links')
+        .insert(links.map((work_id) => ({ photo_id: id, work_id })));
+      if (lErr) throw new Error(`${group.id} liens : ${lErr.message}`);
+    }
     await fs.promises.mkdir(origDir, { recursive: true });
     await fs.promises.copyFile(srcAbs, path.join(origDir, base.replace(/\.jpeg$/, path.extname(bestName).toLowerCase() || '.jpeg')));
 

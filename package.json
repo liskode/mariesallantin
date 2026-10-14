@@ -24,7 +24,8 @@
     "export:triage": "node scripts/export-triage-build.mjs",
     "export:tri": "node scripts/export-triage-server.mjs",
     "works:similar": "node scripts/works-similarity-scan.mjs",
-    "export:analyse": "node scripts/export-analyse.mjs"
+    "export:analyse": "node scripts/export-analyse.mjs",
+    "export:en-ligne": "node scripts/export-online.mjs"
   },
   "devDependencies": {
     "@supabase/supabase-js": "^2.49.8",

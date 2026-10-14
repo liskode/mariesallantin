@@ -15,3 +15,6 @@ verify_jwt = false
 
 [functions.public-site-api]
 verify_jwt = false
+
+[functions.triage-api]
+verify_jwt = false
