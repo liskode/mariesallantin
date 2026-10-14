@@ -232,7 +232,7 @@ async function fetchWorksWithSeries(supabase) {
     supabase
       .from('works')
       .select(
-        'id, title, year, format_code, technique_code, publication_status_code, photo_status_code, photo_credit, collector_code, width_cm, height_cm, filename_original, image_ext, sort_order, updated_at'
+        'id, title, year, format_code, technique_code, publication_status_code, photo_status_code, photo_credit, collector_code, width_cm, height_cm, filename_original, image_ext, sort_order, updated_at, image_quality, image_quality_details'
       )
       .order('sort_order', { ascending: true })
       .order('id', { ascending: true })

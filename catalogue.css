@@ -2917,3 +2917,19 @@ body[data-editor-tab="works"] .editor-tabs-nav {
   font-size: 0.75rem;
   line-height: 1.35;
 }
+
+/* Pastille de qualité photo (works-editor) */
+.works-quality-dot {
+  display: inline-block;
+  width: 0.7em;
+  height: 0.7em;
+  margin-left: 0.4em;
+  border-radius: 50%;
+  vertical-align: middle;
+  cursor: help;
+}
+
+.works-quality-dot--none {
+  border: 1px solid currentColor;
+  opacity: 0.35;
+}

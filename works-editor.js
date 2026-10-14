@@ -3,7 +3,7 @@
  */
 (function () {
   const AUTH = () => window.EditorCommon;
-  const MEDIA_BASE = 'media/';
+  const MEDIA_BASE = (window.BASEART_CONFIG && window.BASEART_CONFIG.mediaBase) || 'media/';
   const DEFAULT_PAGE_SIZE = 50;
   const PRODUCTION_API =
     'https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api';
@@ -106,7 +106,7 @@
     if (siteConfig) return siteConfig;
     siteConfig = {};
     try {
-      const r = await fetch(MEDIA_BASE + 'collectors-config.json', { cache: 'no-store' });
+      const r = await fetch('media/collectors-config.json', { cache: 'no-store' });
       if (r.ok) siteConfig = await r.json();
     } catch {
       /* optionnel */
@@ -1400,6 +1400,30 @@
     return media ? MEDIA_BASE + encodeMediaPath(media) : '';
   }
 
+  /** Pastille de qualité photo : rouge (0) → vert (100), détail au survol. */
+  function createQualityDot(work) {
+    const dot = document.createElement('span');
+    dot.className = 'works-quality-dot';
+    const q = work.image_quality;
+    if (q == null) {
+      dot.classList.add('works-quality-dot--none');
+      dot.title = 'Qualité photo non mesurée';
+      return dot;
+    }
+    // ≤ 30 rouge, 60 jaune, ≥ 90 vert
+    dot.style.backgroundColor = 'hsl(' + Math.round(Math.max(0, Math.min(120, (q - 30) * 2))) + ', 75%, 45%)';
+    const d = work.image_quality_details || {};
+    const lines = ['Qualité photo : ' + q + '/100'];
+    if (d.width_px && d.height_px) {
+      lines.push(d.width_px + ' × ' + d.height_px + ' px (' + d.megapixels + ' Mpx)');
+    }
+    if (d.laplacian_var != null) lines.push('Netteté : ' + d.laplacian_var);
+    if (d.bits_per_pixel != null) lines.push('Compression : ' + d.bits_per_pixel + ' bit/px');
+    dot.title = lines.join('\n');
+    dot.setAttribute('aria-label', 'Qualité photo ' + q + ' sur 100');
+    return dot;
+  }
+
   function attachThumbPreview(thumb, fullSrc) {
     if (!thumb || !fullSrc) return;
     thumb.style.cursor = 'zoom-in';
@@ -1549,6 +1573,7 @@
       tdId.textContent = work.id;
       const origFilename = originalFilenameLabel(work);
       if (origFilename) tdId.title = origFilename;
+      tdId.appendChild(createQualityDot(work));
       tr.appendChild(tdId);
 
       tr.appendChild(createTitleCell(work, tr));
