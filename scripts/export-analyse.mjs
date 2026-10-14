@@ -30,7 +30,7 @@ const SAME = 0.33;
 
 const photos = fs
   .readdirSync(exportDir)
-  .filter((n) => /\.(jpe?g|png|tiff?|heic)$/i.test(n) && !n.startsWith('.'))
+  .filter((n) => /\.(jpe?g|png|tiff?|heic)$/i.test(n) && !n.startsWith('._')) // « ._x » : fichiers système macOS
   .sort()
   .map((n) => path.join(exportDir, n));
 const catalogue = catalogueImages();
