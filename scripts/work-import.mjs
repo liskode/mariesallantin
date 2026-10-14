@@ -2,6 +2,7 @@
  * Import d'œuvres : ajout (nouveaux MS####) ou mise à jour image (remplacement fichier).
  * Métadonnées (séries, année, technique, format, titre) extraites du nom de fichier en mode ajout.
  */
+import { fetchAll } from './supabase-fetch-all.mjs';
 import fs from 'fs';
 import path from 'path';
 import { isFormatLikeCode, pickFormatCodeFromStem } from './parse-format-from-filename.mjs';
@@ -73,9 +74,8 @@ export function loadWorksJsonIds(worksJsonPath) {
  * @param {import('@supabase/supabase-js').SupabaseClient} supabase
  */
 export async function fetchExistingWorkIds(supabase) {
-  const { data, error } = await supabase.from('works').select('id');
-  if (error) throw error;
-  return new Set((data || []).map((r) => String(r.id).toUpperCase()));
+  const data = await fetchAll((from, to) => supabase.from('works').select('id').order('id').range(from, to));
+  return new Set(data.map((r) => String(r.id).toUpperCase()));
 }
 
 /**

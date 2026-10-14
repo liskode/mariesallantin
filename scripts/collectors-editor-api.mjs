@@ -12,6 +12,7 @@
  *   CATALOGUE_EDITOR_TOKEN  (obligatoire, dans .env)
  */
 
+import { fetchAll } from './supabase-fetch-all.mjs';
 import http from 'node:http';
 import fs from 'fs';
 import path from 'path';
@@ -153,13 +154,14 @@ async function fetchCollectorsWithCounts(supabase) {
 
   if (error) throw error;
 
-  const { data: works, error: wErr } = await supabase
-    .from('works')
-    .select('id, title, collector_code')
-    .not('collector_code', 'is', null)
-    .order('id', { ascending: true });
-
-  if (wErr) throw wErr;
+  const works = await fetchAll((from, to) =>
+    supabase
+      .from('works')
+      .select('id, title, collector_code')
+      .not('collector_code', 'is', null)
+      .order('id', { ascending: true })
+      .range(from, to)
+  );
 
   /** @type {Map<string, object[]>} */
   const worksByCollector = new Map();

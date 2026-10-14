@@ -3,6 +3,7 @@
  * API locale pour éditer les séries Supabase (service role).
  * Usage : npm run series:api  →  http://127.0.0.1:47833/
  */
+import { fetchAll } from './supabase-fetch-all.mjs';
 import http from 'node:http';
 import fs from 'fs';
 import path from 'path';
@@ -131,8 +132,9 @@ async function fetchSeriesWithCounts(supabase) {
     .order('code', { ascending: true });
   if (error) throw error;
 
-  const { data: links, error: lErr } = await supabase.from('work_series').select('series_code');
-  if (lErr) throw lErr;
+  const links = await fetchAll((from, to) =>
+    supabase.from('work_series').select('work_id, series_code').order('work_id').order('series_code').range(from, to)
+  );
 
   const counts = new Map();
   for (const row of links || []) {

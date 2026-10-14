@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { fetchAll } from '../_shared/fetch-all.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -70,11 +71,9 @@ async function fetchSeriesWithCounts(supabase: SupabaseClient) {
 
   if (error) throw error;
 
-  const { data: links, error: lErr } = await supabase
-    .from('work_series')
-    .select('series_code');
-
-  if (lErr) throw lErr;
+  const links = await fetchAll((from, to) =>
+    supabase.from('work_series').select('work_id, series_code').order('work_id').order('series_code').range(from, to)
+  );
 
   const counts = new Map<string, number>();
   for (const row of links || []) {

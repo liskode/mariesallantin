@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { fetchAll } from '../_shared/fetch-all.ts';
 
 const COLLECTOR_TYPES = new Set(['Galerie', 'Institutions', 'Particulier']);
 const CODE_RE = /^COL(\d+)$/i;
@@ -78,12 +79,14 @@ async function fetchCollectorsWithCounts(supabase: SupabaseClient) {
     .order('name', { ascending: true });
   if (error) throw error;
 
-  const { data: works, error: wErr } = await supabase
-    .from('works')
-    .select('id, title, collector_code')
-    .not('collector_code', 'is', null)
-    .order('id', { ascending: true });
-  if (wErr) throw wErr;
+  const works = await fetchAll((from, to) =>
+    supabase
+      .from('works')
+      .select('id, title, collector_code')
+      .not('collector_code', 'is', null)
+      .order('id', { ascending: true })
+      .range(from, to)
+  );
 
   const worksByCollector = new Map<string, { id: string; title: string }[]>();
   for (const row of works || []) {

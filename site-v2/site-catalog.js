@@ -162,6 +162,18 @@
     return fetchCatalogDirect(cfg);
   }
 
+  /** PostgREST plafonne à 1000 lignes : lecture par tranches (la requête doit avoir un ordre stable). */
+  async function fetchAllRows(url, headers, label) {
+    const rows = [];
+    for (let offset = 0; ; offset += 1000) {
+      const r = await fetch(url + '&limit=1000&offset=' + offset, { headers, cache: 'no-store' });
+      if (!r.ok) throw new Error('Lecture ' + label + ' Supabase : ' + r.status);
+      const page = await r.json();
+      rows.push(...page);
+      if (page.length < 1000) return rows;
+    }
+  }
+
   async function fetchCatalogDirect(cfg) {
     const base = String(cfg.supabaseUrl || '').replace(/\/$/, '');
     const key = String(cfg.anonKey || '').trim();
@@ -174,27 +186,26 @@
     const qs =
       'select=id,title,year,image_ext,filename_original,publication_status_code,sort_order,format_code,technique_code' +
       '&publication_status_code=in.(W,G)&order=sort_order.asc,id.asc';
-    const worksRes = await fetch(base + '/rest/v1/works?' + qs, { headers, cache: 'no-store' });
-    if (!worksRes.ok) throw new Error('Lecture works Supabase : ' + worksRes.status);
-
-    const worksRaw = await worksRes.json();
+    const worksRaw = await fetchAllRows(base + '/rest/v1/works?' + qs, headers, 'works');
     const publicIds = new Set(worksRaw.map((w) => w.id));
 
-    const [seriesRes, linksRes, formatsRes, techniquesRes] = await Promise.all([
+    const [seriesRes, linksRaw, formatsRes, techniquesRes] = await Promise.all([
       fetch(
         base + '/rest/v1/series?select=code,label,sort_order,icon_work_id,year_start,year_end,description&order=sort_order.asc,code.asc',
         { headers, cache: 'no-store' }
       ),
-      fetch(base + '/rest/v1/work_series?select=work_id,series_code', { headers, cache: 'no-store' }),
+      fetchAllRows(
+        base + '/rest/v1/work_series?select=work_id,series_code&order=work_id.asc,series_code.asc',
+        headers,
+        'work_series'
+      ),
       fetch(base + '/rest/v1/formats?select=code,label,width_cm,height_cm&order=sort_order.asc', { headers, cache: 'no-store' }),
       fetch(base + '/rest/v1/techniques?select=code,label&order=sort_order.asc', { headers, cache: 'no-store' }),
     ]);
     if (!seriesRes.ok) throw new Error('Lecture series Supabase : ' + seriesRes.status);
-    if (!linksRes.ok) throw new Error('Lecture work_series Supabase : ' + linksRes.status);
     if (!formatsRes.ok) throw new Error('Lecture formats Supabase : ' + formatsRes.status);
     if (!techniquesRes.ok) throw new Error('Lecture techniques Supabase : ' + techniquesRes.status);
 
-    const linksRaw = await linksRes.json();
     const seriesCodesWithWorks = new Set();
     const linksByWork = new Map();
     for (const link of linksRaw) {

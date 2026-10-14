@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { fetchAll } from '../_shared/fetch-all.ts';
 import { sortFormats } from '../_shared/format-sort.ts';
 
 const corsHeaders = {
@@ -93,10 +94,9 @@ async function fetchCodesWithCounts(supabase: SupabaseClient) {
     fetchFormats(supabase),
     fetchTechniques(supabase),
   ]);
-  const { data: works, error } = await supabase
-    .from('works')
-    .select('format_code, technique_code');
-  if (error) throw error;
+  const works = await fetchAll((from, to) =>
+    supabase.from('works').select('id, format_code, technique_code').order('id').range(from, to)
+  );
 
   const formatCounts = new Map<string, number>();
   const techniqueCounts = new Map<string, number>();

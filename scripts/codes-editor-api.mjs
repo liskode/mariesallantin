@@ -3,6 +3,7 @@
  * API locale pour éditer formats et techniques Supabase.
  * Usage : npm run codes:api  →  http://127.0.0.1:47834/
  */
+import { fetchAll } from './supabase-fetch-all.mjs';
 import http from 'node:http';
 import fs from 'fs';
 import path from 'path';
@@ -156,10 +157,9 @@ async function fetchCodesWithCounts(supabase) {
     fetchFormats(supabase),
     fetchTechniques(supabase),
   ]);
-  const { data: works, error } = await supabase
-    .from('works')
-    .select('format_code, technique_code');
-  if (error) throw error;
+  const works = await fetchAll((from, to) =>
+    supabase.from('works').select('id, format_code, technique_code').order('id').range(from, to)
+  );
 
   const formatCounts = new Map();
   const techniqueCounts = new Map();

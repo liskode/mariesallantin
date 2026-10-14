@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { fetchAll } from '../_shared/fetch-all.ts';
 import { sortFormats } from '../_shared/format-sort.ts';
 import {
   fetchExistingWorkIds,
@@ -126,19 +127,25 @@ async function fetchMeta(supabase: SupabaseClient) {
 }
 
 async function fetchWorksWithSeries(supabase: SupabaseClient) {
-  const { data: works, error } = await supabase
-    .from('works')
-    .select(
-      'id, title, year, format_code, technique_code, publication_status_code, photo_status_code, photo_credit, collector_code, width_cm, height_cm, filename_original, image_ext, sort_order, updated_at'
-    )
-    .order('sort_order', { ascending: true })
-    .order('id', { ascending: true });
-  if (error) throw error;
+  const works = await fetchAll((from, to) =>
+    supabase
+      .from('works')
+      .select(
+        'id, title, year, format_code, technique_code, publication_status_code, photo_status_code, photo_credit, collector_code, width_cm, height_cm, filename_original, image_ext, sort_order, updated_at'
+      )
+      .order('sort_order', { ascending: true })
+      .order('id', { ascending: true })
+      .range(from, to)
+  );
 
-  const { data: links, error: lErr } = await supabase
-    .from('work_series')
-    .select('work_id, series_code');
-  if (lErr) throw lErr;
+  const links = await fetchAll((from, to) =>
+    supabase
+      .from('work_series')
+      .select('work_id, series_code')
+      .order('work_id')
+      .order('series_code')
+      .range(from, to)
+  );
 
   const byWork = new Map<string, string[]>();
   for (const row of links || []) {

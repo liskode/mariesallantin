@@ -3,6 +3,7 @@
  * API locale pour éditer les tableaux (works) Supabase.
  * Usage : npm run works:api  →  http://127.0.0.1:47835/
  */
+import { fetchAll } from './supabase-fetch-all.mjs';
 import http from 'node:http';
 import fs from 'fs';
 import path from 'path';
@@ -227,19 +228,20 @@ async function fetchMeta(supabase) {
 }
 
 async function fetchWorksWithSeries(supabase) {
-  const { data: works, error } = await supabase
-    .from('works')
-    .select(
-      'id, title, year, format_code, technique_code, publication_status_code, photo_status_code, photo_credit, collector_code, width_cm, height_cm, filename_original, image_ext, sort_order, updated_at'
-    )
-    .order('sort_order', { ascending: true })
-    .order('id', { ascending: true });
-  if (error) throw error;
+  const works = await fetchAll((from, to) =>
+    supabase
+      .from('works')
+      .select(
+        'id, title, year, format_code, technique_code, publication_status_code, photo_status_code, photo_credit, collector_code, width_cm, height_cm, filename_original, image_ext, sort_order, updated_at'
+      )
+      .order('sort_order', { ascending: true })
+      .order('id', { ascending: true })
+      .range(from, to)
+  );
 
-  const { data: links, error: lErr } = await supabase
-    .from('work_series')
-    .select('work_id, series_code');
-  if (lErr) throw lErr;
+  const links = await fetchAll((from, to) =>
+    supabase.from('work_series').select('work_id, series_code').order('work_id').order('series_code').range(from, to)
+  );
 
   const byWork = new Map();
   for (const row of links || []) {

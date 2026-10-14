@@ -1,4 +1,5 @@
 import { createClient, type SupabaseClient } from 'https://esm.sh/@supabase/supabase-js@2.49.8';
+import { fetchAll } from '../_shared/fetch-all.ts';
 
 const PUBLIC_STATUSES = ['W', 'G'];
 
@@ -164,28 +165,33 @@ async function fetchEvents(supabase: SupabaseClient) {
 }
 
 async function fetchCatalog(supabase: SupabaseClient) {
-  const [worksRes, seriesRes, linksRes, formatsRes, techniquesRes] = await Promise.all([
-    supabase
-      .from('works')
-      .select(
-        'id, title, year, image_ext, filename_original, publication_status_code, sort_order, format_code, technique_code'
-      )
-      .in('publication_status_code', PUBLIC_STATUSES)
-      .order('sort_order', { ascending: true })
-      .order('id', { ascending: true }),
+  const [worksData, seriesRes, linksData, formatsRes, techniquesRes] = await Promise.all([
+    fetchAll((from, to) =>
+      supabase
+        .from('works')
+        .select(
+          'id, title, year, image_ext, filename_original, publication_status_code, sort_order, format_code, technique_code'
+        )
+        .in('publication_status_code', PUBLIC_STATUSES)
+        .order('sort_order', { ascending: true })
+        .order('id', { ascending: true })
+        .range(from, to)
+    ),
     supabase
       .from('series')
       .select('code, label, sort_order, icon_work_id, year_start, year_end, description')
       .order('sort_order', { ascending: true })
       .order('code', { ascending: true }),
-    supabase.from('work_series').select('work_id, series_code'),
+    fetchAll((from, to) =>
+      supabase.from('work_series').select('work_id, series_code').order('work_id').order('series_code').range(from, to)
+    ),
     supabase.from('formats').select('code, label, width_cm, height_cm').order('sort_order', { ascending: true }),
     supabase.from('techniques').select('code, label').order('sort_order', { ascending: true }),
   ]);
 
-  if (worksRes.error) throw worksRes.error;
+  const worksRes = { data: worksData };
+  const linksRes = { data: linksData };
   if (seriesRes.error) throw seriesRes.error;
-  if (linksRes.error) throw linksRes.error;
   if (formatsRes.error) throw formatsRes.error;
   if (techniquesRes.error) throw techniquesRes.error;
 
