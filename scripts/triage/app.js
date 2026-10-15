@@ -3,7 +3,7 @@
   'use strict';
 
   const PAGE_SIZE = 40;
-  const CAT_LABELS = { duplicate: 'Doublon', new: 'Nouvelle', situ: 'Autre photo', ignore: 'Écarter' };
+  const CAT_LABELS = { duplicate: 'Doublon', new: 'Nouvelle', situ: 'Autre photo', ignore: 'Écarter', unsure: 'À revoir' };
   const CAT_KEYS = { d: 'duplicate', n: 'new', s: 'situ', x: 'ignore' };
   const SITU_TYPES = { A: 'Atelier', E: 'Exposition', C: 'Chez un collectionneur', M: 'Combinaison de tableaux', D: 'Détail', X: 'Autre' };
 
@@ -69,6 +69,7 @@
     ['maybe', 'Peut-être une autre photo', (g, s) => s.category === 'new' && g.maybe_situ],
     ['situ', 'Autres photos', (g, s) => s.category === 'situ'],
     ['ignore', 'Écartées', (g, s) => s.category === 'ignore'],
+    ['unsure', 'À revoir (cas compliqués)', (g, s) => s.category === 'unsure'],
     ['imported', 'Importées', (g) => !!imported[g.id]],
   ];
 

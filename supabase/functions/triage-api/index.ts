@@ -41,8 +41,9 @@ function createSupabase(): SupabaseClient {
   return createClient(url, key, { auth: { persistSession: false } });
 }
 
-const CATEGORIES = new Set(['duplicate', 'new', 'situ', 'ignore']);
-const DECISION_KEYS = new Set(['category', 'work', 'keep', 'replace', 'best', 'situ_works', 'situ_type', 'caption', 'later', 'title', 'meta']);
+// « unsure » : cas compliqué mis de côté (à revoir), ignoré par l'import
+const CATEGORIES = new Set(['duplicate', 'new', 'situ', 'ignore', 'unsure']);
+const DECISION_KEYS = new Set(['category', 'work', 'keep', 'replace', 'best', 'situ_works', 'situ_type', 'caption', 'later', 'title', 'meta', 'note']);
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -84,7 +85,8 @@ Deno.serve(async (req) => {
           .range(from, to)
       );
       const done = decided.filter((d: Record<string, unknown>) => d.category).length;
-      return jsonResponse(200, { ok: true, export: exp.id, label: exp.label, total, done, remaining: Math.max(0, total - done) });
+      const unsure = decided.filter((d: Record<string, unknown>) => d.category === 'unsure').length;
+      return jsonResponse(200, { ok: true, export: exp.id, label: exp.label, total, done, unsure, remaining: Math.max(0, total - done) });
     }
 
     if (req.method === 'GET' && path === '/api/triage') {
