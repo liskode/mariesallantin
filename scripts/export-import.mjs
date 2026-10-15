@@ -99,7 +99,8 @@ export async function importNewGroups(opts) {
     const workId = formatWorkId(nextNum);
     const m = group.meta || {};
     const item = {
-      title: m.title || '',
+      // Titre saisi ou corrigé dans la page de tri, sinon titre décodé du nom de fichier
+      title: (typeof decision.title === 'string' && decision.title.trim()) || m.title || '',
       year: m.year || null,
       formatCode: m.format || null,
       techniqueCode: m.technique || null,

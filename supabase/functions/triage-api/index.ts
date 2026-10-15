@@ -42,7 +42,7 @@ function createSupabase(): SupabaseClient {
 }
 
 const CATEGORIES = new Set(['duplicate', 'new', 'situ', 'ignore']);
-const DECISION_KEYS = new Set(['category', 'work', 'keep', 'replace', 'best', 'situ_works', 'situ_type', 'caption', 'later']);
+const DECISION_KEYS = new Set(['category', 'work', 'keep', 'replace', 'best', 'situ_works', 'situ_type', 'caption', 'later', 'title']);
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
