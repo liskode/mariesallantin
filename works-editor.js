@@ -795,7 +795,7 @@
   }
 
   if (twinsDialog) {
-    document.getElementById('works-twins-btn').addEventListener('click', () => {
+    document.getElementById('works-twins-btn')?.addEventListener('click', () => {
       if (dirtyIds.size) {
         setStatus('Enregistrez d\u2019abord vos modifications en cours avant de traiter les doublons.', true);
         return;
