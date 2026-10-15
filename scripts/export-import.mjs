@@ -173,7 +173,11 @@ export async function importNewGroups(opts) {
   return { imported: done, remaining: pending.length - done.length };
 }
 
-/** Doublons pour lesquels « remplacer la photo » est coché et pas encore fait. */
+/** Une décision « doublon » demande-t-elle quelque chose (photo remplacée ou fiche corrigée) ? */
+const replacesPhoto = (d) => d.replace === true || (!!d.keep && d.keep !== 'catalogue');
+const editsRecord = (d) => typeof d.title === 'string' || (d.meta && typeof d.meta === 'object' && Object.keys(d.meta).length > 0);
+
+/** Doublons à traiter : photo à remplacer et/ou fiche du catalogue à corriger, pas encore faits. */
 export function pendingReplacements(exportDir) {
   const work = path.join(exportDir, '_baseart');
   const triage = readJson(path.join(work, 'triage.json'), { groups: [] });
@@ -183,9 +187,8 @@ export function pendingReplacements(exportDir) {
     .filter((g) => !imported[g.id])
     .filter((g) => {
       const d = decisions[g.id] || {};
-      // « Remplacer » coché (page locale) ou photo de l'export gardée à la place de celle du catalogue (page en ligne)
-      const keepsExportPhoto = !!d.keep && d.keep !== 'catalogue';
-      return (d.category || g.proposal) === 'duplicate' && (d.replace === true || keepsExportPhoto) && (d.work !== undefined ? d.work : g.work);
+      // « Remplacer » coché (page locale), photo de l'export gardée (page en ligne) ou fiche corrigée
+      return (d.category || g.proposal) === 'duplicate' && (replacesPhoto(d) || editsRecord(d)) && (d.work !== undefined ? d.work : g.work);
     })
     .map((g) => {
       const d = decisions[g.id] || {};
@@ -220,60 +223,94 @@ export async function replacePhotos(opts) {
   for (const { group, decision, workId } of batch) {
     const bestName = decision.best || group.photos[0].name;
     const srcAbs = path.join(exportDir, bestName);
+    const withPhoto = replacesPhoto(decision);
     const { data: row, error: rErr } = await supabase.from('works').select('id').eq('id', workId).maybeSingle();
     if (rErr) throw rErr;
-    if (!row || !fs.existsSync(srcAbs)) {
+    if (!row || (withPhoto && !fs.existsSync(srcAbs))) {
       log(`  ${group.id} : ${!row ? 'œuvre ' + workId + ' introuvable' : 'photo introuvable'}, ignoré`);
       continue;
     }
     if (dryRun) {
-      log(`  ${group.id} → ${workId} : nouvelle photo ${bestName} (simulation)`);
+      log(`  ${group.id} → ${workId} : ${withPhoto ? 'nouvelle photo ' + bestName : ''}${editsRecord(decision) ? ' fiche corrigée' : ''} (simulation)`);
       done.push({ group: group.id, work: workId });
       continue;
     }
-    // Archive l'ancienne image, sa miniature et l'ancien original
-    for (const name of fs.readdirSync(catalogueDir)) {
-      if (belongs(name, workId) && fs.statSync(path.join(catalogueDir, name)).isFile()) {
-        await moveFile(path.join(catalogueDir, name), path.join(archiveDir, 'catalogue', name));
+    if (withPhoto) {
+      // Archive l'ancienne image, sa miniature et l'ancien original
+      for (const name of fs.readdirSync(catalogueDir)) {
+        if (belongs(name, workId) && fs.statSync(path.join(catalogueDir, name)).isFile()) {
+          await moveFile(path.join(catalogueDir, name), path.join(archiveDir, 'catalogue', name));
+        }
       }
-    }
-    const thumbDir = path.join(catalogueDir, '_thumbs');
-    for (const name of fs.existsSync(thumbDir) ? fs.readdirSync(thumbDir) : []) {
-      if (belongs(name, workId)) await moveFile(path.join(thumbDir, name), path.join(archiveDir, 'catalogue', '_thumbs', name));
-    }
-    for (const name of fs.existsSync(origDir) ? fs.readdirSync(origDir) : []) {
-      if (belongs(name, workId)) await moveFile(path.join(origDir, name), path.join(archiveDir, 'originaux', name));
+      const thumbDir = path.join(catalogueDir, '_thumbs');
+      for (const name of fs.existsSync(thumbDir) ? fs.readdirSync(thumbDir) : []) {
+        if (belongs(name, workId)) await moveFile(path.join(thumbDir, name), path.join(archiveDir, 'catalogue', '_thumbs', name));
+      }
+      for (const name of fs.existsSync(origDir) ? fs.readdirSync(origDir) : []) {
+        if (belongs(name, workId)) await moveFile(path.join(origDir, name), path.join(archiveDir, 'originaux', name));
+      }
+
+      // Nouvelle photo
+      const mediaRel = `catalogue/${workId}.jpeg`;
+      const webAbs = path.join(mediaRoot, 'catalogue', workId + '.jpeg');
+      await makeWebVersion(srcAbs, webAbs);
+      await generateThumbnailForMedia(mediaRoot, mediaRel);
+      const measures = await measureImage(sharp, srcAbs);
+      const webBuf = await fs.promises.readFile(webAbs);
+      const { error } = await supabase
+        .from('works')
+        .update({
+          image_ext: 'jpeg',
+          filename_original: bestName,
+          image_quality: qualityScore(measures),
+          image_quality_details: measures,
+          file_sha256: sha256Buffer(webBuf),
+          phash: await computeDHash(sharp, webBuf),
+          file_size_bytes: webBuf.length,
+        })
+        .eq('id', workId);
+      if (error) throw new Error(`${workId} : ${error.message}`);
+      appendWorksJsonEntries(worksJsonPath, [{ id: workId, media: mediaRel }]);
+      await fs.promises.mkdir(origDir, { recursive: true });
+      await fs.promises.copyFile(srcAbs, path.join(origDir, workId + (path.extname(bestName).toLowerCase() || '.jpeg')));
+
     }
 
-    // Nouvelle photo
-    const mediaRel = `catalogue/${workId}.jpeg`;
-    const webAbs = path.join(mediaRoot, 'catalogue', workId + '.jpeg');
-    await makeWebVersion(srcAbs, webAbs);
-    await generateThumbnailForMedia(mediaRoot, mediaRel);
-    const measures = await measureImage(sharp, srcAbs);
-    const webBuf = await fs.promises.readFile(webAbs);
-    const { error } = await supabase
-      .from('works')
-      .update({
-        image_ext: 'jpeg',
-        filename_original: bestName,
-        image_quality: qualityScore(measures),
-        image_quality_details: measures,
-        file_sha256: sha256Buffer(webBuf),
-        phash: await computeDHash(sharp, webBuf),
-        file_size_bytes: webBuf.length,
-      })
-      .eq('id', workId);
-    if (error) throw new Error(`${workId} : ${error.message}`);
-    appendWorksJsonEntries(worksJsonPath, [{ id: workId, media: mediaRel }]);
-    await fs.promises.mkdir(origDir, { recursive: true });
-    await fs.promises.copyFile(srcAbs, path.join(origDir, workId + (path.extname(bestName).toLowerCase() || '.jpeg')));
+    // Corrections de la fiche du catalogue (seulement les champs modifiés dans la page de tri)
+    const edited = editsRecord(decision);
+    if (edited) {
+      const em = decision.meta || {};
+      const patch = {};
+      if (typeof decision.title === 'string') patch.title = decision.title.trim();
+      const map = { year: 'year', format: 'format_code', technique: 'technique_code', width_cm: 'width_cm', height_cm: 'height_cm' };
+      for (const [k, col] of Object.entries(map)) if (Object.prototype.hasOwnProperty.call(em, k)) patch[col] = em[k] ?? null;
+      if (Object.keys(patch).length) {
+        patch.updated_at = new Date().toISOString();
+        const { error: uErr } = await supabase.from('works').update(patch).eq('id', workId);
+        if (uErr) throw new Error(`${workId} fiche : ${uErr.message}`);
+      }
+      if (Array.isArray(em.series)) {
+        const { error: dErr } = await supabase.from('work_series').delete().eq('work_id', workId);
+        if (dErr) throw dErr;
+        if (em.series.length) {
+          const { error: sErr } = await supabase.from('work_series').insert(em.series.map((series_code) => ({ work_id: workId, series_code })));
+          if (sErr) throw new Error(`${workId} séries : ${sErr.message}`);
+        }
+      }
+      if (patch.title !== undefined) appendWorksJsonEntries(worksJsonPath, [{ id: workId, title: patch.title }]);
+    }
 
     const imported = readJson(importedPath, {});
-    imported[group.id] = { work: workId, photo: bestName, replaced: true, at: new Date().toISOString() };
+    imported[group.id] = {
+      work: workId,
+      photo: withPhoto ? bestName : null,
+      replaced: withPhoto,
+      edited,
+      at: new Date().toISOString(),
+    };
     writeJson(importedPath, imported);
     done.push({ group: group.id, work: workId });
-    log(`  ${group.id} → ${workId} : photo remplacée par ${bestName}`);
+    log(`  ${group.id} → ${workId} :${withPhoto ? ' photo remplacée par ' + bestName : ''}${edited ? ' fiche corrigée' : ''}`);
   }
   return { replaced: done, remaining: pending.length - done.length };
 }

@@ -296,7 +296,7 @@
     $('replace-btn').disabled = !!s.busy || !s.pending_replace;
     $('photos-btn').disabled = !!s.busy || !s.pending_photos;
     $('photos-btn').textContent = 'Ajouter les autres photos (' + s.pending_photos + ')';
-    $('replace-btn').textContent = 'Remplacer les photos cochées (' + s.pending_replace + ')';
+    $('replace-btn').textContent = 'Traiter les doublons — photos / fiches (' + s.pending_replace + ')';
     $('import-btn').disabled = !!s.busy || !pending;
     $('publish-btn').disabled = !!s.busy || !s.to_publish;
   }
@@ -331,10 +331,10 @@
     render();
   });
   $('replace-btn').addEventListener('click', async () => {
-    if (!confirm('Remplacer la photo de référence des œuvres cochées (anciennes photos archivées, informations des fiches conservées) ?')) return;
+    if (!confirm('Traiter les doublons : photos de référence remplacées (anciennes archivées) et corrections de fiche appliquées ?')) return;
     const j = await runAction('api/replace', 'Remplacement en cours');
     for (const x of j.replaced) imported[x.group] = { work: x.work, replaced: true };
-    $('import-msg').textContent = j.replaced.length + ' photo(s) remplacée(s). Vérifiez-les dans l\u2019éditeur puis publiez.';
+    $('import-msg').textContent = j.replaced.length + ' doublon(s) traité(s). Vérifiez-les dans l\u2019éditeur puis publiez.';
     render();
   });
   $('validate-page').addEventListener('click', async () => {

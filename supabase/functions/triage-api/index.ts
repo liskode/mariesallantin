@@ -107,8 +107,22 @@ Deno.serve(async (req) => {
           .range(from, to)
       );
       const works = await fetchAll((from, to) =>
-        supabase.from('works').select('id, title, year, image_quality').order('id').range(from, to)
+        supabase
+          .from('works')
+          .select('id, title, year, image_quality, format_code, technique_code, width_cm, height_cm')
+          .order('id')
+          .range(from, to)
       );
+      // Séries de chaque œuvre (fiche d'un doublon pré-remplie avec celle du catalogue)
+      const links = await fetchAll((from, to) =>
+        supabase.from('work_series').select('work_id, series_code').order('work_id').order('series_code').range(from, to)
+      );
+      const seriesByWork = new Map<string, string[]>();
+      for (const l of links) {
+        if (!seriesByWork.has(l.work_id)) seriesByWork.set(l.work_id, []);
+        seriesByWork.get(l.work_id)!.push(l.series_code);
+      }
+      for (const w of works) w.series_codes = seriesByWork.get(w.id) || [];
       const [series, formats, techniques] = await Promise.all([
         supabase.from('series').select('code, label').order('code'),
         supabase.from('formats').select('code, label, width_cm, height_cm').order('sort_order').order('code'),
