@@ -838,6 +838,27 @@
     });
   }
 
+  /** Bouton rouge « N photos à trier » (page de tri en ligne), masqué s'il n'y a rien à trier. */
+  async function refreshTriageCount() {
+    const link = document.getElementById('works-tri-link');
+    if (!link || !token) return;
+    try {
+      const cfg = await loadSiteConfig();
+      const base = String(cfg.triageApiUrl || String(cfg.supabaseUrl || '').replace(/\/$/, '') + '/functions/v1/triage-api').replace(/\/$/, '');
+      const r = await serviceApiFetch(base, '/api/triage/summary?token=' + encodeURIComponent(token));
+      const j = await r.json();
+      if (!r.ok || !j.ok || !j.remaining) {
+        link.hidden = true;
+        return;
+      }
+      link.textContent = j.remaining.toLocaleString('fr-FR') + ' photo' + (j.remaining > 1 ? 's' : '') + ' à trier';
+      link.title = 'Tri des photos de la photothèque : ' + j.done + ' traitée(s) sur ' + j.total + ' — ouvrir la page de tri';
+      link.hidden = false;
+    } catch {
+      link.hidden = true;
+    }
+  }
+
   function setStatus(msg, isError) {
     if (!statusEl) return;
     statusEl.textContent = msg || '';
@@ -1945,6 +1966,7 @@
       setStatus('');
       updateLocalStudioUi();
       await checkLocalApiCapabilities();
+      refreshTriageCount();
     } catch (e) {
       setStatus(String(e.message || e), true);
     }

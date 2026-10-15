@@ -2949,4 +2949,6 @@ body[data-editor-tab="works"] .editor-tabs-nav {
 .works-twins-series { grid-column: span 2; display: flex; flex-wrap: wrap; gap: 4px 12px; }
 @media (max-width: 640px) { .works-twins-grid { grid-template-columns: 1fr 1fr; } .works-twins-label { grid-column: span 2; } .works-twins-grid > div:first-child { display: none; } }
 
-.works-tri-toolbar-link { text-decoration: none; font-size: 13px; white-space: nowrap; }
+.works-tri-toolbar-link { text-decoration: none; font-size: 13px; font-weight: 600; white-space: nowrap; background: #c62828; border-color: #c62828; color: #fff; }
+.works-tri-toolbar-link:hover, .works-tri-toolbar-link:focus-visible { background: #a31f1f; border-color: #a31f1f; color: #fff; }
+.works-tri-toolbar-link[hidden] { display: none; }

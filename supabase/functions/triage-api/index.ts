@@ -62,6 +62,31 @@ Deno.serve(async (req) => {
       return jsonResponse(200, { ok: true, exports: data || [] });
     }
 
+    // Décompte pour le bouton de l'éditeur : cartes restant à traiter dans le dernier export
+    if (req.method === 'GET' && path === '/api/triage/summary') {
+      if (!checkToken(url.searchParams.get('token') || '')) return jsonResponse(403, { ok: false, error: 'token incorrect' });
+      const supabase = createSupabase();
+      const { data: exp, error } = await supabase
+        .from('photo_triage_exports')
+        .select('id, label, triage->groups')
+        .order('updated_at', { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (error) throw error;
+      if (!exp) return jsonResponse(200, { ok: true, export: null, total: 0, done: 0, remaining: 0 });
+      const total = Array.isArray(exp.groups) ? exp.groups.length : 0;
+      const decided = await fetchAll((from, to) =>
+        supabase
+          .from('photo_triage_decisions')
+          .select('group_id, decision->category')
+          .eq('export_id', exp.id)
+          .order('group_id')
+          .range(from, to)
+      );
+      const done = decided.filter((d: Record<string, unknown>) => d.category).length;
+      return jsonResponse(200, { ok: true, export: exp.id, label: exp.label, total, done, remaining: Math.max(0, total - done) });
+    }
+
     if (req.method === 'GET' && path === '/api/triage') {
       if (!checkToken(url.searchParams.get('token') || '')) return jsonResponse(403, { ok: false, error: 'token incorrect' });
       const exportId = url.searchParams.get('export') || '';

@@ -10,7 +10,7 @@
   <meta name="works-api" content="https://leezsypadtvypdgqgvtk.supabase.co/functions/v1/works-api" />
   <meta name="supabase-anon-key" content="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxlZXpzeXBhZHR2eXBkZ3FndnRrIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODIzNTk3MTYsImV4cCI6MjA5NzkzNTcxNn0.kzN9eL5fhbFLECWD4PMPXjTHSYh-KJsbjCcPrwJoaTo" />
   <title>Interface d'édition des fichiers du catalogue</title>
-  <link rel="stylesheet" href="catalogue.css?v=20250929-1" />
+  <link rel="stylesheet" href="catalogue.css?v=20261015-1" />
   <link rel="icon" type="image/png" href="images/logo-artmajeur.png" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
 </head>
@@ -119,7 +119,10 @@
               <button type="button" class="legend-editor-btn works-import-toolbar-btn" id="works-import-btn" aria-label="Importer des œuvres" title="Importer des œuvres (studio local : npm run works:import)">
                 <img src="images/import.png" alt="" class="legend-editor-btn-picto" width="16" height="16" />
               </button>
-              <a class="legend-editor-btn works-tri-toolbar-link" href="https://catalogue.mariesallantin.art/tri-photos.html" target="_blank" rel="noopener" title="Trier les photos à importer (photothèque) : doublons, nouvelles œuvres, autres photos">Tri des photos</a>
+              <button type="button" class="legend-editor-btn works-twins-toolbar-btn" id="works-twins-btn" aria-label="Doublons possibles" title="Doublons possibles : comparer et fusionner les fiches">
+                <span class="works-twins-picto" aria-hidden="true">♊&#xFE0E;</span>
+              </button>
+              <a class="legend-editor-btn works-tri-toolbar-link" id="works-tri-link" href="https://catalogue.mariesallantin.art/tri-photos.html" target="_blank" rel="noopener" hidden title="Trier les photos à importer (photothèque) : doublons, nouvelles œuvres, autres photos">Photos à trier</a>
               <button type="button" class="legend-editor-btn works-publish-toolbar-btn" id="works-publish-btn" hidden title="Publier les médias sur mariesallantin.art (git push)">
                 Publier médias
               </button>
@@ -379,6 +382,6 @@
   </dialog>
 
   <script src="editor-common.js?v=20250702-1"></script>
-  <script src="works-editor.js?v=20250929-1"></script>
+  <script src="works-editor.js?v=20261015-1"></script>
 </body>
 </html>
