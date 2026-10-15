@@ -128,7 +128,7 @@ function inside(dir, rel) {
   return abs.startsWith(path.resolve(dir) + path.sep) ? abs : null;
 }
 
-const DECISION_KEYS = new Set(['category', 'work', 'keep', 'replace', 'best', 'situ_works', 'situ_type', 'caption', 'later', 'title']);
+const DECISION_KEYS = new Set(['category', 'work', 'keep', 'replace', 'best', 'situ_works', 'situ_type', 'caption', 'later', 'title', 'meta']);
 const CATEGORIES = new Set(['duplicate', 'new', 'situ', 'ignore']);
 
 const server = http.createServer(async (req, res) => {

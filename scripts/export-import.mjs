@@ -98,13 +98,15 @@ export async function importNewGroups(opts) {
     }
     const workId = formatWorkId(nextNum);
     const m = group.meta || {};
+    // Fiche saisie ou corrigée dans la page de tri, sinon informations décodées du nom de fichier
+    const edited = decision.meta && typeof decision.meta === 'object' ? decision.meta : {};
+    const pick = (k, fallback) => (Object.prototype.hasOwnProperty.call(edited, k) ? edited[k] : fallback);
     const item = {
-      // Titre saisi ou corrigé dans la page de tri, sinon titre décodé du nom de fichier
       title: (typeof decision.title === 'string' && decision.title.trim()) || m.title || '',
-      year: m.year || null,
-      formatCode: m.format || null,
-      techniqueCode: m.technique || null,
-      seriesCodes: m.series || [],
+      year: pick('year', m.year || null),
+      formatCode: pick('format', m.format || null),
+      techniqueCode: pick('technique', m.technique || null),
+      seriesCodes: Array.isArray(edited.series) ? edited.series : m.series || [],
     };
     const built = buildWorkRecordsFromPlanItem({
       workId,
@@ -114,6 +116,8 @@ export async function importNewGroups(opts) {
       item,
     });
     built.dbRow.filename_original = bestName;
+    if (edited.width_cm) built.dbRow.width_cm = Number(edited.width_cm) || null;
+    if (edited.height_cm) built.dbRow.height_cm = Number(edited.height_cm) || null;
     if (dryRun) {
       log(`  ${group.id} → ${workId} : ${bestName} (simulation)`);
       done.push({ group: group.id, work: workId });

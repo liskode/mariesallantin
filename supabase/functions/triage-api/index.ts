@@ -42,7 +42,7 @@ function createSupabase(): SupabaseClient {
 }
 
 const CATEGORIES = new Set(['duplicate', 'new', 'situ', 'ignore']);
-const DECISION_KEYS = new Set(['category', 'work', 'keep', 'replace', 'best', 'situ_works', 'situ_type', 'caption', 'later', 'title']);
+const DECISION_KEYS = new Set(['category', 'work', 'keep', 'replace', 'best', 'situ_works', 'situ_type', 'caption', 'later', 'title', 'meta']);
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
@@ -84,7 +84,19 @@ Deno.serve(async (req) => {
       const works = await fetchAll((from, to) =>
         supabase.from('works').select('id, title, year, image_quality').order('id').range(from, to)
       );
-      return jsonResponse(200, { ok: true, export: exp, decisions, works });
+      const [series, formats, techniques] = await Promise.all([
+        supabase.from('series').select('code, label').order('code'),
+        supabase.from('formats').select('code, label, width_cm, height_cm').order('sort_order').order('code'),
+        supabase.from('techniques').select('code, label').order('code'),
+      ]);
+      for (const r of [series, formats, techniques]) if (r.error) throw r.error;
+      return jsonResponse(200, {
+        ok: true,
+        export: exp,
+        decisions,
+        works,
+        meta: { series: series.data || [], formats: formats.data || [], techniques: techniques.data || [] },
+      });
     }
 
     if (req.method === 'POST' && path === '/api/triage/decision') {
