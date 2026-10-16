@@ -295,8 +295,9 @@
       pending + ' nouvelle(s) à importer' + (withAuto ? ' (dont propositions non vues)' : ' (validées)') +
       ' · ' + s.pending_replace + ' photo(s) à remplacer · ' + s.imported + ' traitée(s) · ' + s.to_publish + ' fichier(s) à publier';
     $('replace-btn').disabled = !!s.busy || !s.pending_replace;
-    $('photos-btn').disabled = !!s.busy || !s.pending_photos;
-    $('photos-btn').textContent = 'Ajouter les autres photos (' + s.pending_photos + ')';
+    const photos = s.pending_photos + ($('include-later').checked ? s.pending_photos_later : 0);
+    $('photos-btn').disabled = !!s.busy || !photos;
+    $('photos-btn').textContent = 'Ajouter les autres photos (' + photos + ')' + (s.pending_photos_later ? ' — ' + s.pending_photos_later + ' à rattacher en attente' : '');
     $('replace-btn').textContent = 'Traiter les doublons — photos / fiches (' + s.pending_replace + ')';
     $('import-btn').disabled = !!s.busy || !pending;
     $('publish-btn').disabled = !!s.busy || !s.to_publish;
@@ -324,9 +325,10 @@
     render();
   });
   $('include-unreviewed').addEventListener('change', refreshImportStatus);
+  $('include-later').addEventListener('change', refreshImportStatus);
   $('photos-btn').addEventListener('click', async () => {
     if (!confirm('Ajouter les autres photos validées (atelier, exposition, combinaison, détail…) et les rattacher à leurs œuvres ?')) return;
-    const j = await runAction('api/photos', 'Ajout des autres photos en cours');
+    const j = await runAction('api/photos', 'Ajout des autres photos en cours', { include_later: $('include-later').checked });
     for (const x of j.added) imported[x.group] = { photo_id: x.photo_id, work: x.works.join(' ') };
     $('import-msg').textContent = j.added.length + ' photo(s) ajoutée(s).' + (j.remaining ? ' ' + j.remaining + ' restante(s).' : '');
     render();

@@ -317,8 +317,12 @@ export async function replacePhotos(opts) {
 
 export const PHOTO_MAX_SIDE = 2048;
 
-/** Groupes triés « autre photo » (décision explicite) avec au moins une œuvre rattachée, pas encore importés. */
-export function pendingOtherPhotos(exportDir) {
+/**
+ * Groupes triés « autre photo » (décision explicite), pas encore importés, rattachés à au moins une œuvre.
+ * Les photos « rattacher plus tard » attendent dans la page de tri (filtre « Autres photos à rattacher »),
+ * sauf si includeLater : elles sont alors importées sans rattachement.
+ */
+export function pendingOtherPhotos(exportDir, { includeLater = false } = {}) {
   const work = path.join(exportDir, '_baseart');
   const triage = readJson(path.join(work, 'triage.json'), { groups: [] });
   const decisions = readJson(path.join(work, 'decisions.json'), {});
@@ -326,8 +330,7 @@ export function pendingOtherPhotos(exportDir) {
   return triage.groups
     .filter((g) => !imported[g.id] && decisions[g.id]?.category === 'situ')
     .map((g) => ({ group: g, decision: decisions[g.id] }))
-    // Rattachée à au moins une œuvre, ou gardée « on verra plus tard » (sans rattachement pour l'instant)
-    .filter(({ decision }) => (Array.isArray(decision.situ_works) && decision.situ_works.length) || decision.later === true);
+    .filter(({ decision }) => (Array.isArray(decision.situ_works) && decision.situ_works.length) || (includeLater && decision.later === true));
 }
 
 /**
@@ -336,9 +339,9 @@ export function pendingOtherPhotos(exportDir) {
  * fiche work_photos + liens vers les œuvres.
  */
 export async function importOtherPhotos(opts) {
-  const { root, exportDir, supabase, limit = 50, dryRun = false, log = console.log } = opts;
+  const { root, exportDir, supabase, limit = 50, dryRun = false, includeLater = false, log = console.log } = opts;
   const importedPath = path.join(exportDir, '_baseart', 'imported.json');
-  const pending = pendingOtherPhotos(exportDir);
+  const pending = pendingOtherPhotos(exportDir, { includeLater });
   const batch = pending.slice(0, limit);
   const mediaRoot = path.join(root, 'media');
   const origDir = path.join(originalsDir(root), 'autres-photos');

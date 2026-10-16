@@ -161,6 +161,7 @@ const server = http.createServer(async (req, res) => {
           pending_new_unreviewed: pendingNewGroups(exportDir, { includeUnreviewed: true }).length,
           pending_replace: pendingReplacements(exportDir).length,
           pending_photos: pendingOtherPhotos(exportDir).length,
+          pending_photos_later: pendingOtherPhotos(exportDir, { includeLater: true }).length - pendingOtherPhotos(exportDir).length,
           imported: Object.keys(readImported()).length,
           to_publish: paths.length,
         });
@@ -213,7 +214,10 @@ const server = http.createServer(async (req, res) => {
         if (url.pathname === '/api/photos') {
           busy = 'autres photos';
           const log = [];
-          const result = await importOtherPhotos({ root, exportDir, supabase, limit: 50, log: (m) => { log.push(m); console.error(m); } });
+          const result = await importOtherPhotos({
+            root, exportDir, supabase, limit: 50, includeLater: !!body.include_later,
+            log: (m) => { log.push(m); console.error(m); },
+          });
           return sendJson(res, 200, { ok: true, ...result, log });
         }
         busy = 'publication';
