@@ -69,7 +69,7 @@
     ['maybe', 'Peut-être une autre photo', (g, s) => s.category === 'new' && g.maybe_situ],
     ['situ', 'Autres photos', (g, s) => s.category === 'situ'],
     ['ignore', 'Écartées', (g, s) => s.category === 'ignore'],
-    ['unsure', 'À revoir (cas compliqués)', (g, s) => s.category === 'unsure'],
+    ['unsure', 'À revoir (Je ne sais pas)', (g, s) => s.category === 'unsure'],
     ['imported', 'Importées', (g) => !!imported[g.id]],
   ];
 
